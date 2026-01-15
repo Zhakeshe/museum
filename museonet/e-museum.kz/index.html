@@ -184,6 +184,87 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 <link rel='stylesheet' id='elementor-post-1081-css' href='wp-content/uploads/sites/11/elementor/css/post-1081baf0.css?ver=1766506447' media='all' />
 <link rel='stylesheet' id='elementor-gf-nunitosans-css' href='https://fonts.googleapis.com/css?family=Nunito+Sans:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&amp;display=auto&amp;subset=cyrillic' media='all' />
 <link rel='stylesheet' id='elementor-gf-roboto-css' href='https://fonts.googleapis.com/css?family=Roboto:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&amp;display=auto&amp;subset=cyrillic' media='all' />
+<style>
+	.elementor-442 .elementor-element.elementor-element-01cbb60 {
+		position: fixed;
+		left: 50%;
+		bottom: 24px;
+		transform: translateX(-50%);
+		z-index: 999;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-01cbb60 .elementor-nav-menu--main {
+		background: rgba(35, 35, 35, 0.9);
+		border-radius: 18px;
+		padding: 12px 18px;
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+	}
+
+	.elementor-442 .elementor-element.elementor-element-01cbb60 .elementor-nav-menu--main .elementor-item {
+		color: #f4f1ea;
+		padding: 8px 14px;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-01cbb60 .elementor-nav-menu--main .elementor-item:hover,
+	.elementor-442 .elementor-element.elementor-element-01cbb60 .elementor-nav-menu--main .elementor-item:focus {
+		color: #bda488;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-468157b,
+	.elementor-442 .elementor-element.elementor-element-5471dcb,
+	.elementor-442 .elementor-element.elementor-element-bce7cd5 {
+		text-align: left;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-5471dcb > .elementor-widget-container {
+		padding: 0;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-34d199b {
+		display: none !important;
+	}
+
+	.hero-3d-wrapper {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		width: 100%;
+	}
+
+	.hero-3d-model {
+		width: min(380px, 100%);
+		height: 380px;
+	}
+
+	.elementor-background-video-container,
+	.elementor-background-video-embed,
+	.elementor-background-video-hosted {
+		display: none !important;
+	}
+
+	@media (max-width: 767px) {
+		.elementor-442 .elementor-element.elementor-element-01cbb60 {
+			bottom: 12px;
+			width: calc(100% - 24px);
+		}
+
+		.elementor-442 .elementor-element.elementor-element-01cbb60 .elementor-nav-menu--main {
+			padding: 10px 12px;
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 6px;
+		}
+
+		.hero-3d-wrapper {
+			justify-content: center;
+		}
+
+		.hero-3d-model {
+			height: 260px;
+		}
+	}
+</style>
 <script src="wp-content/themes/astra/assets/js/minified/flexibility.minb925.js?ver=4.12.0" id="astra-flexibility-js"></script>
 <script id="astra-flexibility-js-after">
 typeof flexibility !== "undefined" && flexibility(document.documentElement);
@@ -759,8 +840,14 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 		<div class="elementor-element elementor-element-d1e67c3 e-con-full e-flex e-con e-child" data-id="d1e67c3" data-element_type="container">
 				<div class="elementor-element elementor-element-deadc02 e-transform elementor-widget elementor-widget-html" data-id="deadc02" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;none&quot;,&quot;_transform_scale_effect_hover&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:1.07,&quot;sizes&quot;:[]},&quot;_transform_scale_effect_hover_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_scale_effect_hover_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<!-- Видимая кнопка -->
-
+					<div class="hero-3d-wrapper">
+						<model-viewer src="https://crm.e-museum.kz/emuseum/museum/3DModels/6949473eb2f163716"
+							auto-rotate
+							rotation-per-second="20deg"
+							camera-controls
+							class="hero-3d-model"
+							alt="3D модель экспоната"></model-viewer>
+					</div>
 
 				</div>
 				</div>
