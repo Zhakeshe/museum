@@ -1,0 +1,828 @@
+    .kz-map-container {
+        display: flex;
+        width: 100%;
+        min-height: 10vh;
+    }
+
+    /* Левая панель */
+    .kz-map-info-panel {
+        width: 35%;
+        padding: 30px 40px;
+        padding-left: 5%;
+        display: flex;
+        flex-direction: column;
+        gap: 0px;
+    }
+
+    .kz-map-title {
+        font-size: 50px;
+        font-weight: 700;
+        color: #8B1538;
+        line-height: 1;
+        margin: 0;
+        letter-spacing: -1px;
+    }
+
+    .kz-map-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #999;
+        margin-top: -20px;
+    }
+
+    .kz-map-breadcrumb span {
+        color: #8B1538;
+    }
+
+    .kz-map-region-info {
+        display: flex;
+        flex-direction: column;
+        /*gap: 20px;*/
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .kz-map-region-info.kz-map-active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .kz-map-region-name {
+        font-size: 36px;
+        font-weight: 600;
+        color: #B8956A;
+        margin: 0;
+        line-height: 1.2;
+		margin-top: 100px;
+		/*margin-bottom: -15px;*/
+    }
+
+    .kz-map-region-desc {
+        font-size: 16px;
+        color: #666;
+        line-height: 1.7;
+        margin: 0 !important;
+    }
+
+    .kz-map-museums-count {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        /*margin: 15px 0;*/
+    }
+
+    .kz-map-count-label {
+        font-size: 20px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .kz-map-count-number {
+        font-size: 56px;
+        font-weight: 700;
+        color: #8B1538;
+    }
+
+    .kz-map-details-btn {
+        background: #8B1538;
+        color: white;
+        border: none;
+        padding: 18px 52px;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        align-self: flex-start;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(139, 21, 56, 0.2);
+    }
+
+    .kz-map-details-btn:hover {
+        background: #6B0F2B;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(139, 21, 56, 0.35);
+    }
+
+    .kz-map-details-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Правая часть с картой */
+    .kz-map-wrapper {
+        width: 65%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 20px;
+        position: relative;
+    }
+
+    .kz-map-svg-container {
+        width: 100%;
+        /*max-width: 900px;*/
+        position: relative;
+    }
+
+    .kz-map-svg {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* Стили для SVG областей */
+    .kz-map-svg path,
+    .kz-map-svg circle {
+        fill: #C5B59A;
+        stroke: white;
+        stroke-width: 2;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .kz-map-svg path:hover,
+    .kz-map-svg circle:hover {
+        fill: #A89577;
+        filter: brightness(0.95);
+    }
+
+    .kz-map-svg path.kz-map-region-active,
+    .kz-map-svg circle.kz-map-region-active {
+        fill: #8B1538;
+        stroke: white;
+        stroke-width: 2.5;
+    }
+
+    /* Стили для текстов на карте */
+    .kz-map-svg text {
+        fill: #8B1538;
+		stroke: none;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        cursor: pointer;
+        pointer-events: all;
+        user-select: none;
+        text-anchor: middle;
+        transition: all 0.3s ease;
+    }
+
+    .kz-map-svg text:hover {
+        fill: #fff;
+        font-size: 13px;
+    }
+
+    .kz-map-svg text.kz-map-text-active {
+        fill: #fff;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    /* Специальные стили для городов республиканского значения */
+    .kz-map-svg text.kz-map-city-label {
+        font-size: 13px;
+        font-weight: 700;
+        fill: #fff;
+    }
+
+    .kz-map-svg text.kz-map-city-label:hover {
+        font-size: 14px;
+        fill: #fff;
+    }
+
+    .kz-map-svg text.kz-map-city-label.kz-map-text-active {
+        fill: #8B1538;
+        font-size: 15px;
+    }
+
+    /* Список областей внизу */
+    .kz-map-regions-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 30px;
+        padding: 30px 50px;
+        background: white;
+    }
+
+    .kz-map-region-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: #666;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .kz-map-region-item:hover {
+        color: #8B1538;
+    }
+
+    .kz-map-region-icon {
+        width: 12px;
+        height: 12px;
+        background: #C5B59A;
+        border-radius: 2px;
+        transition: background 0.2s;
+    }
+
+    .kz-map-region-item:hover .kz-map-region-icon {
+        background: #8B1538;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 1200px) {
+        .kz-map-title {
+            font-size: 56px;
+        }
+
+        .kz-map-region-name {
+            font-size: 28px;
+        }
+
+        .kz-map-count-number {
+            font-size: 42px;
+        }
+
+        .kz-map-svg text {
+            font-size: 10px;
+        }
+
+        .kz-map-svg text.kz-map-city-label {
+            font-size: 11px;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .kz-map-container {
+            flex-direction: column;
+        }
+
+        .kz-map-info-panel,
+        .kz-map-wrapper {
+            width: 100%;
+        }
+
+        .kz-map-title {
+            font-size: 48px;
+        }
+
+        .kz-map-wrapper {
+            padding: 40px 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .kz-map-info-panel {
+            padding: 40px 30px;
+        }
+
+        .kz-map-title {
+            font-size: 32px;
+			text-align: center;
+        }
+
+        .kz-map-region-name {
+            font-size: 24px;
+        }
+
+        .kz-map-count-number {
+            font-size: 30px;
+        }
+
+        .kz-map-regions-list {
+            grid-template-columns: 1fr;
+            padding: 20px 30px;
+        }
+
+        .kz-map-svg text {
+            font-size: 8px;
+        }
+
+        .kz-map-svg text.kz-map-city-label {
+            font-size: 9px;
+        }
+		.kz-map-svg text {
+        fill: #fff;
+		text-shadow: none;
+		}
+    }
+    .kz-regions-list {
+    width: 100%;
+    padding: 30px;
+	padding-top: 0px;
+}
+
+/* Сетка 6 столбцов */
+.kz-regions-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+	row-gap: 2px;
+}
+
+/* Элемент региона */
+.kz-region-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.kz-region-item:hover {
+    border-color: #6f9c76;
+    background: #f0f7f1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(111, 156, 118, 0.2);
+}
+
+/* Активный элемент в списке */
+.kz-region-item.kz-region-item--active {
+    border-color: #4a7c52;
+    background: #e8f5e9;
+    box-shadow: 0 4px 15px rgba(74, 124, 82, 0.3);
+}
+
+/* Города республиканского значения - другой стиль */
+.kz-region-item--city {
+    
+}
+
+.kz-region-item--city:hover {
+    border-color: #c49a3c;
+    background: #fff9e6;
+}
+
+.kz-region-item--city.kz-region-item--active {
+    border-color: #b8860b;
+    background: #fff3cd;
+    box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+}
+
+/* Миниатюра */
+.kz-region-thumb {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: contain;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* Название региона */
+.kz-region-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.3;
+}
+
+/* Адаптив для планшетов */
+@media (max-width: 1200px) {
+    .kz-regions-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+    .kz-regions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .kz-regions-list {
+        padding: 20px 15px;
+    }
+    
+    .kz-region-item {
+        padding: 10px;
+    }
+    
+    .kz-region-thumb {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .kz-region-item-name {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kz-regions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ============================================
+   CSS для карусели музеев
+   ============================================ */
+
+/* Контейнер карусели */
+.kz-museums-carousel {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px 30px 25px;
+    z-index: 1000;
+    animation: kzSlideUp 0.3s ease;
+}
+
+.kz-museums-carousel.kz-museums-carousel--active {
+    display: block;
+}
+
+@keyframes kzSlideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Шапка карусели */
+.kz-museums-carousel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.kz-museums-carousel-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.kz-museums-carousel-title span {
+    color: #bda488;
+}
+
+.kz-museums-carousel-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 50%;
+    font-size: 24px;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.kz-museums-carousel-close:hover {
+    background: #e0e0e0;
+    color: #333;
+}
+
+/* Обёртка карусели */
+.kz-museums-carousel-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Стрелки */
+.kz-museums-carousel-arrow {
+    width: 48px;
+    height: 48px;
+    /*border: 2px solid #6f9c76;*/
+    background: #ffffff;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6f9c76;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.kz-museums-carousel-arrow:hover {
+    /*background: #6f9c76;*/
+    color: #ffffff;
+}
+
+.kz-museums-carousel-arrow:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.kz-museums-carousel-arrow:disabled:hover {
+    background: #ffffff;
+    color: #6f9c76;
+}
+
+/* Контейнер трека */
+.kz-museums-carousel-track-container {
+    flex: 1;
+    overflow: hidden;
+}
+
+.kz-museums-carousel-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.4s ease;
+}
+
+/* Карточка музея */
+.kz-museum-card {
+    flex: 0 0 280px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.kz-museum-card:hover {
+    border-color: #6f9c76;
+    box-shadow: 0 6px 20px rgba(111, 156, 118, 0.2);
+    transform: translateY(-4px);
+}
+
+.kz-museum-card-image {
+    width: 100%;
+    height: 160px !important;
+    object-fit: cover;
+    background: #f0f0f0;
+	/*aspect-ratio: 4 / 3 !important;*/
+}
+
+.kz-museum-card-content {
+    padding: 15px;
+}
+
+.kz-museum-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 8px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.kz-museum-card-address {
+    font-size: 13px;
+    color: #777;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Точки пагинации */
+.kz-museums-carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.kz-museums-carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d0d0d0;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.kz-museums-carousel-dot:hover {
+    background: #a0a0a0;
+}
+
+.kz-museums-carousel-dot.kz-museums-carousel-dot--active {
+    background: #8B1538;
+    transform: scale(1.2);
+}
+
+
+.kz-museums-carousel-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.kz-museums-carousel-track {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.kz-museum-card {
+    flex: 0 0 auto;
+    width: 280px;
+}
+
+/* Адаптивные размеры карточек */
+@media (max-width: 640px) {
+    .kz-museum-card {
+        width: calc(100% - 40px); /* полная ширина с учетом отступов */
+    }
+    .kz-museums-carousel-track {
+        gap: 15px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+    .kz-museum-card {
+        width: calc(50% - 10px); /* 2 карточки */
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+    .kz-museum-card {
+        width: calc(33.333% - 14px); /* 3 карточки */
+    }
+}
+
+@media (min-width: 1280px) {
+    .kz-museum-card {
+        width: 280px; /* 4 карточки по 280px */
+    }
+}
+.kz-museums-carousel-track {
+    display: flex;
+    gap: 20px;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+.kz-museums-carousel-track:active {
+    cursor: grabbing;
+}
+
+.kz-museum-card {
+    flex: 0 0 auto;
+    width: 280px;
+    pointer-events: auto;
+}
+
+.kz-museum-card * {
+    pointer-events: none;
+}
+
+.kz-museum-card a {
+    pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+    .kz-museums-carousel {
+        padding: 15px 8px 20px;
+    }
+    
+    .kz-museum-card {
+        flex: 0 0 200px;
+    }
+    
+    .kz-museum-card-image {
+        height: 120px !important;
+    }
+    
+    .kz-museums-carousel-arrow {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kz-museums-carousel-wrapper {
+        gap: 10px;
+    }
+    
+    .kz-museum-card {
+        flex: 0 0 180px;
+    }
+    
+    .kz-museums-carousel-arrow {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* ============================================
+   Мобильный выпадающий список регионов
+   ============================================ */
+
+.kz-mobile-region-select-wrapper {
+    display: none;
+    width: 100%;
+    padding: 20px 15px;
+}
+
+.kz-mobile-region-select {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    background: white;
+    border: 2px solid #C5B59A;
+    border-radius: 12px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%238B1538"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 24px;
+    transition: all 0.3s ease;
+}
+
+.kz-mobile-region-select:focus {
+    outline: none;
+    border-color: #8B1538;
+    box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+}
+
+.kz-mobile-region-select option {
+    padding: 15px;
+    font-size: 16px;
+}
+.kz-map-title-mobile {
+		display: none;
+	}
+
+/* Адаптив для мобильных - показываем select, скрываем grid */
+@media (max-width: 768px) {
+	.kz-map-wrapper {
+        padding: 0;
+    }
+    .kz-regions-list {
+        display: none !important;
+    }
+    
+    .kz-mobile-region-select-wrapper {
+        display: block;
+    }
+	.kz-map-region-name {
+		
+	}
+	.kz-map-title {
+		display: none;
+	}
+	.kz-map-title-mobile {
+		display: block;
+	}
+	h1.kz-map-title.kz-map-title-mobile {
+    order: 1;
+	}
+	.kz-mobile-region-select-wrapper {
+    order: 2;
+}
+	.kz-map-wrapper {
+    order: 3;
+}
+	.kz-map-info-panel {
+    order: 4;
+}
+.kz-map-info-panel {
+        text-align: center;
+        padding: 0;
+    }
+	.kz-map-region-name {
+    margin-top: 20px;
+	}
+	.kz-map-museums-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+	}
+	.kz-map-details-btn {
+    padding: 14px 46px;
+	}
+	.kz-map-museums-count {
+    margin-bottom: 5px;
+}
+.kz-map-details-btn {
+        align-self: center;
+}
+
+}

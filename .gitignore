@@ -1,0 +1,19 @@
+# Next.js / build
+.next/
+node_modules/
+
+# CDN / mirrors
+cdn.*/
+ajax.googleapis.com/
+cdnjs.cloudflare.com/
+cdn.jsdelivr.net/
+cdn.matomo.cloud/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Archives / dumps (егер бар болса)
+*.zip
+*.tar
+*.gz
