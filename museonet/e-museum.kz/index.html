@@ -184,9 +184,260 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 <link rel='stylesheet' id='elementor-post-1081-css' href='wp-content/uploads/sites/11/elementor/css/post-1081baf0.css?ver=1766506447' media='all' />
 <link rel='stylesheet' id='elementor-gf-nunitosans-css' href='https://fonts.googleapis.com/css?family=Nunito+Sans:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&amp;display=auto&amp;subset=cyrillic' media='all' />
 <link rel='stylesheet' id='elementor-gf-roboto-css' href='https://fonts.googleapis.com/css?family=Roboto:100,100italic,200,200italic,300,300italic,400,400italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic&amp;display=auto&amp;subset=cyrillic' media='all' />
+<style>
+	.elementor-442 .elementor-element.elementor-element-01cbb60 {
+		display: none !important;
+	}
+
+	.elementor-location-header {
+		position: sticky;
+		top: 0;
+		background: #ffffff;
+		z-index: 1000;
+		box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+	}
+
+	.elementor-location-header .elementor-nav-menu--main .elementor-item {
+		color: #1f2937;
+		font-size: 15px;
+		letter-spacing: 0.01em;
+	}
+
+	.elementor-location-header .elementor-nav-menu--main .elementor-item:hover,
+	.elementor-location-header .elementor-nav-menu--main .elementor-item:focus {
+		color: #8b1538;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-468157b,
+	.elementor-442 .elementor-element.elementor-element-5471dcb,
+	.elementor-442 .elementor-element.elementor-element-bce7cd5 {
+		text-align: left;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-468157b .elementor-heading-title {
+		font-size: clamp(36px, 4.4vw, 68px);
+		line-height: 1.08;
+		letter-spacing: -0.03em;
+		color: #1e1a16;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-5471dcb {
+		font-size: 18px;
+		line-height: 1.75;
+		color: rgba(50, 50, 50, 0.8);
+		max-width: 560px;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-5471dcb > .elementor-widget-container {
+		padding: 0;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-34d199b {
+		display: none !important;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-9cd1ebf {
+		position: relative;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-9cd1ebf::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(246, 244, 240, 0.85) 55%, rgba(236, 232, 225, 0.75));
+		z-index: 0;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-9cd1ebf > .e-con-inner {
+		position: relative;
+		z-index: 1;
+	}
+
+	.hero-cta .elementor-button {
+		background: #8b1538;
+		color: #ffffff;
+		border-radius: 999px;
+		padding: 14px 30px;
+		font-size: 15px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		box-shadow: 0 12px 24px rgba(139, 21, 56, 0.25);
+	}
+
+	.hero-3d-wrapper {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		width: 100%;
+	}
+
+	.hero-3d-surface {
+		width: min(460px, 100%);
+		height: 460px;
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		isolation: isolate;
+	}
+
+	.hero-3d-model,
+	.hero-3d-preview {
+		width: 100%;
+		height: 100%;
+		border-radius: 24px;
+		background: transparent;
+	}
+
+	.hero-3d-scene {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	.hero-3d-floor {
+		position: absolute;
+		inset: auto 12% 6% 12%;
+		height: 35%;
+		background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.5), rgba(210, 198, 184, 0.1) 45%, rgba(0, 0, 0, 0));
+		filter: blur(6px);
+	}
+
+	.hero-3d-glass {
+		position: absolute;
+		border-radius: 22px;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.08));
+		border: 1px solid rgba(255, 255, 255, 0.4);
+		box-shadow: 0 18px 45px rgba(70, 50, 35, 0.15);
+		backdrop-filter: blur(12px);
+	}
+
+	.hero-3d-glass--left {
+		width: 45%;
+		height: 35%;
+		left: 4%;
+		top: 18%;
+		transform: rotate(-6deg);
+	}
+
+	.hero-3d-glass--right {
+		width: 42%;
+		height: 40%;
+		right: 2%;
+		bottom: 12%;
+		transform: rotate(4deg);
+	}
+
+	.hero-3d-halo {
+		position: absolute;
+		width: 60%;
+		height: 60%;
+		right: 10%;
+		top: 6%;
+		background: radial-gradient(circle, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
+		filter: blur(18px);
+	}
+
+	.hero-3d-fog {
+		position: absolute;
+		inset: auto 0 0 0;
+		height: 40%;
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8));
+		filter: blur(12px);
+	}
+
+	.hero-3d-preview {
+		object-fit: cover;
+		display: none;
+	}
+
+	.hero-3d-model {
+		opacity: 0;
+		transform: translateY(24px) scale(0.95);
+		animation: heroModelIn 0.6s ease-out forwards;
+		z-index: 1;
+	}
+
+	@keyframes heroModelIn {
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	.elementor-background-video-container,
+	.elementor-background-video-embed,
+	.elementor-background-video-hosted {
+		display: none !important;
+	}
+
+	#newskaz {
+		display: none !important;
+	}
+
+	.hero-3d--static .hero-3d-model {
+		display: none;
+	}
+
+	.hero-3d--static .hero-3d-preview {
+		display: block;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-3d-model {
+			animation: none;
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@media (max-width: 767px) {
+		.hero-3d-wrapper {
+			justify-content: center;
+		}
+
+		.hero-3d-surface {
+			height: 260px;
+		}
+	}
+</style>
 <script src="wp-content/themes/astra/assets/js/minified/flexibility.minb925.js?ver=4.12.0" id="astra-flexibility-js"></script>
 <script id="astra-flexibility-js-after">
 typeof flexibility !== "undefined" && flexibility(document.documentElement);
+</script>
+<script>
+const HERO_MODEL_URL = "https://crm.e-museum.kz/emuseum/museum/3DModels/6949473eb2f163716.glb";
+const HERO_MODEL_PREVIEW = "https://crm.e-museum.kz/emuseum/museum/3DModels/6949489a8136d7c98";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const hero3d = document.querySelector("#hero-3d");
+  const modelViewer = hero3d?.querySelector("model-viewer");
+  const previewImage = hero3d?.querySelector(".hero-3d-preview");
+
+  if (!hero3d || !modelViewer || !previewImage) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isMobile = window.matchMedia("(max-width: 767px)").matches;
+  const lowDpr = window.devicePixelRatio <= 1.5;
+
+  previewImage.src = modelViewer.dataset.previewUrl || HERO_MODEL_PREVIEW;
+  modelViewer.src = modelViewer.dataset.modelUrl || HERO_MODEL_URL;
+
+  if (prefersReducedMotion) {
+    modelViewer.removeAttribute("auto-rotate");
+  } else {
+    modelViewer.setAttribute("auto-rotate", "");
+  }
+
+  if (isMobile || !lowDpr) {
+    hero3d.classList.add("hero-3d--static");
+  } else {
+    hero3d.classList.remove("hero-3d--static");
+  }
+});
 </script>
 <script src="wp-includes/js/jquery/jquery.minf43b.js?ver=3.7.1" id="jquery-core-js"></script>
 <script src="wp-includes/js/jquery/jquery-migrate.min5589.js?ver=3.4.1" id="jquery-migrate-js"></script>
@@ -529,7 +780,7 @@ class="hfeed site" id="page">
         </div>
         
         <!-- Навигация - ЗДЕСЬ ПРОПИШИТЕ СВОИ ПУНКТЫ МЕНЮ -->
-        <nav class="kz-menu-nav"><a href="museum/index.html" class="kz-menu-link" style="--i: 1">Музеи Казахстана</a><a href="model-3d/index.html" class="kz-menu-link" style="--i: 2">3D модели</a><a href="exhibit/index.html" class="kz-menu-link" style="--i: 3">Государственный каталог</a><a href="news-article/index.html" class="kz-menu-link" style="--i: 4">Новости</a><a href="zakonodatelstvo/index.html" class="kz-menu-link" style="--i: 5">Законодательство</a></nav>
+        <nav class="kz-menu-nav"><a href="#museumkaz" class="kz-menu-link" style="--i: 1">Музеи</a><a href="#models3dkaz" class="kz-menu-link" style="--i: 2">3D модели</a><a href="#tourskaz" class="kz-menu-link" style="--i: 3">Виртуальные туры</a><a href="#museumexhibitkaz" class="kz-menu-link" style="--i: 4">Каталог</a></nav>
         
         <!-- Футер меню -->
         <div class="kz-menu-footer">
@@ -605,18 +856,16 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div class="elementor-element elementor-element-3a233a6 elementor-nav-menu__align-start elementor-nav-menu--dropdown-none main-none elementor-hidden-tablet elementor-hidden-mobile elementor-widget elementor-widget-nav-menu" data-id="3a233a6" data-element_type="widget" id="m-menu" data-settings="{&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;svg aria-hidden=\&quot;true\&quot; class=\&quot;e-font-icon-svg e-fas-caret-down\&quot; viewBox=\&quot;0 0 320 512\&quot; xmlns=\&quot;http:\/\/www.w3.org\/2000\/svg\&quot;&gt;&lt;path d=\&quot;M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z\&quot;&gt;&lt;\/path&gt;&lt;\/svg&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
 								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-none">
-				<ul id="menu-1-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="museum/index.html" class="elementor-item menu-link">Музеи Казахстана</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="model-3d/index.html" class="elementor-item menu-link">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="exhibit/index.html" class="elementor-item menu-link">каталог</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="news-article/index.html" class="elementor-item menu-link">Игры</a></li>
-<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-31216"><a href="zakonodatelstvo/index.html" class="elementor-item menu-link">Законодательство</a></li>
+				<ul id="menu-1-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link">Музеи</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link">3D модели</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link">Виртуальные туры</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="#museumexhibitkaz" class="elementor-item menu-link">Каталог</a></li>
 </ul>			</nav>
 						<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
-				<ul id="menu-2-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="museum/index.html" class="elementor-item menu-link" tabindex="-1">Музеи Казахстана</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="model-3d/index.html" class="elementor-item menu-link" tabindex="-1">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="exhibit/index.html" class="elementor-item menu-link" tabindex="-1">Государственный каталог</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="news-article/index.html" class="elementor-item menu-link" tabindex="-1">Новости</a></li>
-<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-31216"><a href="zakonodatelstvo/index.html" class="elementor-item menu-link" tabindex="-1">Законодательство</a></li>
+				<ul id="menu-2-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link" tabindex="-1">Музеи</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link" tabindex="-1">3D модели</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link" tabindex="-1">Виртуальные туры</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="#museumexhibitkaz" class="elementor-item menu-link" tabindex="-1">Каталог</a></li>
 </ul>			</nav>
 						</div>
 				</div>
@@ -691,18 +940,16 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 				<div class="elementor-element elementor-element-01cbb60 elementor-nav-menu__align-center elementor-nav-menu--dropdown-none elementor-hidden-mobile elementor-widget elementor-widget-nav-menu" data-id="01cbb60" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;svg aria-hidden=\&quot;true\&quot; class=\&quot;e-font-icon-svg e-fas-caret-down\&quot; viewBox=\&quot;0 0 320 512\&quot; xmlns=\&quot;http:\/\/www.w3.org\/2000\/svg\&quot;&gt;&lt;path d=\&quot;M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z\&quot;&gt;&lt;\/path&gt;&lt;\/svg&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
 								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-none">
-				<ul id="menu-1-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Музеи Казахстана</a></li>
+				<ul id="menu-1-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Музеи</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Государственный каталог</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="#newskaz" class="elementor-item elementor-item-anchor menu-link">Новости</a></li>
-<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-31239"><a href="zakonodatelstvo/index.html" class="elementor-item menu-link">Законодательство</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link">Виртуальные туры</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Каталог</a></li>
 </ul>			</nav>
 						<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
-				<ul id="menu-2-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Музеи Казахстана</a></li>
+				<ul id="menu-2-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Музеи</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Государственный каталог</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="#newskaz" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Новости</a></li>
-<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-31239"><a href="zakonodatelstvo/index.html" class="elementor-item menu-link" tabindex="-1">Законодательство</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Виртуальные туры</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Каталог</a></li>
 </ul>			</nav>
 						</div>
 				</div>
@@ -738,18 +985,18 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 				</div>
 				<div class="elementor-element elementor-element-468157b elementor-widget elementor-widget-heading" data-id="468157b" data-element_type="widget" data-widget_type="heading.default">
 				<div class="elementor-widget-container">
-					<h2 class="elementor-heading-title elementor-size-default">Виртуальный музей</h2>				</div>
+					<h1 class="elementor-heading-title elementor-size-default">Museonet — Виртуальный музей Казахстана</h1>				</div>
 				</div>
 				<div class="elementor-element elementor-element-5471dcb elementor-widget elementor-widget-text-editor" data-id="5471dcb" data-element_type="widget" data-widget_type="text-editor.default">
 				<div class="elementor-widget-container">
-									<p>«museonet» - портал, где культурное наследие Казахстана оживает в цифровом пространстве</p>								</div>
+									<p>Национальная цифровая коллекция, где культурное наследие Казахстана открывается в 3D, турах и музейных историях.</p>								</div>
 				</div>
-				<div class="elementor-element elementor-element-bce7cd5 elementor-hidden-mobile elementor-widget elementor-widget-button" data-id="bce7cd5" data-element_type="widget" data-widget_type="button.default">
+				<div class="elementor-element elementor-element-bce7cd5 elementor-widget elementor-widget-button hero-cta" data-id="bce7cd5" data-element_type="widget" data-widget_type="button.default">
 				<div class="elementor-widget-container">
 									<div class="elementor-button-wrapper">
-					<a class="elementor-button elementor-button-link elementor-size-sm" href="about/index.html">
+					<a class="elementor-button elementor-button-link elementor-size-sm" href="exhibit/index.html">
 						<span class="elementor-button-content-wrapper">
-									<span class="elementor-button-text">Подробнее о проекте</span>
+									<span class="elementor-button-text">Смотреть коллекцию</span>
 					</span>
 					</a>
 				</div>
@@ -759,21 +1006,29 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 		<div class="elementor-element elementor-element-d1e67c3 e-con-full e-flex e-con e-child" data-id="d1e67c3" data-element_type="container">
 				<div class="elementor-element elementor-element-deadc02 e-transform elementor-widget elementor-widget-html" data-id="deadc02" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;none&quot;,&quot;_transform_scale_effect_hover&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:1.07,&quot;sizes&quot;:[]},&quot;_transform_scale_effect_hover_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_scale_effect_hover_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<!-- Видимая кнопка -->
+					<div class="hero-3d-wrapper hero-3d--static" id="hero-3d">
+						<div class="hero-3d-surface">
+							<div class="hero-3d-scene" aria-hidden="true">
+								<div class="hero-3d-halo"></div>
+								<div class="hero-3d-glass hero-3d-glass--left"></div>
+								<div class="hero-3d-glass hero-3d-glass--right"></div>
+								<div class="hero-3d-floor"></div>
+								<div class="hero-3d-fog"></div>
+							</div>
+							<model-viewer
+								class="hero-3d-model"
+								camera-controls
+								disable-zoom
+								rotation-per-second="4deg"
+								alt="3D модель экспоната"
+								data-model-url="https://crm.e-museum.kz/emuseum/museum/3DModels/6949473eb2f163716.glb"
+								data-preview-url="https://crm.e-museum.kz/emuseum/museum/3DModels/6949489a8136d7c98">
+							</model-viewer>
+							<img class="hero-3d-preview" alt="Превью 3D модели" />
+						</div>
+					</div>
 
-
 				</div>
-				</div>
-				<div class="elementor-element elementor-element-3eb3332 elementor-mobile-align-center elementor-hidden-desktop elementor-hidden-tablet elementor-widget elementor-widget-button" data-id="3eb3332" data-element_type="widget" data-widget_type="button.default">
-				<div class="elementor-widget-container">
-									<div class="elementor-button-wrapper">
-					<a class="elementor-button elementor-button-link elementor-size-sm" href="about/index.html">
-						<span class="elementor-button-content-wrapper">
-									<span class="elementor-button-text">Подробнее о проекте</span>
-					</span>
-					</a>
-				</div>
-								</div>
 				</div>
 				</div>
 				</div>
@@ -1495,7 +1750,7 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 				</div>
 					</div>
 				</div>
-		<div class="elementor-element elementor-element-12ec5f9 e-flex e-con-boxed e-con e-parent" data-id="12ec5f9" data-element_type="container">
+		<div class="elementor-element elementor-element-12ec5f9 e-flex e-con-boxed e-con e-parent" data-id="12ec5f9" data-element_type="container" id="tourskaz">
 					<div class="e-con-inner">
 				<div class="elementor-element elementor-element-25853c2 elementor-widget elementor-widget-heading" data-id="25853c2" data-element_type="widget" data-widget_type="heading.default">
 				<div class="elementor-widget-container">
