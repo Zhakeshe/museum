@@ -415,6 +415,26 @@
             return;
         }
 
+        // Если админ-ajax на другом домене, используем заглушки без запроса
+        if (typeof kzMuseumsMapAjax !== 'undefined' && kzMuseumsMapAjax.ajaxurl) {
+            try {
+                const ajaxOrigin = new URL(kzMuseumsMapAjax.ajaxurl, window.location.href).origin;
+                if (ajaxOrigin !== window.location.origin) {
+                    const fallbackMuseums = getFallbackMuseums(kzCurrentRegionId);
+
+                    if (fallbackMuseums.length > 0) {
+                        kzMuseumsCache[kzCurrentRegionId] = fallbackMuseums;
+                        kzMuseumsCache[kzCurrentRegionId + '_name'] = kzRegionsData[kzCurrentRegionId].name;
+                        if (loader) loader.style.display = 'none';
+                        renderMuseumsCarousel(fallbackMuseums, kzRegionsData[kzCurrentRegionId].name);
+                        return;
+                    }
+                }
+            } catch (error) {
+                // Если URL некорректный, продолжаем с AJAX-запросом
+            }
+        }
+
         // AJAX запрос
         $.ajax({
             url: kzMuseumsMapAjax.ajaxurl,
