@@ -17,8 +17,25 @@
       background: rgba(15, 23, 42, 0.85);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
     a { color: #fef3e5; text-decoration: none; }
+    nav a {
+      border: 1px solid rgba(254, 243, 229, 0.35);
+      padding: 6px 14px;
+      border-radius: 999px;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    nav a:hover,
+    nav a:focus-visible {
+      background: rgba(254, 243, 229, 0.12);
+      transform: translateY(-1px);
+    }
     .container { padding: 32px; max-width: 1100px; margin: 0 auto; }
     .game {
       background: rgba(255, 255, 255, 0.08);
@@ -40,8 +57,16 @@
 </head>
 <body>
   <header>
-    <a href="/cabinet/index.html">← Личный кабинет</a>
-    <span>Игры</span>
+    <div>Игры</div>
+    <nav>
+      <a href="/index.html">Главная</a>
+      <a href="/games/index.html">Игры</a>
+      <a href="/index.html#museumkaz">Музей тарихы</a>
+      <a href="/index.html#models3dkaz">3D коллекциялар</a>
+      <a href="/index.html#tourskaz">Виртуалды көрме</a>
+      <a href="/index.html#museumexhibitkaz">Каталог</a>
+      <a href="/cabinet/index.html">Кабинет</a>
+    </nav>
   </header>
   <div class="container">
     <h1>Ойындар</h1>
@@ -90,6 +115,13 @@
               user.points = (user.points || 0) + game.points;
               user.gamesPlayed = (user.gamesPlayed || 0) + 1;
               localStorage.setItem('emuseum:user', JSON.stringify(user));
+              const history = JSON.parse(localStorage.getItem('emuseum:history') || '[]');
+              history.push({
+                label: `Ойын: ${game.title}`,
+                points: game.points,
+                date: new Date().toISOString()
+              });
+              localStorage.setItem('emuseum:history', JSON.stringify(history));
               alert(`Жарайсыз! +${game.points} ұпай`);
               button.disabled = false;
             }
