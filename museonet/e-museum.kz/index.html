@@ -763,21 +763,21 @@ class="hfeed site" id="page">
 			<div class="elementor-element elementor-element-c359326 e-grid e-con-full e-con e-parent" data-id="c359326" data-element_type="container" data-settings="{&quot;sticky&quot;:&quot;top&quot;,&quot;sticky_on&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;],&quot;sticky_offset&quot;:0,&quot;sticky_effects_offset&quot;:0,&quot;sticky_anchor_link_offset&quot;:0}">
 				<div class="elementor-element elementor-element-a234c80 elementor-widget elementor-widget-html" data-id="a234c80" data-element_type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<!-- Бургер меню иконка -->
-<div class="kz-burger-menu" id="kzBurgerMenu" onclick="toggleKzMenu()">
+<!-- Бургер меню иконка -->
+<button class="kz-burger-menu" id="kzBurgerMenu" onclick="toggleKzMenu()" type="button" aria-expanded="false" aria-controls="kzFullscreenMenu" aria-label="Открыть меню">
     <span class="kz-burger-line"></span>
     <span class="kz-burger-line"></span>
     <span class="kz-burger-line"></span>
-</div>
+</button>
 
 <!-- Полноэкранное меню -->
-<div class="kz-fullscreen-menu" id="kzFullscreenMenu">
+<div class="kz-fullscreen-menu" id="kzFullscreenMenu" aria-hidden="true">
     <!-- Левая часть - меню (60%) -->
     <div class="kz-menu-left">
-        <div class="kz-menu-close" onclick="toggleKzMenu()">
+        <button class="kz-menu-close" onclick="toggleKzMenu()" type="button" aria-label="Закрыть меню">
             <span></span>
             <span></span>
-        </div>
+        </button>
         
         <!-- Навигация - ЗДЕСЬ ПРОПИШИТЕ СВОИ ПУНКТЫ МЕНЮ -->
         <nav class="kz-menu-nav"><a href="#museumkaz" class="kz-menu-link" style="--i: 1">Музеи</a><a href="#models3dkaz" class="kz-menu-link" style="--i: 2">3D модели</a><a href="#tourskaz" class="kz-menu-link" style="--i: 3">Виртуальные туры</a><a href="#museumexhibitkaz" class="kz-menu-link" style="--i: 4">Каталог</a></nav>
@@ -817,30 +817,41 @@ class="hfeed site" id="page">
 
 <style>
 /* ===== БУРГЕР МЕНЮ СТИЛИ ===== */
-
-
+.kz-burger-menu,
+.kz-menu-close {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
 </style>
 
 <script>
-function toggleKzMenu() {
+function setKzMenuState(isOpen) {
     const menu = document.getElementById('kzFullscreenMenu');
     const burger = document.getElementById('kzBurgerMenu');
-    
-    menu.classList.toggle('active');
-    burger.classList.toggle('active');
-    
-    document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+
+    if (!menu || !burger) {
+        return;
+    }
+
+    menu.classList.toggle('active', isOpen);
+    burger.classList.toggle('active', isOpen);
+    burger.setAttribute('aria-expanded', String(isOpen));
+    menu.setAttribute('aria-hidden', String(!isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+
+function toggleKzMenu() {
+    const menu = document.getElementById('kzFullscreenMenu');
+    const isOpen = menu ? !menu.classList.contains('active') : false;
+    setKzMenuState(isOpen);
 }
 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const menu = document.getElementById('kzFullscreenMenu');
-        const burger = document.getElementById('kzBurgerMenu');
-        
         if (menu && menu.classList.contains('active')) {
-            menu.classList.remove('active');
-            burger.classList.remove('active');
-            document.body.style.overflow = '';
+            setKzMenuState(false);
         }
     }
 });
