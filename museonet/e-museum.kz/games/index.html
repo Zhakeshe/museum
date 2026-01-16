@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Игры — Museonet</title>
+  <style>
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px 32px;
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      justify-content: space-between;
+    }
+    a { color: #fef3e5; text-decoration: none; }
+    .container { padding: 32px; max-width: 1100px; margin: 0 auto; }
+    .game {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .game h3 { margin: 0 0 8px; }
+    button {
+      background: #fef3e5;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .timer { font-weight: 600; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/cabinet/index.html">← Личный кабинет</a>
+    <span>Игры</span>
+  </header>
+  <div class="container">
+    <h1>Ойындар</h1>
+    <div id="games"></div>
+  </div>
+  <script>
+    const userRaw = localStorage.getItem('emuseum:user');
+    if (!userRaw) {
+      window.location.href = '/auth/login.html';
+    }
+    const user = JSON.parse(userRaw || '{}');
+
+    fetch('/data/games.json')
+      .then((res) => res.json())
+      .then((data) => {
+        const list = document.getElementById('games');
+        data.games.forEach((game) => {
+          const card = document.createElement('div');
+          card.className = 'game';
+          card.innerHTML = `
+            <h3>${game.title}</h3>
+            <p>${game.description}</p>
+            <div>Ұпай: ${game.points}</div>
+            <div class="timer" data-timer>Уақыт: ${game.timeLimitSeconds} сек</div>
+            <button>Ойынды бастау</button>
+          `;
+          const button = card.querySelector('button');
+          const timerEl = card.querySelector('[data-timer]');
+          let timerId;
+          button.addEventListener('click', () => {
+            let remaining = game.timeLimitSeconds;
+            button.disabled = true;
+            timerEl.textContent = `Уақыт: ${remaining} сек`;
+            timerId = setInterval(() => {
+              remaining -= 1;
+              timerEl.textContent = `Уақыт: ${remaining} сек`;
+              if (remaining <= 0) {
+                clearInterval(timerId);
+                button.disabled = false;
+              }
+            }, 1000);
+
+            const found = confirm('Экспонатты таптыңыз ба?');
+            if (found) {
+              clearInterval(timerId);
+              user.points = (user.points || 0) + game.points;
+              user.gamesPlayed = (user.gamesPlayed || 0) + 1;
+              localStorage.setItem('emuseum:user', JSON.stringify(user));
+              alert(`Жарайсыз! +${game.points} ұпай`);
+              button.disabled = false;
+            }
+          });
+          list.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>

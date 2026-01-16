@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Регистрация — Личный кабинет</title>
+  <style>
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 24px;
+    }
+    .card {
+      width: min(460px, 100%);
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+    }
+    h1 { margin: 0 0 16px; font-size: 24px; }
+    label { display: block; margin: 12px 0 6px; font-size: 14px; color: #e2e8f0; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.6);
+      color: #f8fafc;
+    }
+    .actions { display: flex; gap: 12px; margin-top: 16px; }
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #fef3e5;
+      color: #0f172a;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    a { color: #fef3e5; font-size: 14px; }
+    .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Регистрация</h1>
+    <form id="register-form">
+      <label for="name">Имя</label>
+      <input id="name" name="name" type="text" required />
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required />
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" required />
+      <div class="row">
+        <input id="admin" type="checkbox" />
+        <label for="admin">Админ роль</label>
+      </div>
+      <div class="actions">
+        <button type="submit">Создать аккаунт</button>
+      </div>
+    </form>
+    <p><a href="/auth/login.html">Уже есть аккаунт? Войти</a></p>
+  </div>
+  <script>
+    const form = document.getElementById('register-form');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const isAdmin = document.getElementById('admin').checked;
+      const users = JSON.parse(localStorage.getItem('emuseum:users') || '[]');
+      if (users.some((u) => u.email === email)) {
+        alert('Пользователь с таким email уже существует.');
+        return;
+      }
+      const user = {
+        name,
+        email,
+        password,
+        role: isAdmin ? 'admin' : 'user',
+        points: 0,
+        gamesPlayed: 0
+      };
+      users.push(user);
+      localStorage.setItem('emuseum:users', JSON.stringify(users));
+      localStorage.setItem('emuseum:user', JSON.stringify({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        points: user.points,
+        gamesPlayed: user.gamesPlayed
+      }));
+      window.location.href = '/cabinet/index.html';
+    });
+  </script>
+</body>
+</html>

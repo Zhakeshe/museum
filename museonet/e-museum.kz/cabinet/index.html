@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Личный кабинет — Museonet</title>
+  <style>
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.85);
+      position: sticky;
+      top: 0;
+    }
+    nav a {
+      color: #fef3e5;
+      margin-right: 16px;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(254, 243, 229, 0.35);
+    }
+    .container { padding: 32px; max-width: 1100px; margin: 0 auto; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+    }
+    .stat {
+      font-size: 32px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+    button {
+      background: #fef3e5;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>Личный кабинет</div>
+    <nav>
+      <a href="/">Главная</a>
+      <a href="/games/index.html">Игры</a>
+      <a href="/admin/index.html" data-admin-link>Админ панель</a>
+    </nav>
+    <button id="logout">Выход</button>
+  </header>
+  <div class="container">
+    <h1 id="welcome">Добро пожаловать!</h1>
+    <div class="grid">
+      <div class="card">
+        <div>Баланс ұпай</div>
+        <div class="stat" id="points">0</div>
+      </div>
+      <div class="card">
+        <div>Ойындар саны</div>
+        <div class="stat" id="games">0</div>
+      </div>
+      <div class="card">
+        <div>Статистика</div>
+        <p id="stats">Жинақталған ұпайлар мен ойын прогресін осы жерде көресіз.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const userRaw = localStorage.getItem('emuseum:user');
+    if (!userRaw) {
+      window.location.href = '/auth/login.html';
+    }
+    const user = JSON.parse(userRaw || '{}');
+    document.getElementById('welcome').textContent = `Сәлем, ${user.name || 'қолданушы'}!`;
+    document.getElementById('points').textContent = user.points || 0;
+    document.getElementById('games').textContent = user.gamesPlayed || 0;
+
+    if (user.role !== 'admin') {
+      const adminLink = document.querySelector('[data-admin-link]');
+      if (adminLink) adminLink.style.display = 'none';
+    }
+
+    document.getElementById('logout').addEventListener('click', () => {
+      localStorage.removeItem('emuseum:user');
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

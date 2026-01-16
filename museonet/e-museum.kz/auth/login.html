@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход — Личный кабинет</title>
+  <style>
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 24px;
+    }
+    .card {
+      width: min(420px, 100%);
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+    }
+    h1 { margin: 0 0 16px; font-size: 24px; }
+    label { display: block; margin: 12px 0 6px; font-size: 14px; color: #e2e8f0; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.6);
+      color: #f8fafc;
+    }
+    .actions { display: flex; gap: 12px; margin-top: 16px; }
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #fef3e5;
+      color: #0f172a;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    a { color: #fef3e5; font-size: 14px; }
+    .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .note { font-size: 12px; color: #cbd5f5; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Вход</h1>
+    <form id="login-form">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required />
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" required />
+      <div class="row">
+        <input id="admin" type="checkbox" />
+        <label for="admin">Войти как админ</label>
+      </div>
+      <div class="actions">
+        <button type="submit">Войти</button>
+      </div>
+    </form>
+    <p class="note">Нет аккаунта? <a href="/auth/register.html">Регистрация</a></p>
+  </div>
+  <script>
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const isAdmin = document.getElementById('admin').checked;
+      const users = JSON.parse(localStorage.getItem('emuseum:users') || '[]');
+      const user = users.find((u) => u.email === email && u.password === password);
+      if (!user) {
+        alert('Неверный email или пароль.');
+        return;
+      }
+      const activeUser = {
+        name: user.name,
+        email: user.email,
+        role: isAdmin ? 'admin' : user.role || 'user',
+        points: user.points || 0,
+        gamesPlayed: user.gamesPlayed || 0
+      };
+      localStorage.setItem('emuseum:user', JSON.stringify(activeUser));
+      window.location.href = '/cabinet/index.html';
+    });
+  </script>
+</body>
+</html>

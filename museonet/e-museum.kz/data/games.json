@@ -1,0 +1,18 @@
+{
+  "games": [
+    {
+      "id": "find-museum",
+      "title": "Музей қайда орналасқан?",
+      "description": "Берілген 3D экспонат қай музейге тиесілі екенін табыңыз.",
+      "points": 10,
+      "timeLimitSeconds": 60
+    },
+    {
+      "id": "find-artifact",
+      "title": "Экспонатты тап",
+      "description": "Музей залында көрсетілген экспонатты дұрыс анықтаңыз.",
+      "points": 10,
+      "timeLimitSeconds": 45
+    }
+  ]
+}

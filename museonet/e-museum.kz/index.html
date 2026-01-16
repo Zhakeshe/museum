@@ -1081,11 +1081,11 @@ class="hfeed site" id="page">
 				</div>
 				<div class="elementor-element elementor-element-42110f6 elementor-widget elementor-widget-html" data-id="42110f6" data-element_type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<a href="https://crm.e-museum.kz/" target="_blank" class="logh">
+					<a href="/auth/login.html" class="logh" data-login-link>
 						<svg class="logh-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 							<path d="M12 2a8 8 0 1 0 8 8 8 8 0 0 0-8-8Zm0 14.5a6.5 6.5 0 1 1 6.5-6.5A6.51 6.51 0 0 1 12 16.5Zm.75-9.25h-1.5v3.5H9.5l2.5 2.5 2.5-2.5h-1.75Z"></path>
 						</svg>
-						<span>Войти</span>
+						<span data-login-name>Войти</span>
 					</a>				</div>
 				</div>
 				</div>
@@ -1093,6 +1093,8 @@ class="hfeed site" id="page">
 		<script>
 			document.addEventListener('DOMContentLoaded', function() {
 				const header = document.querySelector('.elementor-location-header');
+				const loginName = document.querySelector('[data-login-name]');
+				const loginLink = document.querySelector('[data-login-link]');
 				if (!header) {
 					return;
 				}
@@ -1100,6 +1102,19 @@ class="hfeed site" id="page">
 				const toggleHeaderState = () => {
 					header.classList.toggle('is-scrolled', window.scrollY > 10);
 				};
+
+				const storedUser = localStorage.getItem('emuseum:user');
+				if (storedUser && loginName && loginLink) {
+					try {
+						const user = JSON.parse(storedUser);
+						if (user && user.name) {
+							loginName.textContent = user.name;
+							loginLink.setAttribute('href', '/cabinet/index.html');
+						}
+					} catch (error) {
+						localStorage.removeItem('emuseum:user');
+					}
+				}
 
 				toggleHeaderState();
 				window.addEventListener('scroll', toggleHeaderState, { passive: true });
@@ -2724,7 +2739,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <div><a href="exhibit/index.html">Государственный каталог</a></div>
     <div><a href="museum/index.html">Музеи Казахстана</a></div>
     <div><a href="model-3d/index.html">3D модели</a></div>
-    <div><a href="news-article/index.html">Новости</a></div>
     <div><a href="zakonodatelstvo/index.html">Законодательство</a></div>
 </div>				</div>
 				</div>
