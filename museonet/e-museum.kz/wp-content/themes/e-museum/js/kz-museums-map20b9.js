@@ -362,6 +362,37 @@
     }
 
     /**
+     * Генерация заглушек музеев для статичного зеркала
+     */
+    function getFallbackMuseums(regionId) {
+        if (typeof kzRegionsData === 'undefined' || !kzRegionsData[regionId]) {
+            return [];
+        }
+
+        const region = kzRegionsData[regionId];
+        const count = Math.max(0, Number(region.museums) || 0);
+        const placeholderImage =
+            'data:image/svg+xml;utf8,' +
+            encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200">' +
+                    '<rect width="100%" height="100%" fill="#e2e8f0"/>' +
+                    '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#475569" font-family="Arial" font-size="16">' +
+                        'Музей' +
+                    '</text>' +
+                '</svg>'
+            );
+
+        return Array.from({ length: count }, function(_, index) {
+            return {
+                id: regionId + '-' + (index + 1),
+                title: region.name + ' — Музей ' + (index + 1),
+                url: '#',
+                image: placeholderImage
+            };
+        });
+    }
+
+    /**
      * Показать карусель с музеями
      */
     function showKzMapDetails() {
@@ -396,20 +427,36 @@
             },
             success: function(response) {
                 if (loader) loader.style.display = 'none';
-                
-                if (response.success && response.data.museums) {
+
+                if (response && response.success && response.data && Array.isArray(response.data.museums) && response.data.museums.length > 0) {
                     // Кэшируем
                     kzMuseumsCache[kzCurrentRegionId] = response.data.museums;
                     kzMuseumsCache[kzCurrentRegionId + '_name'] = response.data.region_name;
                     
                     renderMuseumsCarousel(response.data.museums, response.data.region_name);
                 } else {
-                    track.innerHTML = '<div class="kz-no-museums">' + kzMapTranslations.no_museums + '</div>';
+                    const fallbackMuseums = getFallbackMuseums(kzCurrentRegionId);
+
+                    if (fallbackMuseums.length > 0) {
+                        kzMuseumsCache[kzCurrentRegionId] = fallbackMuseums;
+                        kzMuseumsCache[kzCurrentRegionId + '_name'] = kzRegionsData[kzCurrentRegionId].name;
+                        renderMuseumsCarousel(fallbackMuseums, kzRegionsData[kzCurrentRegionId].name);
+                    } else {
+                        track.innerHTML = '<div class="kz-no-museums">' + kzMapTranslations.no_museums + '</div>';
+                    }
                 }
             },
             error: function() {
                 if (loader) loader.style.display = 'none';
-                track.innerHTML = '<div class="kz-no-museums">' + kzMapTranslations.error_loading + '</div>';
+                const fallbackMuseums = getFallbackMuseums(kzCurrentRegionId);
+
+                if (fallbackMuseums.length > 0) {
+                    kzMuseumsCache[kzCurrentRegionId] = fallbackMuseums;
+                    kzMuseumsCache[kzCurrentRegionId + '_name'] = kzRegionsData[kzCurrentRegionId].name;
+                    renderMuseumsCarousel(fallbackMuseums, kzRegionsData[kzCurrentRegionId].name);
+                } else {
+                    track.innerHTML = '<div class="kz-no-museums">' + kzMapTranslations.error_loading + '</div>';
+                }
             }
         });
     }
