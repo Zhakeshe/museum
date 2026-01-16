@@ -768,6 +768,7 @@ class="hfeed site" id="page">
     <span class="kz-burger-line"></span>
     <span class="kz-burger-line"></span>
     <span class="kz-burger-line"></span>
+    <span class="kz-burger-text">Навигация</span>
 </button>
 
 <!-- Полноэкранное меню -->
@@ -824,10 +825,35 @@ class="hfeed site" id="page">
     padding: 0;
 }
 
+.kz-burger-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.kz-burger-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f8fafc;
+    letter-spacing: 0.02em;
+}
+
 .elementor-location-header {
     background: #0f172a;
     color: #f8fafc;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+}
+
+.site-content {
+    padding-top: 96px;
+}
+
+.ast-desktop .site-content {
+    padding-top: 110px;
+}
+
+.ast-header-break-point .site-content {
+    padding-top: 88px;
 }
 
 .elementor-location-header .elementor-nav-menu {
@@ -860,6 +886,30 @@ class="hfeed site" id="page">
 
 .elementor-location-header .logoh {
     filter: brightness(0) invert(1);
+}
+
+.elementor-location-header .logh {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #f8fafc;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.elementor-location-header .logh:hover,
+.elementor-location-header .logh:focus-visible {
+    background-color: rgba(56, 189, 248, 0.12);
+    transform: translateY(-1px);
+}
+
+.elementor-location-header .logh-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
 }
 
 .kz-burger-menu .kz-burger-line {
@@ -906,6 +956,12 @@ class="hfeed site" id="page">
     .elementor-location-header .elementor-nav-menu {
         flex-wrap: wrap;
         gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .kz-burger-text {
+        display: none;
     }
 }
 </style>
@@ -1006,7 +1062,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				</div>
 				<div class="elementor-element elementor-element-42110f6 elementor-widget elementor-widget-html" data-id="42110f6" data-element_type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<a href="https://crm.e-museum.kz/" target="_blank" class="logh">Войти</a>				</div>
+					<a href="https://crm.e-museum.kz/" target="_blank" class="logh">
+						<svg class="logh-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path d="M12 2a8 8 0 1 0 8 8 8 8 0 0 0-8-8Zm0 14.5a6.5 6.5 0 1 1 6.5-6.5A6.51 6.51 0 0 1 12 16.5Zm.75-9.25h-1.5v3.5H9.5l2.5 2.5 2.5-2.5h-1.75Z"></path>
+						</svg>
+						<span>Войти</span>
+					</a>				</div>
 				</div>
 				</div>
 				</header>
