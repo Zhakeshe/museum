@@ -415,6 +415,19 @@
             return;
         }
 
+        // Для статичных копий используем заглушки без запроса
+        if (window.location.hostname !== 'e-museum.kz' && window.location.hostname !== 'www.e-museum.kz') {
+            const fallbackMuseums = getFallbackMuseums(kzCurrentRegionId);
+
+            if (fallbackMuseums.length > 0) {
+                kzMuseumsCache[kzCurrentRegionId] = fallbackMuseums;
+                kzMuseumsCache[kzCurrentRegionId + '_name'] = kzRegionsData[kzCurrentRegionId].name;
+                if (loader) loader.style.display = 'none';
+                renderMuseumsCarousel(fallbackMuseums, kzRegionsData[kzCurrentRegionId].name);
+                return;
+            }
+        }
+
         // Если админ-ajax на другом домене, используем заглушки без запроса
         if (typeof kzMuseumsMapAjax !== 'undefined' && kzMuseumsMapAjax.ajaxurl) {
             try {
