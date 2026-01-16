@@ -772,19 +772,6 @@ class="hfeed site" id="page">
     padding: 0;
 }
 
-.kz-burger-menu {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.kz-burger-text {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #f8fafc;
-    letter-spacing: 0.02em;
-}
-
 .elementor-location-header {
     background: #0f172a;
     color: #f8fafc;
@@ -810,79 +797,12 @@ class="hfeed site" id="page">
 }
 
 .elementor-location-header .elementor-item.menu-link {
-    color: #f8fafc;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    padding: 0.5rem 0.25rem;
-    border-radius: 999px;
-    transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.elementor-location-header .elementor-item.menu-link:hover,
-.elementor-location-header .elementor-item.menu-link:focus-visible {
-    color: #38bdf8;
-    background-color: rgba(56, 189, 248, 0.12);
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
-    transform: translateY(-2px);
-}
-
-.elementor-location-header .elementor-nav-menu__container {
-    align-items: center;
-}
-
-.elementor-location-header .logoh {
-    filter: brightness(0) invert(1);
-}
-
-.elementor-location-header .logh {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #f8fafc;
-    font-weight: 600;
-    text-decoration: none;
-    padding: 0.35rem 0.75rem;
-    border-radius: 999px;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.elementor-location-header .logh:hover,
-.elementor-location-header .logh:focus-visible {
-    background-color: rgba(56, 189, 248, 0.12);
-    transform: translateY(-1px);
-}
-
-.elementor-location-header {
-    background: #0f172a;
-    color: #f8fafc;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
-}
-
-.site-content {
-    padding-top: 96px;
-}
-
-.ast-desktop .site-content {
-    padding-top: 110px;
-}
-
-.ast-header-break-point .site-content {
-    padding-top: 88px;
-}
-
-.elementor-location-header .elementor-nav-menu {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-}
-
-.elementor-location-header .elementor-item.menu-link {
-    color: #b0895b;
+    color: #fef3e5;
     font-weight: 600;
     letter-spacing: 0.01em;
     padding: 0.5rem 1rem;
-    background: #ffffff;
+    background: transparent;
+    border: 1px solid rgba(254, 243, 229, 0.35);
     border-radius: 999px;
     transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease,
         box-shadow 0.2s ease;
@@ -890,8 +810,8 @@ class="hfeed site" id="page">
 
 .elementor-location-header .elementor-item.menu-link:hover,
 .elementor-location-header .elementor-item.menu-link:focus-visible {
-    color: #8c6a40;
-    background-color: #fef7ec;
+    color: #fef3e5;
+    background-color: rgba(254, 243, 229, 0.12);
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
     transform: translateY(-2px);
 }
@@ -908,18 +828,19 @@ class="hfeed site" id="page">
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: #8c6a40;
+    color: #fef3e5;
     font-weight: 600;
     text-decoration: none;
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
-    background: #ffffff;
+    background: transparent;
+    border: 1px solid rgba(254, 243, 229, 0.35);
     transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .elementor-location-header .logh:hover,
 .elementor-location-header .logh:focus-visible {
-    background-color: #fef7ec;
+    background-color: rgba(254, 243, 229, 0.12);
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
     transform: translateY(-2px);
 }
@@ -938,28 +859,28 @@ class="hfeed site" id="page">
 
 .elementor-element-9cd1ebf .hero-copy {
     flex: 1 1 50%;
-    order: 2;
+    order: 1;
     min-width: 280px;
 }
 
 .elementor-element-9cd1ebf .elementor-element-d1e67c3 {
     flex: 1 1 50%;
-    order: 1;
+    order: 2;
     display: flex;
     justify-content: center;
 }
 
 .hero-cta .elementor-button {
-    background: #ffffff;
-    color: #8c6a40;
-    border: 1px solid #f1dfc7;
+    background: rgba(254, 243, 229, 0.16);
+    color: #fef3e5;
+    border: 1px solid rgba(254, 243, 229, 0.4);
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .hero-cta .elementor-button:hover,
 .hero-cta .elementor-button:focus-visible {
-    background-color: #fef7ec;
+    background-color: rgba(254, 243, 229, 0.26);
     box-shadow: 0 14px 28px rgba(15, 23, 42, 0.22);
     transform: translateY(-2px);
 }
@@ -1226,6 +1147,8 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 							</div>
 							<model-viewer
 								class="hero-3d-model"
+								src="https://crm.e-museum.kz/emuseum/museum/3DModels/6949473eb2f163716.glb"
+								poster="https://crm.e-museum.kz/emuseum/museum/3DModels/6949489a8136d7c98"
 								camera-controls
 								disable-zoom
 								rotation-per-second="4deg"
