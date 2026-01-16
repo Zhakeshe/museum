@@ -224,8 +224,13 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 	.elementor-442 .elementor-element.elementor-element-5471dcb {
 		font-size: 18px;
 		line-height: 1.75;
-		color: rgba(50, 50, 50, 0.8);
+		color: rgba(248, 243, 232, 0.9);
 		max-width: 560px;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-468157b .elementor-heading-title {
+		color: #fef3e5;
+		text-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
 	}
 
 	.elementor-442 .elementor-element.elementor-element-5471dcb > .elementor-widget-container {
@@ -238,13 +243,14 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 
 	.elementor-442 .elementor-element.elementor-element-9cd1ebf {
 		position: relative;
+		background: url('wp-content/uploads/sites/11/2025/11/slide.jpg') center/cover no-repeat;
 	}
 
 	.elementor-442 .elementor-element.elementor-element-9cd1ebf::before {
 		content: "";
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(246, 244, 240, 0.85) 55%, rgba(236, 232, 225, 0.75));
+		background: rgba(15, 23, 42, 0.45);
 		z-index: 0;
 	}
 
@@ -254,14 +260,15 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 	}
 
 	.hero-cta .elementor-button {
-		background: #8b1538;
-		color: #ffffff;
+		background: rgba(254, 243, 229, 0.18);
+		color: #fef3e5;
+		border: 1px solid rgba(254, 243, 229, 0.4);
 		border-radius: 999px;
 		padding: 14px 30px;
 		font-size: 15px;
 		font-weight: 600;
 		letter-spacing: 0.02em;
-		box-shadow: 0 12px 24px rgba(139, 21, 56, 0.25);
+		box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
 	}
 
 	.hero-3d-wrapper {
@@ -269,6 +276,7 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 		justify-content: flex-end;
 		align-items: center;
 		width: 100%;
+		padding-right: 24px;
 	}
 
 	.hero-3d-surface {
@@ -773,21 +781,29 @@ class="hfeed site" id="page">
 }
 
 .elementor-location-header {
-    background: #0f172a;
+    background: rgba(15, 23, 42, 0.65);
     color: #f8fafc;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+    backdrop-filter: blur(8px);
+}
+
+.home .elementor-location-header {
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 10;
 }
 
 .site-content {
-    padding-top: 96px;
+    padding-top: 0;
 }
 
-.ast-desktop .site-content {
-    padding-top: 110px;
-}
-
-.ast-header-break-point .site-content {
-    padding-top: 88px;
+.home .elementor-element-9cd1ebf {
+    padding-top: 140px;
 }
 
 .elementor-location-header .elementor-nav-menu {
@@ -861,6 +877,7 @@ class="hfeed site" id="page">
     flex: 1 1 50%;
     order: 1;
     min-width: 280px;
+    padding-right: 16px;
 }
 
 .elementor-element-9cd1ebf .elementor-element-d1e67c3 {
