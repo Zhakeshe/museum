@@ -224,8 +224,13 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 	.elementor-442 .elementor-element.elementor-element-5471dcb {
 		font-size: 18px;
 		line-height: 1.75;
-		color: rgba(50, 50, 50, 0.8);
+		color: rgba(248, 243, 232, 0.9);
 		max-width: 560px;
+	}
+
+	.elementor-442 .elementor-element.elementor-element-468157b .elementor-heading-title {
+		color: #fef3e5;
+		text-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
 	}
 
 	.elementor-442 .elementor-element.elementor-element-5471dcb > .elementor-widget-container {
@@ -238,13 +243,14 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 
 	.elementor-442 .elementor-element.elementor-element-9cd1ebf {
 		position: relative;
+		background: url('wp-content/uploads/sites/11/2025/11/slide.jpg') center/cover no-repeat;
 	}
 
 	.elementor-442 .elementor-element.elementor-element-9cd1ebf::before {
 		content: "";
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(246, 244, 240, 0.85) 55%, rgba(236, 232, 225, 0.75));
+		background: rgba(15, 23, 42, 0.45);
 		z-index: 0;
 	}
 
@@ -254,14 +260,15 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 	}
 
 	.hero-cta .elementor-button {
-		background: #8b1538;
-		color: #ffffff;
+		background: rgba(254, 243, 229, 0.18);
+		color: #fef3e5;
+		border: 1px solid rgba(254, 243, 229, 0.4);
 		border-radius: 999px;
 		padding: 14px 30px;
 		font-size: 15px;
 		font-weight: 600;
 		letter-spacing: 0.02em;
-		box-shadow: 0 12px 24px rgba(139, 21, 56, 0.25);
+		box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
 	}
 
 	.hero-3d-wrapper {
@@ -269,6 +276,8 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 		justify-content: flex-end;
 		align-items: center;
 		width: 100%;
+		padding-right: 24px;
+		margin-left: auto;
 	}
 
 	.hero-3d-surface {
@@ -287,6 +296,10 @@ window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16
 		height: 100%;
 		border-radius: 24px;
 		background: transparent;
+	}
+
+	.hero-3d-preview {
+		display: none;
 	}
 
 	.hero-3d-scene {
@@ -763,108 +776,266 @@ class="hfeed site" id="page">
 			<div class="elementor-element elementor-element-c359326 e-grid e-con-full e-con e-parent" data-id="c359326" data-element_type="container" data-settings="{&quot;sticky&quot;:&quot;top&quot;,&quot;sticky_on&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;],&quot;sticky_offset&quot;:0,&quot;sticky_effects_offset&quot;:0,&quot;sticky_anchor_link_offset&quot;:0}">
 				<div class="elementor-element elementor-element-a234c80 elementor-widget elementor-widget-html" data-id="a234c80" data-element_type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<!-- Бургер меню иконка -->
-<div class="kz-burger-menu" id="kzBurgerMenu" onclick="toggleKzMenu()">
-    <span class="kz-burger-line"></span>
-    <span class="kz-burger-line"></span>
-    <span class="kz-burger-line"></span>
-</div>
-
-<!-- Полноэкранное меню -->
-<div class="kz-fullscreen-menu" id="kzFullscreenMenu">
-    <!-- Левая часть - меню (60%) -->
-    <div class="kz-menu-left">
-        <div class="kz-menu-close" onclick="toggleKzMenu()">
-            <span></span>
-            <span></span>
-        </div>
-        
-        <!-- Навигация - ЗДЕСЬ ПРОПИШИТЕ СВОИ ПУНКТЫ МЕНЮ -->
-        <nav class="kz-menu-nav"><a href="#museumkaz" class="kz-menu-link" style="--i: 1">Музеи</a><a href="#models3dkaz" class="kz-menu-link" style="--i: 2">3D модели</a><a href="#tourskaz" class="kz-menu-link" style="--i: 3">Виртуальные туры</a><a href="#museumexhibitkaz" class="kz-menu-link" style="--i: 4">Каталог</a></nav>
-        
-        <!-- Футер меню -->
-        <div class="kz-menu-footer">
-            <div class="kz-menu-social">
-                <a href="#" class="kz-social-link" aria-label="Twitter">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                    </svg>
-                </a>
-                <a href="https://www.instagram.com/nationalmuseumkz/" target="_blank" class="kz-social-link" aria-label="Instagram">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                </a>
-                <a href="https://www.facebook.com/www.qrum.kz" target="_blank" class="kz-social-link" aria-label="Facebook">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
-                    </svg>
-                </a>
-            </div>
-            <p class="kz-menu-copyright">© 2026 MuseoNet</p>
-        </div>
-    </div>
-    
-    <!-- Правая часть - изображение (40%) -->
-    <div class="kz-menu-right" style="background-image: url('wp-content/uploads/sites/11/2025/11/slide.jpg');">
-        <div class="kz-menu-right-overlay"></div>
-        <div class="kz-menu-right-content">
-            <h2>Откройте для себя</h2>
-            <p>богатую историю и культуру Казахстана</p>
-        </div>
-    </div>
-</div>
-
 <style>
 /* ===== БУРГЕР МЕНЮ СТИЛИ ===== */
 
-
-</style>
-
-<script>
-function toggleKzMenu() {
-    const menu = document.getElementById('kzFullscreenMenu');
-    const burger = document.getElementById('kzBurgerMenu');
-    
-    menu.classList.toggle('active');
-    burger.classList.toggle('active');
-    
-    document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+.elementor-location-header {
+    background: rgba(15, 23, 42, 0.65);
+    color: #f8fafc;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+    backdrop-filter: blur(8px);
 }
 
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const menu = document.getElementById('kzFullscreenMenu');
-        const burger = document.getElementById('kzBurgerMenu');
-        
-        if (menu && menu.classList.contains('active')) {
-            menu.classList.remove('active');
-            burger.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    }
-});
+	.home .elementor-location-header {
+	    background: transparent;
+	    box-shadow: none;
+	    backdrop-filter: none;
+	    position: absolute;
+	    left: 0;
+	    right: 0;
+	    top: 0;
+	    z-index: 10;
+	}
 
-document.addEventListener('DOMContentLoaded', function() {
-    const rightSide = document.querySelector('.kz-menu-right');
-    if (rightSide) {
-        rightSide.addEventListener('click', toggleKzMenu);
+	.home .elementor-location-header .elementor-item.menu-link,
+	.home .elementor-location-header .logh {
+	    background: #ffffff;
+	    color: #0f172a;
+	    border: 1px solid rgba(255, 255, 255, 0.8);
+	}
+
+	.home .elementor-location-header .logh {
+	    background: transparent;
+	    color: #ffffff;
+	}
+
+	.home .elementor-location-header.is-scrolled {
+	    background: rgba(15, 23, 42, 0.75);
+	    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+	    backdrop-filter: blur(8px);
+	}
+
+	.home .elementor-location-header.is-scrolled .elementor-item.menu-link,
+	.home .elementor-location-header.is-scrolled .logh {
+	    background: #ffffff;
+	    color: #b0895b;
+	    border-color: rgba(255, 255, 255, 0.8);
+	}
+
+	.home .elementor-location-header.is-scrolled .logh {
+	    background: transparent;
+	    color: #fef3e5;
+	    border-color: rgba(254, 243, 229, 0.4);
+	}
+
+.site-content {
+    padding-top: 0;
+}
+
+.home .elementor-element-9cd1ebf {
+    padding-top: 140px;
+}
+
+.elementor-location-header .elementor-nav-menu {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.elementor-location-header .elementor-item.menu-link {
+    color: #fef3e5;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(254, 243, 229, 0.35);
+    border-radius: 999px;
+    transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.elementor-location-header .elementor-item.menu-link:hover,
+.elementor-location-header .elementor-item.menu-link:focus-visible {
+    color: #fef3e5;
+    background-color: rgba(254, 243, 229, 0.12);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
+    transform: translateY(-2px);
+}
+
+.elementor-location-header .elementor-nav-menu__container {
+    align-items: center;
+}
+
+.elementor-location-header .logoh {
+    filter: brightness(0) invert(1);
+}
+
+.elementor-location-header .logh {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fef3e5;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid rgba(254, 243, 229, 0.35);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.elementor-location-header .logh:hover,
+.elementor-location-header .logh:focus-visible {
+    background-color: rgba(254, 243, 229, 0.12);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+    transform: translateY(-2px);
+}
+
+.elementor-location-header .logh-icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.elementor-element-9cd1ebf .e-con-inner {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    justify-content: space-between;
+}
+
+.elementor-element-9cd1ebf .hero-copy {
+    flex: 1 1 50%;
+    order: 1;
+    min-width: 280px;
+    padding-right: 16px;
+}
+
+.elementor-element-9cd1ebf .elementor-element-d1e67c3 {
+    flex: 1 1 50%;
+    order: 2;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.hero-cta .elementor-button {
+    background: rgba(254, 243, 229, 0.16);
+    color: #fef3e5;
+    border: 1px solid rgba(254, 243, 229, 0.4);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.hero-cta .elementor-button:hover,
+.hero-cta .elementor-button:focus-visible {
+    background-color: rgba(254, 243, 229, 0.26);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.22);
+    transform: translateY(-2px);
+}
+
+.hero-copy .elementor-heading-title,
+.hero-copy .elementor-widget-text-editor,
+.hero-copy .hero-cta {
+    animation: heroSlideIn 0.7s ease both;
+}
+
+.hero-copy .elementor-widget-text-editor {
+    animation-delay: 0.12s;
+}
+
+.hero-copy .hero-cta {
+    animation-delay: 0.22s;
+}
+
+.hero-3d-wrapper {
+    animation: heroFadeIn 0.8s ease both;
+}
+
+.elementor-location-header,
+.elementor-location-header .elementor-item.menu-link {
+    animation: menuFadeIn 0.45s ease both;
+}
+
+@keyframes heroSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
     }
-});
-</script>				</div>
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes menuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .elementor-location-header,
+    .elementor-location-header .elementor-item.menu-link {
+        animation: none;
+        transition: none;
+    }
+
+    .hero-copy .elementor-heading-title,
+    .hero-copy .elementor-widget-text-editor,
+    .hero-copy .hero-cta,
+    .hero-3d-wrapper {
+        animation: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .elementor-location-header .elementor-nav-menu {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .elementor-element-9cd1ebf .e-con-inner {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .elementor-element-9cd1ebf .hero-copy,
+    .elementor-element-9cd1ebf .elementor-element-d1e67c3 {
+        order: initial;
+        width: 100%;
+    }
+}
+
+</style>				</div>
 				</div>
 				<div class="elementor-element elementor-element-3a233a6 elementor-nav-menu__align-start elementor-nav-menu--dropdown-none main-none elementor-hidden-tablet elementor-hidden-mobile elementor-widget elementor-widget-nav-menu" data-id="3a233a6" data-element_type="widget" id="m-menu" data-settings="{&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;svg aria-hidden=\&quot;true\&quot; class=\&quot;e-font-icon-svg e-fas-caret-down\&quot; viewBox=\&quot;0 0 320 512\&quot; xmlns=\&quot;http:\/\/www.w3.org\/2000\/svg\&quot;&gt;&lt;path d=\&quot;M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z\&quot;&gt;&lt;\/path&gt;&lt;\/svg&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
 								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-none">
-				<ul id="menu-1-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link">Виртуальные туры</a></li>
+<ul id="menu-1-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="#museumexhibitkaz" class="elementor-item menu-link">Каталог</a></li>
 </ul>			</nav>
 						<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
-				<ul id="menu-2-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link" tabindex="-1">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link" tabindex="-1">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link" tabindex="-1">Виртуальные туры</a></li>
+<ul id="menu-2-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link" tabindex="-1">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link" tabindex="-1">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link" tabindex="-1">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="#museumexhibitkaz" class="elementor-item menu-link" tabindex="-1">Каталог</a></li>
 </ul>			</nav>
 						</div>
@@ -910,10 +1081,30 @@ document.addEventListener('DOMContentLoaded', function() {
 				</div>
 				<div class="elementor-element elementor-element-42110f6 elementor-widget elementor-widget-html" data-id="42110f6" data-element_type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<a href="https://crm.e-museum.kz/" target="_blank" class="logh">Войти</a>				</div>
+					<a href="https://crm.e-museum.kz/" target="_blank" class="logh">
+						<svg class="logh-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path d="M12 2a8 8 0 1 0 8 8 8 8 0 0 0-8-8Zm0 14.5a6.5 6.5 0 1 1 6.5-6.5A6.51 6.51 0 0 1 12 16.5Zm.75-9.25h-1.5v3.5H9.5l2.5 2.5 2.5-2.5h-1.75Z"></path>
+						</svg>
+						<span>Войти</span>
+					</a>				</div>
 				</div>
 				</div>
-				</header>
+		</header>
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				const header = document.querySelector('.elementor-location-header');
+				if (!header) {
+					return;
+				}
+
+				const toggleHeaderState = () => {
+					header.classList.toggle('is-scrolled', window.scrollY > 10);
+				};
+
+				toggleHeaderState();
+				window.addEventListener('scroll', toggleHeaderState, { passive: true });
+			});
+		</script>
 		<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
 	<div id="content" class="site-content">
@@ -940,15 +1131,15 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 				<div class="elementor-element elementor-element-01cbb60 elementor-nav-menu__align-center elementor-nav-menu--dropdown-none elementor-hidden-mobile elementor-widget elementor-widget-nav-menu" data-id="01cbb60" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;svg aria-hidden=\&quot;true\&quot; class=\&quot;e-font-icon-svg e-fas-caret-down\&quot; viewBox=\&quot;0 0 320 512\&quot; xmlns=\&quot;http:\/\/www.w3.org\/2000\/svg\&quot;&gt;&lt;path d=\&quot;M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z\&quot;&gt;&lt;\/path&gt;&lt;\/svg&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
 								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-none">
-				<ul id="menu-1-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link">Виртуальные туры</a></li>
+				<ul id="menu-1-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Каталог</a></li>
 </ul>			</nav>
 						<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
-				<ul id="menu-2-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Виртуальные туры</a></li>
+				<ul id="menu-2-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Каталог</a></li>
 </ul>			</nav>
 						</div>
@@ -983,6 +1174,7 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 		</search>
 						</div>
 				</div>
+				<div class="hero-copy">
 				<div class="elementor-element elementor-element-468157b elementor-widget elementor-widget-heading" data-id="468157b" data-element_type="widget" data-widget_type="heading.default">
 				<div class="elementor-widget-container">
 					<h1 class="elementor-heading-title elementor-size-default">Museonet — Виртуальный музей Казахстана</h1>				</div>
@@ -1003,6 +1195,7 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 								</div>
 				</div>
 				</div>
+				</div>
 		<div class="elementor-element elementor-element-d1e67c3 e-con-full e-flex e-con e-child" data-id="d1e67c3" data-element_type="container">
 				<div class="elementor-element elementor-element-deadc02 e-transform elementor-widget elementor-widget-html" data-id="deadc02" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;none&quot;,&quot;_transform_scale_effect_hover&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:1.07,&quot;sizes&quot;:[]},&quot;_transform_scale_effect_hover_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;_transform_scale_effect_hover_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}" data-widget_type="html.default">
 				<div class="elementor-widget-container">
@@ -1015,15 +1208,17 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 								<div class="hero-3d-floor"></div>
 								<div class="hero-3d-fog"></div>
 							</div>
-							<model-viewer
-								class="hero-3d-model"
-								camera-controls
-								disable-zoom
-								rotation-per-second="4deg"
-								alt="3D модель экспоната"
-								data-model-url="https://crm.e-museum.kz/emuseum/museum/3DModels/6949473eb2f163716.glb"
-								data-preview-url="https://crm.e-museum.kz/emuseum/museum/3DModels/6949489a8136d7c98">
-							</model-viewer>
+								<model-viewer
+									class="hero-3d-model"
+									src="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341"
+									poster="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341"
+									camera-controls
+									disable-zoom
+									rotation-per-second="4deg"
+									alt="3D модель экспоната"
+									data-model-url="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341"
+									data-preview-url="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341">
+								</model-viewer>
 							<img class="hero-3d-preview" alt="Превью 3D модели" />
 						</div>
 					</div>
