@@ -787,16 +787,36 @@ class="hfeed site" id="page">
     backdrop-filter: blur(8px);
 }
 
-.home .elementor-location-header {
-    background: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: 10;
-}
+	.home .elementor-location-header {
+	    background: transparent;
+	    box-shadow: none;
+	    backdrop-filter: none;
+	    position: absolute;
+	    left: 0;
+	    right: 0;
+	    top: 0;
+	    z-index: 10;
+	}
+
+	.home .elementor-location-header .elementor-item.menu-link,
+	.home .elementor-location-header .logh {
+	    background: #ffffff;
+	    color: #0f172a;
+	    border: 1px solid rgba(255, 255, 255, 0.7);
+	}
+
+	.home .elementor-location-header.is-scrolled {
+	    background: rgba(15, 23, 42, 0.75);
+	    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+	    backdrop-filter: blur(8px);
+	}
+
+	.home .elementor-location-header.is-scrolled .elementor-item.menu-link,
+	.home .elementor-location-header.is-scrolled .logh {
+	    background: rgba(254, 243, 229, 0.16);
+	    color: #fef3e5;
+	    border-color: rgba(254, 243, 229, 0.4);
+	}
 
 .site-content {
     padding-top: 0;
@@ -1058,7 +1078,22 @@ class="hfeed site" id="page">
 					</a>				</div>
 				</div>
 				</div>
-				</header>
+		</header>
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				const header = document.querySelector('.elementor-location-header');
+				if (!header) {
+					return;
+				}
+
+				const toggleHeaderState = () => {
+					header.classList.toggle('is-scrolled', window.scrollY > 10);
+				};
+
+				toggleHeaderState();
+				window.addEventListener('scroll', toggleHeaderState, { passive: true });
+			});
+		</script>
 		<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
 
 	<div id="content" class="site-content">
@@ -1162,17 +1197,17 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 								<div class="hero-3d-floor"></div>
 								<div class="hero-3d-fog"></div>
 							</div>
-							<model-viewer
-								class="hero-3d-model"
-								src="https://crm.e-museum.kz/emuseum/museum/3DModels/6949473eb2f163716.glb"
-								poster="https://crm.e-museum.kz/emuseum/museum/3DModels/6949489a8136d7c98"
-								camera-controls
-								disable-zoom
-								rotation-per-second="4deg"
-								alt="3D модель экспоната"
-								data-model-url="https://crm.e-museum.kz/emuseum/museum/3DModels/6949473eb2f163716.glb"
-								data-preview-url="https://crm.e-museum.kz/emuseum/museum/3DModels/6949489a8136d7c98">
-							</model-viewer>
+								<model-viewer
+									class="hero-3d-model"
+									src="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341"
+									poster="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341"
+									camera-controls
+									disable-zoom
+									rotation-per-second="4deg"
+									alt="3D модель экспоната"
+									data-model-url="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341"
+									data-preview-url="https://crm.e-museum.kz/emuseum/museum/3DModels/696949b1466ca7341">
+								</model-viewer>
 							<img class="hero-3d-preview" alt="Превью 3D модели" />
 						</div>
 					</div>
