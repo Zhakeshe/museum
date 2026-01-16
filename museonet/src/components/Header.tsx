@@ -7,31 +7,32 @@ interface MenuItem {
   isAnchor?: boolean;
 }
 
+const menuItems: MenuItem[] = [
+  { label: 'Музеи Казахстана', href: '/museum' },
+  { label: '3D модели', href: '/model-3d' },
+  { label: 'Каталог', href: '/exhibit' },
+  { label: 'Игры', href: '/news-article' },
+  { label: 'Законодательство', href: '/zakonodatelstvo' },
+];
+
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const menuItems: MenuItem[] = [
-    { label: 'Музеи Казахстана', href: '/museum' },
-    { label: '3D модели', href: '/model-3d' },
-    { label: 'каталог', href: '/exhibit' },
-    { label: 'Игры', href: '/news-article' },
-    { label: 'Законодательство', href: '/zakonodatelstvo' },
-  ];
-
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-    if (!isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    setIsMenuOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isMenuOpen) {
         setIsMenuOpen(false);
-        document.body.style.overflow = '';
       }
     };
 
@@ -47,26 +48,36 @@ const Header: React.FC = () => {
     >
       <div className="elementor-element elementor-element-c359326 e-grid e-con-full e-con e-parent">
         {/* Burger Menu */}
-        <div
+        <button
           className={`kz-burger-menu ${isMenuOpen ? 'active' : ''}`}
           id="kzBurgerMenu"
           onClick={toggleMenu}
+          type="button"
+          aria-expanded={isMenuOpen}
+          aria-controls="kzFullscreenMenu"
+          aria-label={isMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
         >
           <span className="kz-burger-line"></span>
           <span className="kz-burger-line"></span>
           <span className="kz-burger-line"></span>
-        </div>
+        </button>
 
         {/* Fullscreen Menu */}
         <div
           className={`kz-fullscreen-menu ${isMenuOpen ? 'active' : ''}`}
           id="kzFullscreenMenu"
+          aria-hidden={!isMenuOpen}
         >
           <div className="kz-menu-left">
-            <div className="kz-menu-close" onClick={toggleMenu}>
+            <button
+              className="kz-menu-close"
+              onClick={toggleMenu}
+              type="button"
+              aria-label="Закрыть меню"
+            >
               <span></span>
               <span></span>
-            </div>
+            </button>
 
             <nav className="kz-menu-nav">
               {menuItems.map((item, index) => (
@@ -212,4 +223,3 @@ const Header: React.FC = () => {
 };
 
 export default Header;
-
