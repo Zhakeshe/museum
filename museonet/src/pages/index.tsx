@@ -193,6 +193,9 @@ const HomePage: React.FC = () => {
           cursor: pointer;
           gap: 4px;
           z-index: 1001;
+          background: transparent;
+          border: none;
+          padding: 0;
         }
 
         .kz-burger-line {
@@ -308,6 +311,9 @@ const HomePage: React.FC = () => {
         height: 30px;
         cursor: pointer;
         z-index: 1001;
+        background: transparent;
+        border: none;
+        padding: 0;
       }
 
       .kz-menu-close span {
@@ -351,4 +357,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-

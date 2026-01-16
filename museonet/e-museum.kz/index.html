@@ -763,24 +763,24 @@ class="hfeed site" id="page">
 			<div class="elementor-element elementor-element-c359326 e-grid e-con-full e-con e-parent" data-id="c359326" data-element_type="container" data-settings="{&quot;sticky&quot;:&quot;top&quot;,&quot;sticky_on&quot;:[&quot;desktop&quot;,&quot;tablet&quot;,&quot;mobile&quot;],&quot;sticky_offset&quot;:0,&quot;sticky_effects_offset&quot;:0,&quot;sticky_anchor_link_offset&quot;:0}">
 				<div class="elementor-element elementor-element-a234c80 elementor-widget elementor-widget-html" data-id="a234c80" data-element_type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
-					<!-- Бургер меню иконка -->
-<div class="kz-burger-menu" id="kzBurgerMenu" onclick="toggleKzMenu()">
+<!-- Бургер меню иконка -->
+<button class="kz-burger-menu" id="kzBurgerMenu" onclick="toggleKzMenu()" type="button" aria-expanded="false" aria-controls="kzFullscreenMenu" aria-label="Открыть меню">
     <span class="kz-burger-line"></span>
     <span class="kz-burger-line"></span>
     <span class="kz-burger-line"></span>
-</div>
+</button>
 
 <!-- Полноэкранное меню -->
-<div class="kz-fullscreen-menu" id="kzFullscreenMenu">
+<div class="kz-fullscreen-menu" id="kzFullscreenMenu" aria-hidden="true">
     <!-- Левая часть - меню (60%) -->
     <div class="kz-menu-left">
-        <div class="kz-menu-close" onclick="toggleKzMenu()">
+        <button class="kz-menu-close" onclick="toggleKzMenu()" type="button" aria-label="Закрыть меню">
             <span></span>
             <span></span>
-        </div>
+        </button>
         
         <!-- Навигация - ЗДЕСЬ ПРОПИШИТЕ СВОИ ПУНКТЫ МЕНЮ -->
-        <nav class="kz-menu-nav"><a href="#museumkaz" class="kz-menu-link" style="--i: 1">Музеи</a><a href="#models3dkaz" class="kz-menu-link" style="--i: 2">3D модели</a><a href="#tourskaz" class="kz-menu-link" style="--i: 3">Виртуальные туры</a><a href="#museumexhibitkaz" class="kz-menu-link" style="--i: 4">Каталог</a></nav>
+        <nav class="kz-menu-nav"><a href="#museumkaz" class="kz-menu-link" style="--i: 1">Музей тарихы</a><a href="#models3dkaz" class="kz-menu-link" style="--i: 2">3D коллекциялар</a><a href="#tourskaz" class="kz-menu-link" style="--i: 3">Виртуалды көрме</a><a href="#museumexhibitkaz" class="kz-menu-link" style="--i: 4">Каталог</a></nav>
         
         <!-- Футер меню -->
         <div class="kz-menu-footer">
@@ -817,30 +817,126 @@ class="hfeed site" id="page">
 
 <style>
 /* ===== БУРГЕР МЕНЮ СТИЛИ ===== */
+.kz-burger-menu,
+.kz-menu-close {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
 
+.elementor-location-header {
+    background: #0f172a;
+    color: #f8fafc;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+}
 
+.elementor-location-header .elementor-nav-menu {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.elementor-location-header .elementor-item.menu-link {
+    color: #f8fafc;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 0.5rem 0.25rem;
+    border-radius: 999px;
+    transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.elementor-location-header .elementor-item.menu-link:hover,
+.elementor-location-header .elementor-item.menu-link:focus-visible {
+    color: #38bdf8;
+    background-color: rgba(56, 189, 248, 0.12);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+    transform: translateY(-2px);
+}
+
+.elementor-location-header .elementor-nav-menu__container {
+    align-items: center;
+}
+
+.elementor-location-header .logoh {
+    filter: brightness(0) invert(1);
+}
+
+.kz-burger-menu .kz-burger-line {
+    background-color: #f8fafc;
+}
+
+.kz-menu-link {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.kz-menu-link:hover,
+.kz-menu-link:focus-visible {
+    color: #38bdf8;
+    transform: translateY(-2px);
+}
+
+.elementor-location-header,
+.kz-menu-link,
+.elementor-location-header .elementor-item.menu-link {
+    animation: menuFadeIn 0.45s ease both;
+}
+
+@keyframes menuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .elementor-location-header,
+    .kz-menu-link,
+    .elementor-location-header .elementor-item.menu-link {
+        animation: none;
+        transition: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .elementor-location-header .elementor-nav-menu {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}
 </style>
 
 <script>
-function toggleKzMenu() {
+function setKzMenuState(isOpen) {
     const menu = document.getElementById('kzFullscreenMenu');
     const burger = document.getElementById('kzBurgerMenu');
-    
-    menu.classList.toggle('active');
-    burger.classList.toggle('active');
-    
-    document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+
+    if (!menu || !burger) {
+        return;
+    }
+
+    menu.classList.toggle('active', isOpen);
+    burger.classList.toggle('active', isOpen);
+    burger.setAttribute('aria-expanded', String(isOpen));
+    menu.setAttribute('aria-hidden', String(!isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+
+function toggleKzMenu() {
+    const menu = document.getElementById('kzFullscreenMenu');
+    const isOpen = menu ? !menu.classList.contains('active') : false;
+    setKzMenuState(isOpen);
 }
 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const menu = document.getElementById('kzFullscreenMenu');
-        const burger = document.getElementById('kzBurgerMenu');
-        
         if (menu && menu.classList.contains('active')) {
-            menu.classList.remove('active');
-            burger.classList.remove('active');
-            document.body.style.overflow = '';
+            setKzMenuState(false);
         }
     }
 });
@@ -856,15 +952,15 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div class="elementor-element elementor-element-3a233a6 elementor-nav-menu__align-start elementor-nav-menu--dropdown-none main-none elementor-hidden-tablet elementor-hidden-mobile elementor-widget elementor-widget-nav-menu" data-id="3a233a6" data-element_type="widget" id="m-menu" data-settings="{&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;svg aria-hidden=\&quot;true\&quot; class=\&quot;e-font-icon-svg e-fas-caret-down\&quot; viewBox=\&quot;0 0 320 512\&quot; xmlns=\&quot;http:\/\/www.w3.org\/2000\/svg\&quot;&gt;&lt;path d=\&quot;M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z\&quot;&gt;&lt;\/path&gt;&lt;\/svg&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
 								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-none">
-				<ul id="menu-1-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link">Виртуальные туры</a></li>
+<ul id="menu-1-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="#museumexhibitkaz" class="elementor-item menu-link">Каталог</a></li>
 </ul>			</nav>
 						<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
-				<ul id="menu-2-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link" tabindex="-1">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link" tabindex="-1">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link" tabindex="-1">Виртуальные туры</a></li>
+<ul id="menu-2-3a233a6" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-464"><a href="#museumkaz" class="elementor-item menu-link" tabindex="-1">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-465"><a href="#models3dkaz" class="elementor-item menu-link" tabindex="-1">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-466"><a href="#tourskaz" class="elementor-item menu-link" tabindex="-1">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-463"><a href="#museumexhibitkaz" class="elementor-item menu-link" tabindex="-1">Каталог</a></li>
 </ul>			</nav>
 						</div>
@@ -940,15 +1036,15 @@ class="post-442 page type-page status-publish ast-article-single" id="post-442" 
 				<div class="elementor-element elementor-element-01cbb60 elementor-nav-menu__align-center elementor-nav-menu--dropdown-none elementor-hidden-mobile elementor-widget elementor-widget-nav-menu" data-id="01cbb60" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;horizontal&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;svg aria-hidden=\&quot;true\&quot; class=\&quot;e-font-icon-svg e-fas-caret-down\&quot; viewBox=\&quot;0 0 320 512\&quot; xmlns=\&quot;http:\/\/www.w3.org\/2000\/svg\&quot;&gt;&lt;path d=\&quot;M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z\&quot;&gt;&lt;\/path&gt;&lt;\/svg&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
 								<nav aria-label="Menu" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal e--pointer-none">
-				<ul id="menu-1-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link">Виртуальные туры</a></li>
+				<ul id="menu-1-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link">Каталог</a></li>
 </ul>			</nav>
 						<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" aria-hidden="true">
-				<ul id="menu-2-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Музеи</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">3D модели</a></li>
-<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Виртуальные туры</a></li>
+				<ul id="menu-2-01cbb60" class="elementor-nav-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31232"><a href="index.html#museumkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Музей тарихы</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31233"><a href="index.html#models3dkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">3D коллекциялар</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-31238"><a href="index.html#tourskaz" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Виртуалды көрме</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-31234"><a href="index.html#museumexhibitkaz" aria-current="page" class="elementor-item elementor-item-anchor menu-link" tabindex="-1">Каталог</a></li>
 </ul>			</nav>
 						</div>
