@@ -106,19 +106,24 @@
         data.games.forEach((game) => {
           const card = document.createElement('div');
           card.className = 'game';
+          const hasTimer = Number(game.timeLimitSeconds) > 0;
           card.innerHTML = `
             <h3>${game.title}</h3>
             <p>${game.description}</p>
             <div class="game-meta">
               <span>Ұпай: ${game.points}</span>
-              <span class="timer" data-timer>Уақыт: ${game.timeLimitSeconds} сек</span>
+              ${hasTimer ? `<span class="timer" data-timer>Уақыт: ${game.timeLimitSeconds} сек</span>` : '<span class="timer" data-timer>Уақыт: шектеусіз</span>'}
             </div>
-            <button>Ойынды бастау</button>
+            <button>${game.url ? 'Ойынды ашу' : 'Ойынды бастау'}</button>
           `;
           const button = card.querySelector('button');
           const timerEl = card.querySelector('[data-timer]');
           let timerId;
           button.addEventListener('click', () => {
+            if (game.url) {
+              window.location.href = game.url;
+              return;
+            }
             let remaining = game.timeLimitSeconds;
             button.disabled = true;
             timerEl.textContent = `Уақыт: ${remaining} сек`;

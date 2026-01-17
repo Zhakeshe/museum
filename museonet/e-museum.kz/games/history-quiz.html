@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тарихи сұрақтар — Museonet</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --accent: #ef476f;
+      --primary: #1f2937;
+      --muted: #6b7280;
+      --border: rgba(248, 219, 201, 0.8);
+      --surface: #ffffff;
+      --soft: #fff7f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Nunito Sans', sans-serif;
+      background: #f7f5f2;
+      color: var(--primary);
+      min-height: 100vh;
+    }
+    header {
+      padding: 18px 32px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header a {
+      color: #b0895b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 30px rgba(31, 41, 55, 0.08);
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .progress {
+      background: #f2f4f8;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      margin: 12px 0 24px;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      background: var(--accent);
+      width: 0;
+      transition: width 0.2s ease;
+    }
+    .question {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: grid;
+      gap: 12px;
+    }
+    .option-btn {
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .option-btn:hover,
+    .option-btn:focus-visible {
+      border-color: var(--accent);
+      box-shadow: 0 6px 12px rgba(239, 71, 111, 0.15);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .option-btn.correct {
+      border-color: #22c55e;
+      background: #ecfdf3;
+    }
+    .option-btn.wrong {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .actions button {
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .actions button.secondary {
+      background: #e2e8f0;
+      color: #1f2937;
+    }
+    .hidden { display: none; }
+    .result {
+      background: var(--soft);
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 20px;
+      color: #1f2937;
+    }
+    .footer-note {
+      margin-top: 18px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/games/index.html">← Ойындар</a>
+    <div>Тарихи сұрақтар</div>
+  </header>
+  <main>
+    <div class="card">
+      <h1>Тарихи сұрақтар</h1>
+      <p>Сұрақтар кездейсоқ беріледі. Әр сұрақтың дұрыс жауабы бар.</p>
+      <div class="meta" id="meta"></div>
+      <div class="progress"><span id="progress-bar"></span></div>
+      <div id="quiz">
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <div class="actions">
+          <button id="next-btn" class="secondary" disabled>Келесі сұрақ</button>
+          <button id="restart-btn" class="secondary">Қайта бастау</button>
+        </div>
+      </div>
+      <div id="result" class="result hidden"></div>
+      <div class="footer-note" id="count-note"></div>
+    </div>
+  </main>
+  <script>
+    const QUESTIONS_URL = '/data/history-questions.json';
+    const QUESTION_LIMIT = 20;
+    const metaEl = document.getElementById('meta');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const resultEl = document.getElementById('result');
+    const progressBar = document.getElementById('progress-bar');
+    const countNote = document.getElementById('count-note');
+
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let canAnswer = true;
+
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+
+    const updateMeta = () => {
+      metaEl.innerHTML = `
+        <span>Сұрақ: ${currentIndex + 1} / ${questions.length}</span>
+        <span>Дұрыс жауаптар: ${score}</span>
+      `;
+      progressBar.style.width = `${((currentIndex) / questions.length) * 100}%`;
+    };
+
+    const renderQuestion = () => {
+      const item = questions[currentIndex];
+      if (!item) {
+        showResult();
+        return;
+      }
+      canAnswer = true;
+      nextBtn.disabled = true;
+      questionEl.textContent = item.question;
+      optionsEl.innerHTML = '';
+      item.options.forEach((option, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.type = 'button';
+        btn.textContent = option;
+        btn.addEventListener('click', () => handleAnswer(btn, index));
+        optionsEl.appendChild(btn);
+      });
+      updateMeta();
+    };
+
+    const handleAnswer = (btn, index) => {
+      if (!canAnswer) return;
+      canAnswer = false;
+      const item = questions[currentIndex];
+      const buttons = optionsEl.querySelectorAll('button');
+      buttons.forEach((button, idx) => {
+        if (idx === item.answerIndex) button.classList.add('correct');
+        if (idx === index && idx !== item.answerIndex) button.classList.add('wrong');
+        button.disabled = true;
+      });
+      if (index === item.answerIndex) {
+        score += 1;
+      }
+      nextBtn.disabled = false;
+      updateMeta();
+    };
+
+    const showResult = () => {
+      questionEl.textContent = 'Ойын аяқталды!';
+      optionsEl.innerHTML = '';
+      nextBtn.disabled = true;
+      resultEl.classList.remove('hidden');
+      resultEl.textContent = `Нәтиже: ${score} / ${questions.length} дұрыс.`;
+      progressBar.style.width = '100%';
+    };
+
+    const restart = () => {
+      score = 0;
+      currentIndex = 0;
+      questions = shuffle([...questions]).slice(0, QUESTION_LIMIT);
+      resultEl.classList.add('hidden');
+      renderQuestion();
+    };
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex += 1;
+      renderQuestion();
+    });
+
+    restartBtn.addEventListener('click', restart);
+
+    fetch(QUESTIONS_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        const allQuestions = data.questions || [];
+        countNote.textContent = `Барлығы ${allQuestions.length} сұрақ қолжетімді. Әр ойында ${QUESTION_LIMIT} сұрақ беріледі.`;
+        questions = shuffle(allQuestions).slice(0, QUESTION_LIMIT);
+        renderQuestion();
+      })
+      .catch(() => {
+        questionEl.textContent = 'Сұрақтар жүктелмеді. Кейінірек қайталап көріңіз.';
+      });
+  </script>
+</body>
+</html>
