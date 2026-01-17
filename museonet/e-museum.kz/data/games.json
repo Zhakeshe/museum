@@ -13,6 +13,14 @@
       "description": "Музей залында көрсетілген экспонатты дұрыс анықтаңыз.",
       "points": 10,
       "timeLimitSeconds": 45
+    },
+    {
+      "id": "history-quiz",
+      "title": "Тарихи викторина",
+      "description": "1000+ сұрақтан кездейсоқ таңдалған тарихи викторина.",
+      "points": 5,
+      "timeLimitSeconds": 0,
+      "url": "/games/history-quiz.html"
     }
   ]
 }
