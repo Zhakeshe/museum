@@ -66,28 +66,39 @@
   </div>
   <script>
     const form = document.getElementById('register-form');
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const API_BASE = window.EMUSEUM_API_BASE || '/api';
 
-      fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            throw new Error(data.error);
-          }
-          window.location.href = '/auth/login.html';
-        })
-        .catch((error) => {
-          alert(error.message || 'Ошибка регистрации.');
+      try {
+        const response = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
         });
+        const contentType = response.headers.get('content-type') || '';
+        const isJson = contentType.includes('application/json');
+        const payload = isJson ? await response.json() : null;
+
+        if (!response.ok) {
+          const message =
+            (payload && payload.error) ||
+            (payload && payload.message) ||
+            `Ошибка сервера (${response.status}). Попробуйте позже.`;
+          throw new Error(message);
+        }
+
+        if (payload && payload.error) {
+          throw new Error(payload.error);
+        }
+
+        window.location.href = '/auth/login.html';
+      } catch (error) {
+        alert(error.message || 'Ошибка регистрации.');
+      }
     });
   </script>
 </body>
