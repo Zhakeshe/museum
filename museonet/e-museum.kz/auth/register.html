@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Регистрация — Личный кабинет</title>
+  <style>
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      background: #ffffff;
+      color: #1f2937;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 24px;
+    }
+    .card {
+      width: min(460px, 100%);
+      background: #fdf7f1;
+      border-radius: 18px;
+      padding: 28px;
+      border: 1px solid rgba(240, 225, 212, 0.9);
+      box-shadow: 0 20px 50px rgba(31, 41, 55, 0.12);
+    }
+    h1 { margin: 0 0 16px; font-size: 24px; }
+    label { display: block; margin: 12px 0 6px; font-size: 14px; color: #6b7280; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(210, 198, 184, 0.6);
+      background: #ffffff;
+      color: #1f2937;
+    }
+    .actions { display: flex; gap: 12px; margin-top: 16px; }
+    button {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      background: #ef476f;
+      color: #ffffff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    a { color: #b0895b; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Регистрация</h1>
+    <form id="register-form">
+      <label for="name">Имя</label>
+      <input id="name" name="name" type="text" required />
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required />
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" required />
+      <div class="actions">
+        <button type="submit">Создать аккаунт</button>
+      </div>
+    </form>
+    <p><a href="/auth/login.html">Уже есть аккаунт? Войти</a></p>
+  </div>
+  <script>
+    const form = document.getElementById('register-form');
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const API_BASE = window.EMUSEUM_API_BASE || '/api';
+
+      fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          window.location.href = '/auth/login.html';
+        })
+        .catch((error) => {
+          alert(error.message || 'Ошибка регистрации.');
+        });
+    });
+  </script>
+</body>
+</html>

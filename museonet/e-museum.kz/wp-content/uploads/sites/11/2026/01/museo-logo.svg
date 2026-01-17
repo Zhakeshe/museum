@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 220" role="img" aria-labelledby="title desc">
+  <title id="title">Museo.net logo</title>
+  <desc id="desc">Stylized museum icon with Museo.net wordmark.</desc>
+  <style>
+    .primary { fill: #6b1f2a; }
+    .accent { fill: #7b2531; }
+    .text { font: 700 64px "Georgia", "Times New Roman", serif; letter-spacing: 1px; }
+    .subtext { font: 600 36px "Georgia", "Times New Roman", serif; }
+  </style>
+  <rect width="640" height="220" fill="none" />
+  <g transform="translate(40 20)">
+    <path class="primary" d="M40 70 L140 20 L240 70 L228 82 L52 82 Z"/>
+    <rect class="primary" x="60" y="82" width="160" height="16" rx="4"/>
+    <rect class="primary" x="60" y="154" width="160" height="16" rx="4"/>
+    <rect class="primary" x="68" y="98" width="24" height="56" rx="4"/>
+    <rect class="primary" x="196" y="98" width="24" height="56" rx="4"/>
+    <path class="primary" d="M116 154 V108 a24 24 0 0 1 48 0 v46z"/>
+    <path class="primary" d="M80 154 V118 a20 20 0 0 1 40 0 v36z"/>
+    <path class="primary" d="M168 154 V118 a20 20 0 0 1 40 0 v36z"/>
+    <circle class="accent" cx="188" cy="44" r="8"/>
+    <circle class="accent" cx="212" cy="36" r="6"/>
+    <circle class="accent" cx="232" cy="48" r="5"/>
+  </g>
+  <g transform="translate(300 78)">
+    <text class="primary text" x="0" y="60">Museo</text>
+    <text class="primary subtext" x="115" y="110">net</text>
+    <rect class="primary" x="0" y="98" width="90" height="6" rx="3"/>
+    <rect class="primary" x="176" y="98" width="90" height="6" rx="3"/>
+  </g>
+</svg>

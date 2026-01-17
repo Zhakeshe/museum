@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админ панель — Museonet</title>
+  <style>
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px 32px;
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      justify-content: space-between;
+    }
+    a { color: #fef3e5; text-decoration: none; }
+    .container { padding: 32px; max-width: 1100px; margin: 0 auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
+    button {
+      background: #fef3e5;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/cabinet/index.html">← Личный кабинет</a>
+    <span>Админ панель</span>
+  </header>
+  <div class="container">
+    <h1>Пайдаланушылар</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Имя</th>
+          <th>Email</th>
+          <th>Роль</th>
+          <th>Ұпай</th>
+          <th>Әрекет</th>
+        </tr>
+      </thead>
+      <tbody id="users"></tbody>
+    </table>
+  </div>
+  <script>
+    const userRaw = localStorage.getItem('emuseum:user');
+    const user = JSON.parse(userRaw || '{}');
+    if (!userRaw || user.role !== 'admin') {
+      alert('Тек админ үшін қолжетімді.');
+      window.location.href = '/cabinet/index.html';
+    }
+
+    const users = JSON.parse(localStorage.getItem('emuseum:users') || '[]');
+    const tbody = document.getElementById('users');
+
+    const render = () => {
+      tbody.innerHTML = '';
+      users.forEach((u, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td>${u.role}</td>
+          <td>${u.points || 0}</td>
+          <td><button data-index="${index}">+10 ұпай</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+      document.querySelectorAll('button[data-index]').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+          const idx = Number(event.target.dataset.index);
+          users[idx].points = (users[idx].points || 0) + 10;
+          localStorage.setItem('emuseum:users', JSON.stringify(users));
+          if (user.email === users[idx].email) {
+            const updated = { ...user, points: users[idx].points };
+            localStorage.setItem('emuseum:user', JSON.stringify(updated));
+          }
+          render();
+        });
+      });
+    };
+
+    render();
+  </script>
+</body>
+</html>

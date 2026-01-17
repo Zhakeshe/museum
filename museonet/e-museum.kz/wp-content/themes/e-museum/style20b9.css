@@ -292,6 +292,9 @@ header {
     background-position: center;
 	max-width: 230px;
 }
+img.logoh {
+    background-image: none;
+}
 .nav-light-bg .logoh {
     background-image: url(../../uploads/sites/11/2025/12/logo2.png);
 }
@@ -1470,4 +1473,3 @@ a.news-card {
     height: auto;
     display: block;
 }
-
