@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Экспонатты есте сақтау — Museonet</title>
+  <style>
+    :root {
+      --accent: #ef476f;
+      --primary: #1f2937;
+      --muted: #6b7280;
+      --border: rgba(148, 163, 184, 0.35);
+      --surface: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Nunito Sans', sans-serif;
+      background: #f8fafc;
+      color: var(--primary);
+      min-height: 100vh;
+    }
+    header {
+      padding: 18px 32px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header a {
+      color: #b0895b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 30px rgba(31, 41, 55, 0.08);
+    }
+    .meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .tile {
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      background: #ffffff;
+      cursor: pointer;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+    .tile.revealed {
+      background: #fff7f2;
+      border-color: var(--accent);
+    }
+    .tile.matched {
+      background: #ecfdf3;
+      border-color: #22c55e;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    button {
+      border: none;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent);
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/games/index.html">← Ойындар</a>
+    <div>Экспонатты есте сақтау</div>
+  </header>
+  <main>
+    <div class="card">
+      <h1>Экспонатты есте сақтау</h1>
+      <p>Экспонат пен сипаттаманы жұптаңыз.</p>
+      <div class="meta" id="meta"></div>
+      <div class="grid" id="grid"></div>
+      <div class="actions">
+        <button id="reset-btn">Қайта бастау</button>
+      </div>
+    </div>
+  </main>
+  <script>
+    const pairs = [
+      { term: 'Алтын адам', match: 'Есік қорғаны' },
+      { term: 'Томирис', match: 'Сақ-массагеттер патшайымы' },
+      { term: 'Ұлы Жібек жолы', match: 'Сауда жолы' },
+      { term: 'Ботай мәдениеті', match: 'Жылқыны қолға үйрету' },
+      { term: 'Қожа Ахмет Ясауи', match: 'Түркістан' },
+      { term: 'Алтын Орда', match: 'XIII-XV ғасырлар' }
+    ];
+
+    const gridEl = document.getElementById('grid');
+    const metaEl = document.getElementById('meta');
+    const resetBtn = document.getElementById('reset-btn');
+
+    let tiles = [];
+    let firstPick = null;
+    let lock = false;
+    let matches = 0;
+
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+
+    const render = () => {
+      gridEl.innerHTML = '';
+      tiles.forEach((tile) => {
+        const div = document.createElement('div');
+        div.className = 'tile';
+        div.textContent = tile.revealed || tile.matched ? tile.label : '...';
+        if (tile.revealed) div.classList.add('revealed');
+        if (tile.matched) div.classList.add('matched');
+        div.addEventListener('click', () => handlePick(tile));
+        gridEl.appendChild(div);
+      });
+      metaEl.innerHTML = `<span>Табылған жұптар: ${matches} / ${pairs.length}</span>`;
+    };
+
+    const handlePick = (tile) => {
+      if (lock || tile.revealed || tile.matched) return;
+      tile.revealed = true;
+      if (!firstPick) {
+        firstPick = tile;
+        render();
+        return;
+      }
+      if (firstPick.pairId === tile.pairId) {
+        tile.matched = true;
+        firstPick.matched = true;
+        matches += 1;
+        firstPick = null;
+        render();
+        return;
+      }
+      lock = true;
+      render();
+      setTimeout(() => {
+        tile.revealed = false;
+        if (firstPick) firstPick.revealed = false;
+        firstPick = null;
+        lock = false;
+        render();
+      }, 800);
+    };
+
+    const resetGame = () => {
+      matches = 0;
+      firstPick = null;
+      lock = false;
+      tiles = [];
+      pairs.forEach((pair, index) => {
+        tiles.push({ id: `${index}-a`, pairId: index, label: pair.term, revealed: false, matched: false });
+        tiles.push({ id: `${index}-b`, pairId: index, label: pair.match, revealed: false, matched: false });
+      });
+      tiles = shuffle(tiles);
+      render();
+    };
+
+    resetBtn.addEventListener('click', resetGame);
+
+    resetGame();
+  </script>
+</body>
+</html>

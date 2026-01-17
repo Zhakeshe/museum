@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Реализм — Museonet</title>
+  <style>
+    :root {
+      --accent: #ef476f;
+      --primary: #1f2937;
+      --muted: #6b7280;
+      --border: rgba(148, 163, 184, 0.35);
+      --surface: #ffffff;
+      --soft: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Nunito Sans', sans-serif;
+      background: #f3f4f6;
+      color: var(--primary);
+      min-height: 100vh;
+    }
+    header {
+      padding: 18px 32px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header a {
+      color: #b0895b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    main {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 30px rgba(31, 41, 55, 0.08);
+    }
+    .meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .statement {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 16px 0 24px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.true { background: #22c55e; color: #ffffff; }
+    button.false { background: #ef4444; color: #ffffff; }
+    button.secondary { background: #e2e8f0; color: #1f2937; }
+    .feedback {
+      margin-top: 18px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--soft);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/games/index.html">← Ойындар</a>
+    <div>Реализм</div>
+  </header>
+  <main>
+    <div class="card">
+      <h1>Реализм</h1>
+      <p>Тарихи мәлімдемелердің шынайы немесе жалған екенін анықтаңыз.</p>
+      <div class="meta" id="meta"></div>
+      <div class="statement" id="statement"></div>
+      <div class="actions">
+        <button class="true" id="true-btn">Шынайы</button>
+        <button class="false" id="false-btn">Жалған</button>
+        <button class="secondary" id="next-btn">Келесі</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </main>
+  <script>
+    const statements = [
+      { text: 'Қазақ хандығы XV ғасырда құрылған.', isTrue: true },
+      { text: 'Қожа Ахмет Ясауи кесенесі Алматы қаласында орналасқан.', isTrue: false },
+      { text: 'Ұлы Жібек жолы Қазақстан аумағы арқылы өткен.', isTrue: true },
+      { text: 'Абылай хан XVIII ғасырда өмір сүрген.', isTrue: true },
+      { text: 'Ботай мәдениеті жылқыны қолға үйретумен белгілі.', isTrue: true },
+      { text: 'Қазақстан тәуелсіздігі 1981 жылы жарияланды.', isTrue: false },
+      { text: 'Томирис сақ-массагеттердің патшайымы ретінде белгілі.', isTrue: true },
+      { text: 'Семей полигоны 1991 жылы жабылды.', isTrue: true }
+    ];
+
+    const metaEl = document.getElementById('meta');
+    const statementEl = document.getElementById('statement');
+    const feedbackEl = document.getElementById('feedback');
+    const trueBtn = document.getElementById('true-btn');
+    const falseBtn = document.getElementById('false-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    let index = 0;
+    let score = 0;
+
+    const updateMeta = () => {
+      metaEl.innerHTML = `
+        <span>Сұрақ: ${index + 1} / ${statements.length}</span>
+        <span>Дұрыс жауаптар: ${score}</span>
+      `;
+    };
+
+    const showStatement = () => {
+      statementEl.textContent = statements[index].text;
+      feedbackEl.textContent = 'Жауабыңызды таңдаңыз.';
+      updateMeta();
+    };
+
+    const handleAnswer = (value) => {
+      const current = statements[index];
+      if (value === current.isTrue) {
+        score += 1;
+        feedbackEl.textContent = 'Дұрыс жауап!';
+      } else {
+        feedbackEl.textContent = 'Қате жауап. Кейінірек қайтадан көріңіз.';
+      }
+      updateMeta();
+    };
+
+    trueBtn.addEventListener('click', () => handleAnswer(true));
+    falseBtn.addEventListener('click', () => handleAnswer(false));
+    nextBtn.addEventListener('click', () => {
+      index = (index + 1) % statements.length;
+      showStatement();
+    });
+
+    showStatement();
+  </script>
+</body>
+</html>
