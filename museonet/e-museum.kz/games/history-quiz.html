@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Тарихи сұрақтар — Museonet</title>
+  <title>Тарихи викторина — Museonet</title>
   <style>
     :root {
       color-scheme: light;
@@ -143,12 +143,12 @@
 <body>
   <header>
     <a href="/games/index.html">← Ойындар</a>
-    <div>Тарихи сұрақтар</div>
+    <div>Тарихи викторина</div>
   </header>
   <main>
     <div class="card">
-      <h1>Тарихи сұрақтар</h1>
-      <p>Сұрақтар кездейсоқ беріледі. Әр сұрақтың дұрыс жауабы бар.</p>
+      <h1>Тарихи викторина</h1>
+      <p>Сұрақтар рандом беріледі, жауаптар сақталып тұрады және қайталанбайды.</p>
       <div class="meta" id="meta"></div>
       <div class="progress"><span id="progress-bar"></span></div>
       <div id="quiz">
@@ -156,7 +156,7 @@
         <div class="options" id="options"></div>
         <div class="actions">
           <button id="next-btn" class="secondary" disabled>Келесі сұрақ</button>
-          <button id="restart-btn" class="secondary">Қайта бастау</button>
+          <button id="restart-btn" class="secondary">Қалғанын жалғастыру</button>
         </div>
       </div>
       <div id="result" class="result hidden"></div>
@@ -165,7 +165,7 @@
   </main>
   <script>
     const QUESTIONS_URL = '/data/history-questions.json';
-    const QUESTION_LIMIT = 20;
+    const STORAGE_KEY = 'emuseum:history-quiz-state-v1';
     const metaEl = document.getElementById('meta');
     const questionEl = document.getElementById('question');
     const optionsEl = document.getElementById('options');
@@ -176,22 +176,48 @@
     const countNote = document.getElementById('count-note');
 
     let questions = [];
-    let currentIndex = 0;
+    let questionsMap = new Map();
+    let remainingIds = [];
+    let currentId = null;
     let score = 0;
     let canAnswer = true;
+    let seenIds = new Set();
+    let answeredCount = 0;
 
     const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
+    const saveState = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        remainingIds,
+        currentId,
+        score,
+        answeredCount,
+        seenIds: Array.from(seenIds)
+      }));
+    };
+
+    const loadState = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (error) {
+        return null;
+      }
+    };
+
     const updateMeta = () => {
+      const total = answeredCount + remainingIds.length;
+      const currentNumber = remainingIds.length ? answeredCount + 1 : answeredCount;
       metaEl.innerHTML = `
-        <span>Сұрақ: ${currentIndex + 1} / ${questions.length}</span>
+        <span>Сұрақ: ${currentNumber} / ${total}</span>
         <span>Дұрыс жауаптар: ${score}</span>
+        <span>Қалғаны: ${remainingIds.length}</span>
       `;
-      progressBar.style.width = `${((currentIndex) / questions.length) * 100}%`;
+      progressBar.style.width = total ? `${(answeredCount / total) * 100}%` : '100%';
     };
 
     const renderQuestion = () => {
-      const item = questions[currentIndex];
+      const item = currentId ? questionsMap.get(currentId) : null;
       if (!item) {
         showResult();
         return;
@@ -214,7 +240,7 @@
     const handleAnswer = (btn, index) => {
       if (!canAnswer) return;
       canAnswer = false;
-      const item = questions[currentIndex];
+      const item = questionsMap.get(currentId);
       const buttons = optionsEl.querySelectorAll('button');
       buttons.forEach((button, idx) => {
         if (idx === item.answerIndex) button.classList.add('correct');
@@ -224,29 +250,42 @@
       if (index === item.answerIndex) {
         score += 1;
       }
+      seenIds.add(currentId);
+      remainingIds = remainingIds.filter((id) => id !== currentId);
+      answeredCount += 1;
       nextBtn.disabled = false;
+      saveState();
       updateMeta();
     };
 
     const showResult = () => {
-      questionEl.textContent = 'Ойын аяқталды!';
+      questionEl.textContent = 'Барлық сұрақ аяқталды!';
       optionsEl.innerHTML = '';
       nextBtn.disabled = true;
       resultEl.classList.remove('hidden');
-      resultEl.textContent = `Нәтиже: ${score} / ${questions.length} дұрыс.`;
+      resultEl.textContent = `Нәтиже: ${score} / ${answeredCount} дұрыс.`;
       progressBar.style.width = '100%';
     };
 
     const restart = () => {
-      score = 0;
-      currentIndex = 0;
-      questions = shuffle([...questions]).slice(0, QUESTION_LIMIT);
       resultEl.classList.add('hidden');
+      if (!remainingIds.length) {
+        showResult();
+        return;
+      }
+      remainingIds = shuffle([...remainingIds]);
+      currentId = remainingIds[0];
+      saveState();
       renderQuestion();
     };
 
     nextBtn.addEventListener('click', () => {
-      currentIndex += 1;
+      if (!remainingIds.length) {
+        showResult();
+        return;
+      }
+      currentId = remainingIds[0];
+      saveState();
       renderQuestion();
     });
 
@@ -256,8 +295,30 @@
       .then((res) => res.json())
       .then((data) => {
         const allQuestions = data.questions || [];
-        countNote.textContent = `Барлығы ${allQuestions.length} сұрақ қолжетімді. Әр ойында ${QUESTION_LIMIT} сұрақ беріледі.`;
-        questions = shuffle(allQuestions).slice(0, QUESTION_LIMIT);
+        questions = allQuestions;
+        questionsMap = new Map(allQuestions.map((q) => [q.id, q]));
+        const stored = loadState();
+        if (stored) {
+          seenIds = new Set((stored.seenIds || []).filter((id) => questionsMap.has(id)));
+          score = stored.score || 0;
+          answeredCount = stored.answeredCount || 0;
+          if (Array.isArray(stored.remainingIds) && stored.remainingIds.length) {
+            remainingIds = stored.remainingIds.filter((id) => questionsMap.has(id) && !seenIds.has(id));
+          }
+          if (!remainingIds.length) {
+            remainingIds = shuffle(allQuestions.map((q) => q.id).filter((id) => !seenIds.has(id)));
+          }
+          currentId = stored.currentId && remainingIds.includes(stored.currentId) ? stored.currentId : remainingIds[0];
+        } else {
+          remainingIds = shuffle(allQuestions.map((q) => q.id));
+          currentId = remainingIds[0];
+        }
+        countNote.textContent = `Барлығы ${allQuestions.length} сұрақ. Өткен сұрақтар қайталанбайды, прогресс сақталады.`;
+        if (!currentId) {
+          showResult();
+          return;
+        }
+        saveState();
         renderQuestion();
       })
       .catch(() => {
