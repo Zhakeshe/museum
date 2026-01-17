@@ -46,20 +46,23 @@
         
         var s2text = select2Texts[lang] || select2Texts['ru'];
         
-        // Инициализация Select2
-        $('.select2-models').select2({
-            placeholder: s2text.placeholder,
-            allowClear: true,
-            width: '100%',
-            language: {
-                noResults: function() {
-                    return s2text.noResults;
-                },
-                searching: function() {
-                    return s2text.searching;
+        var hasSelect2 = $.fn.select2;
+        if (hasSelect2) {
+            // Инициализация Select2
+            $('.select2-models').select2({
+                placeholder: s2text.placeholder,
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return s2text.noResults;
+                    },
+                    searching: function() {
+                        return s2text.searching;
+                    }
                 }
-            }
-        });
+            });
+        }
         
         // Проверяем cookie (приоритет над sessionStorage)
         var cookieMuseum = getCookie('models_museum_filter');
@@ -79,7 +82,7 @@
         }
         
         $('#models-search').val(savedSearch);
-        $('#models-museum').val(savedMuseum).trigger('change.select2');
+        $('#models-museum').val(savedMuseum).trigger(hasSelect2 ? 'change.select2' : 'change');
         
         // Загрузка при старте
         filterModels();
@@ -109,7 +112,7 @@
         // Сброс фильтров
         $('#models-reset').on('click', function() {
             $('#models-search').val('');
-            $('#models-museum').val('').trigger('change.select2');
+            $('#models-museum').val('').trigger(hasSelect2 ? 'change.select2' : 'change');
             sessionStorage.removeItem('models_search');
             sessionStorage.removeItem('models_museum');
             filterModels();

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тарихи викторина — Museonet</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --accent: #ef476f;
+      --primary: #1f2937;
+      --muted: #6b7280;
+      --border: rgba(248, 219, 201, 0.8);
+      --surface: #ffffff;
+      --soft: #fff7f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Nunito Sans', sans-serif;
+      background: #f7f5f2;
+      color: var(--primary);
+      min-height: 100vh;
+    }
+    header {
+      padding: 18px 32px;
+      background: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header a {
+      color: #b0895b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+    .card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 30px rgba(31, 41, 55, 0.08);
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .progress {
+      background: #f2f4f8;
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      margin: 12px 0 24px;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      background: var(--accent);
+      width: 0;
+      transition: width 0.2s ease;
+    }
+    .question {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: grid;
+      gap: 12px;
+    }
+    .option-btn {
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .option-btn:hover,
+    .option-btn:focus-visible {
+      border-color: var(--accent);
+      box-shadow: 0 6px 12px rgba(239, 71, 111, 0.15);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .option-btn.correct {
+      border-color: #22c55e;
+      background: #ecfdf3;
+    }
+    .option-btn.wrong {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .actions button {
+      border: none;
+      background: var(--accent);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .actions button.secondary {
+      background: #e2e8f0;
+      color: #1f2937;
+    }
+    .hidden { display: none; }
+    .result {
+      background: var(--soft);
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 20px;
+      color: #1f2937;
+    }
+    .footer-note {
+      margin-top: 18px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/games/index.html">← Ойындар</a>
+    <div>Тарихи викторина</div>
+  </header>
+  <main>
+    <div class="card">
+      <h1>Тарихи викторина</h1>
+      <p>Сұрақтар рандом беріледі, жауаптар сақталып тұрады және қайталанбайды.</p>
+      <div class="meta" id="meta"></div>
+      <div class="progress"><span id="progress-bar"></span></div>
+      <div id="quiz">
+        <div class="question" id="question"></div>
+        <div class="options" id="options"></div>
+        <div class="actions">
+          <button id="next-btn" class="secondary" disabled>Келесі сұрақ</button>
+          <button id="restart-btn" class="secondary">Қалғанын жалғастыру</button>
+        </div>
+      </div>
+      <div id="result" class="result hidden"></div>
+      <div class="footer-note" id="count-note"></div>
+    </div>
+  </main>
+  <script>
+    const QUESTIONS_URL = '/data/history-questions.json';
+    const STORAGE_KEY = 'emuseum:history-quiz-state-v1';
+    const metaEl = document.getElementById('meta');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const resultEl = document.getElementById('result');
+    const progressBar = document.getElementById('progress-bar');
+    const countNote = document.getElementById('count-note');
+
+    let questions = [];
+    let questionsMap = new Map();
+    let remainingIds = [];
+    let currentId = null;
+    let score = 0;
+    let canAnswer = true;
+    let seenIds = new Set();
+    let answeredCount = 0;
+
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+
+    const saveState = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        remainingIds,
+        currentId,
+        score,
+        answeredCount,
+        seenIds: Array.from(seenIds)
+      }));
+    };
+
+    const loadState = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (error) {
+        return null;
+      }
+    };
+
+    const updateMeta = () => {
+      const total = answeredCount + remainingIds.length;
+      const currentNumber = remainingIds.length ? answeredCount + 1 : answeredCount;
+      metaEl.innerHTML = `
+        <span>Сұрақ: ${currentNumber} / ${total}</span>
+        <span>Дұрыс жауаптар: ${score}</span>
+        <span>Қалғаны: ${remainingIds.length}</span>
+      `;
+      progressBar.style.width = total ? `${(answeredCount / total) * 100}%` : '100%';
+    };
+
+    const renderQuestion = () => {
+      const item = currentId ? questionsMap.get(currentId) : null;
+      if (!item) {
+        showResult();
+        return;
+      }
+      canAnswer = true;
+      nextBtn.disabled = true;
+      questionEl.textContent = item.question;
+      optionsEl.innerHTML = '';
+      item.options.forEach((option, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.type = 'button';
+        btn.textContent = option;
+        btn.addEventListener('click', () => handleAnswer(btn, index));
+        optionsEl.appendChild(btn);
+      });
+      updateMeta();
+    };
+
+    const handleAnswer = (btn, index) => {
+      if (!canAnswer) return;
+      canAnswer = false;
+      const item = questionsMap.get(currentId);
+      const buttons = optionsEl.querySelectorAll('button');
+      buttons.forEach((button, idx) => {
+        if (idx === item.answerIndex) button.classList.add('correct');
+        if (idx === index && idx !== item.answerIndex) button.classList.add('wrong');
+        button.disabled = true;
+      });
+      if (index === item.answerIndex) {
+        score += 1;
+      }
+      seenIds.add(currentId);
+      remainingIds = remainingIds.filter((id) => id !== currentId);
+      answeredCount += 1;
+      nextBtn.disabled = false;
+      saveState();
+      updateMeta();
+    };
+
+    const showResult = () => {
+      questionEl.textContent = 'Барлық сұрақ аяқталды!';
+      optionsEl.innerHTML = '';
+      nextBtn.disabled = true;
+      resultEl.classList.remove('hidden');
+      resultEl.textContent = `Нәтиже: ${score} / ${answeredCount} дұрыс.`;
+      progressBar.style.width = '100%';
+    };
+
+    const restart = () => {
+      resultEl.classList.add('hidden');
+      if (!remainingIds.length) {
+        showResult();
+        return;
+      }
+      remainingIds = shuffle([...remainingIds]);
+      currentId = remainingIds[0];
+      saveState();
+      renderQuestion();
+    };
+
+    nextBtn.addEventListener('click', () => {
+      if (!remainingIds.length) {
+        showResult();
+        return;
+      }
+      currentId = remainingIds[0];
+      saveState();
+      renderQuestion();
+    });
+
+    restartBtn.addEventListener('click', restart);
+
+    fetch(QUESTIONS_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        const allQuestions = data.questions || [];
+        questions = allQuestions;
+        questionsMap = new Map(allQuestions.map((q) => [q.id, q]));
+        const stored = loadState();
+        if (stored) {
+          seenIds = new Set((stored.seenIds || []).filter((id) => questionsMap.has(id)));
+          score = stored.score || 0;
+          answeredCount = stored.answeredCount || 0;
+          if (Array.isArray(stored.remainingIds) && stored.remainingIds.length) {
+            remainingIds = stored.remainingIds.filter((id) => questionsMap.has(id) && !seenIds.has(id));
+          }
+          if (!remainingIds.length) {
+            remainingIds = shuffle(allQuestions.map((q) => q.id).filter((id) => !seenIds.has(id)));
+          }
+          currentId = stored.currentId && remainingIds.includes(stored.currentId) ? stored.currentId : remainingIds[0];
+        } else {
+          remainingIds = shuffle(allQuestions.map((q) => q.id));
+          currentId = remainingIds[0];
+        }
+        countNote.textContent = `Барлығы ${allQuestions.length} сұрақ. Өткен сұрақтар қайталанбайды, прогресс сақталады.`;
+        if (!currentId) {
+          showResult();
+          return;
+        }
+        saveState();
+        renderQuestion();
+      })
+      .catch(() => {
+        questionEl.textContent = 'Сұрақтар жүктелмеді. Кейінірек қайталап көріңіз.';
+      });
+  </script>
+</body>
+</html>

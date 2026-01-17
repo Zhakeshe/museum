@@ -285,7 +285,7 @@ header {
 	transition: all .4s ease;
 }
 .logoh {
-    background-image: url(../../uploads/sites/11/2025/12/logo1.png);
+    background-image: url(../../uploads/sites/11/2026/01/museo-logo.svg);
     height: 37px;
     background-size: contain;
     background-repeat: no-repeat;
@@ -296,7 +296,7 @@ img.logoh {
     background-image: none;
 }
 .nav-light-bg .logoh {
-    background-image: url(../../uploads/sites/11/2025/12/logo2.png);
+    background-image: url(../../uploads/sites/11/2026/01/museo-logo.svg);
 }
 
 .kz-burger-menu {

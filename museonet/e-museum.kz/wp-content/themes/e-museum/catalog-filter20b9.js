@@ -46,22 +46,25 @@
         
         var s2text = select2Texts[lang] || select2Texts['ru'];
         
-        // Инициализация Select2
-        $('.select2-filter').select2({
-            placeholder: function() {
-                return $(this).data('placeholder') || s2text.placeholder;
-            },
-            allowClear: true,
-            width: '100%',
-            language: {
-                noResults: function() {
-                    return s2text.noResults;
+        var hasSelect2 = $.fn.select2;
+        if (hasSelect2) {
+            // Инициализация Select2
+            $('.select2-filter').select2({
+                placeholder: function() {
+                    return $(this).data('placeholder') || s2text.placeholder;
                 },
-                searching: function() {
-                    return s2text.searching;
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return s2text.noResults;
+                    },
+                    searching: function() {
+                        return s2text.searching;
+                    }
                 }
-            }
-        });
+            });
+        }
         
         // Проверяем cookie (приоритет над sessionStorage)
         var cookieMuseum = getCookie('catalog_museum_filter');
@@ -84,8 +87,8 @@
         }
         
         $('#filter-search').val(savedSearch);
-        $('#filter-museum').val(savedMuseum).trigger('change.select2');
-        $('#filter-category').val(savedCategory).trigger('change.select2');
+        $('#filter-museum').val(savedMuseum).trigger(hasSelect2 ? 'change.select2' : 'change');
+        $('#filter-category').val(savedCategory).trigger(hasSelect2 ? 'change.select2' : 'change');
         
         // Загрузка при старте
         filterExhibits();
@@ -115,8 +118,8 @@
         // Сброс фильтров
         $('#filter-reset').on('click', function() {
             $('#filter-search').val('');
-            $('#filter-museum').val('').trigger('change.select2');
-            $('#filter-category').val('').trigger('change.select2');
+            $('#filter-museum').val('').trigger(hasSelect2 ? 'change.select2' : 'change');
+            $('#filter-category').val('').trigger(hasSelect2 ? 'change.select2' : 'change');
             sessionStorage.removeItem('catalog_search');
             sessionStorage.removeItem('catalog_museum');
             sessionStorage.removeItem('catalog_category');

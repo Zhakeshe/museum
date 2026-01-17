@@ -13,6 +13,30 @@
       "description": "Музей залында көрсетілген экспонатты дұрыс анықтаңыз.",
       "points": 10,
       "timeLimitSeconds": 45
+    },
+    {
+      "id": "history-quiz",
+      "title": "Тарихи викторина",
+      "description": "1000+ сұрақтан кездейсоқ таңдалған тарихи викторина.",
+      "points": 5,
+      "timeLimitSeconds": 0,
+      "url": "/games/history-quiz.html"
+    },
+    {
+      "id": "realism",
+      "title": "Реализм",
+      "description": "Тарихи мәлімдемелердің шынайы/жалған екенін анықтаңыз.",
+      "points": 5,
+      "timeLimitSeconds": 0,
+      "url": "/games/realism.html"
+    },
+    {
+      "id": "memory-match",
+      "title": "Экспонатты есте сақтау",
+      "description": "Экспонат пен сипаттаманы жұптаңыз.",
+      "points": 5,
+      "timeLimitSeconds": 0,
+      "url": "/games/memory-match.html"
     }
   ]
 }
