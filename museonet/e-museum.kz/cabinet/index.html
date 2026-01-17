@@ -254,18 +254,16 @@
     </div>
   </div>
   <script>
-    const userRaw = localStorage.getItem('emuseum:user');
-    if (!userRaw) {
+    const API_BASE = window.EMUSEUM_API_BASE || '/api';
+    const token = localStorage.getItem('emuseum:token');
+    if (!token) {
       window.location.href = '/auth/login.html';
     }
-    const user = JSON.parse(userRaw || '{}');
-    const initial = (user.name || 'М').slice(0, 1).toUpperCase();
-    document.getElementById('avatar').textContent = initial;
-    document.getElementById('welcome').textContent = user.name || 'Қолданушы';
-    document.getElementById('email').textContent = user.email || 'user@example.com';
-    document.getElementById('points').textContent = user.points || 0;
-    document.getElementById('objects').textContent = user.objects || 0;
-    document.getElementById('games').textContent = user.gamesPlayed || 0;
+
+    const authHeaders = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    };
 
     const historyList = document.getElementById('history-list');
     const objectsList = document.getElementById('objects-list');
@@ -273,63 +271,85 @@
     const uploadBtn = document.getElementById('upload-btn');
     const uploadInput = document.getElementById('upload-input');
 
-    const history = JSON.parse(localStorage.getItem('emuseum:history') || '[]');
-    const objects = JSON.parse(localStorage.getItem('emuseum:objects') || '[]');
-
-    function renderHistory() {
+    const renderHistory = (items) => {
       historyList.innerHTML = '';
-      history.slice().reverse().forEach((entry) => {
+      items.slice().reverse().forEach((entry) => {
         const item = document.createElement('li');
         item.className = 'history-item';
         item.innerHTML = `<span>${entry.label}</span><span>+${entry.points} ұпай</span>`;
         historyList.appendChild(item);
       });
-      historyCount.textContent = history.length;
-    }
+      historyCount.textContent = items.length;
+    };
 
-    function renderObjects() {
+    const renderObjects = (items) => {
       objectsList.innerHTML = '';
-      objects.slice().reverse().forEach((entry) => {
+      items.slice().reverse().forEach((entry) => {
         const item = document.createElement('li');
         item.className = 'object-item';
-        item.innerHTML = `<span>${entry.name}</span><span>${entry.date}</span>`;
+        item.innerHTML = `<span>${entry.name}</span><span>${new Date(entry.createdAt).toLocaleDateString('ru-RU')}</span>`;
         objectsList.appendChild(item);
       });
-    }
+    };
 
-    function addHistory(label, points) {
-      history.push({
-        label,
-        points,
-        date: new Date().toISOString()
+    const loadProfile = () =>
+      fetch(`${API_BASE}/profile`, { headers: authHeaders }).then((res) => res.json());
+    const loadHistory = () =>
+      fetch(`${API_BASE}/history`, { headers: authHeaders }).then((res) => res.json());
+    const loadObjects = () =>
+      fetch(`${API_BASE}/objects`, { headers: authHeaders }).then((res) => res.json());
+
+    Promise.all([loadProfile(), loadHistory(), loadObjects()])
+      .then(([profile, history, objects]) => {
+        const initial = (profile.name || 'М').slice(0, 1).toUpperCase();
+        document.getElementById('avatar').textContent = initial;
+        document.getElementById('welcome').textContent = profile.name || 'Қолданушы';
+        document.getElementById('email').textContent = profile.email || 'user@example.com';
+        document.getElementById('points').textContent = profile.points || 0;
+        document.getElementById('objects').textContent = profile.objects || 0;
+        document.getElementById('games').textContent = profile.gamesPlayed || 0;
+        renderHistory(history.history || []);
+        renderObjects(objects.objects || []);
+      })
+      .catch(() => {
+        window.location.href = '/auth/login.html';
       });
-      localStorage.setItem('emuseum:history', JSON.stringify(history));
-      renderHistory();
-    }
-
-    function addObject(name) {
-      const entry = {
-        name,
-        date: new Date().toLocaleDateString('ru-RU')
-      };
-      objects.push(entry);
-      localStorage.setItem('emuseum:objects', JSON.stringify(objects));
-      renderObjects();
-    }
 
     uploadBtn.addEventListener('click', () => uploadInput.click());
     uploadInput.addEventListener('change', (event) => {
       const file = event.target.files[0];
       if (!file) return;
       const points = 10;
-      user.points = (user.points || 0) + points;
-      user.objects = (user.objects || 0) + 1;
-      localStorage.setItem('emuseum:user', JSON.stringify(user));
-      document.getElementById('points').textContent = user.points;
-      document.getElementById('objects').textContent = user.objects;
-      addObject(file.name);
-      addHistory(`Загрузка 3D объекта: ${file.name}`, points);
-      uploadInput.value = '';
+
+      fetch(`${API_BASE}/objects`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ name: file.name })
+      })
+        .then((res) => res.json())
+        .then(() =>
+          fetch(`${API_BASE}/history`, {
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify({ label: `Загрузка 3D объекта: ${file.name}`, points })
+          })
+        )
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById('points').textContent = data.points || 0;
+          return Promise.all([loadHistory(), loadObjects()]);
+        })
+        .then(([history, objects]) => {
+          renderHistory(history.history || []);
+          renderObjects(objects.objects || []);
+          document.getElementById('objects').textContent = (objects.objects || []).length;
+        })
+        .catch(() => {
+          alert('Не удалось сохранить загрузку. Проверьте сервер.');
+        })
+        .finally(() => {
+          uploadInput.value = '';
+        });
     });
 
     document.querySelectorAll('.tab').forEach((tab) => {
@@ -343,12 +363,12 @@
       });
     });
 
-    renderHistory();
-    renderObjects();
-
     document.getElementById('logout').addEventListener('click', () => {
-      localStorage.removeItem('emuseum:user');
-      window.location.href = '/auth/login.html';
+      fetch(`${API_BASE}/auth/logout`, { method: 'POST', headers: authHeaders })
+        .finally(() => {
+          localStorage.removeItem('emuseum:token');
+          window.location.href = '/auth/login.html';
+        });
     });
   </script>
 </body>

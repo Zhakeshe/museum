@@ -69,21 +69,24 @@
       event.preventDefault();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const users = JSON.parse(localStorage.getItem('emuseum:users') || '[]');
-      const user = users.find((u) => u.email === email && u.password === password);
-      if (!user) {
-        alert('Неверный email или пароль.');
-        return;
-      }
-      const activeUser = {
-        name: user.name,
-        email: user.email,
-        role: user.role || 'user',
-        points: user.points || 0,
-        gamesPlayed: user.gamesPlayed || 0
-      };
-      localStorage.setItem('emuseum:user', JSON.stringify(activeUser));
-      window.location.href = '/cabinet/index.html';
+      const API_BASE = window.EMUSEUM_API_BASE || '/api';
+
+      fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.token) {
+            throw new Error(data.error || 'Ошибка входа');
+          }
+          localStorage.setItem('emuseum:token', data.token);
+          window.location.href = '/cabinet/index.html';
+        })
+        .catch(() => {
+          alert('Неверный email или пароль.');
+        });
     });
   </script>
 </body>

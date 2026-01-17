@@ -71,29 +71,23 @@
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      const users = JSON.parse(localStorage.getItem('emuseum:users') || '[]');
-      if (users.some((u) => u.email === email)) {
-        alert('Пользователь с таким email уже существует.');
-        return;
-      }
-      const user = {
-        name,
-        email,
-        password,
-        role: 'user',
-        points: 0,
-        gamesPlayed: 0
-      };
-      users.push(user);
-      localStorage.setItem('emuseum:users', JSON.stringify(users));
-      localStorage.setItem('emuseum:user', JSON.stringify({
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        points: user.points,
-        gamesPlayed: user.gamesPlayed
-      }));
-      window.location.href = '/cabinet/index.html';
+      const API_BASE = window.EMUSEUM_API_BASE || '/api';
+
+      fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          window.location.href = '/auth/login.html';
+        })
+        .catch((error) => {
+          alert(error.message || 'Ошибка регистрации.');
+        });
     });
   </script>
 </body>

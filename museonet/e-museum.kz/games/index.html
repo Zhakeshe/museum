@@ -93,11 +93,11 @@
     <div id="games" class="games-grid"></div>
   </div>
   <script>
-    const userRaw = localStorage.getItem('emuseum:user');
-    if (!userRaw) {
+    const API_BASE = window.EMUSEUM_API_BASE || '/api';
+    const token = localStorage.getItem('emuseum:token');
+    if (!token) {
       window.location.href = '/auth/login.html';
     }
-    const user = JSON.parse(userRaw || '{}');
 
     fetch('/data/games.json')
       .then((res) => res.json())
@@ -134,18 +134,27 @@
             const found = confirm('Экспонатты таптыңыз ба?');
             if (found) {
               clearInterval(timerId);
-              user.points = (user.points || 0) + game.points;
-              user.gamesPlayed = (user.gamesPlayed || 0) + 1;
-              localStorage.setItem('emuseum:user', JSON.stringify(user));
-              const history = JSON.parse(localStorage.getItem('emuseum:history') || '[]');
-              history.push({
-                label: `Ойын: ${game.title}`,
-                points: game.points,
-                date: new Date().toISOString()
-              });
-              localStorage.setItem('emuseum:history', JSON.stringify(history));
-              alert(`Жарайсыз! +${game.points} ұпай`);
-              button.disabled = false;
+              fetch(`${API_BASE}/games/result`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ gameId: game.id, title: game.title, points: game.points })
+              })
+                .then((res) => res.json())
+                .then((result) => {
+                  if (result.error) {
+                    throw new Error(result.error);
+                  }
+                  alert(`Жарайсыз! +${game.points} ұпай`);
+                })
+                .catch(() => {
+                  alert('Ұпайды серверге жазу мүмкін болмады.');
+                })
+                .finally(() => {
+                  button.disabled = false;
+                });
             }
           });
           list.appendChild(card);
