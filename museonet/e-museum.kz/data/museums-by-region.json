@@ -1,178 +1,163 @@
 {
-  "Туркестанская область": [
-    {
-      "title": "Государственный археологический  музей-заповедник «Отрар»",
-      "url": "museum/68da379e2685a18d9-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Жетысайский районный музей",
-      "url": "museum/68da37a07245725a2-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Музей имени Н. Ондасынова",
-      "url": "museum/68da37a156b085060-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
   "Актюбинская область": [
     {
       "title": "Актюбинский областной историко-краеведческий музей",
-      "url": "museum/68da37a6583f40aa7-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da37a6583f40aa7-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/fcef690b-db47-4380-a51f-1c3597f39a7c.jfif"
     },
     {
       "title": "Актюбинский областной музей искусства",
-      "url": "museum/68da379f06d24bf94-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Кобдинский районный музей",
-      "url": "museum/68da379fcac078523-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da379f06d24bf94-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/93cd0909-bb12-4c41-af9c-36c731b10ad3.webp"
     },
     {
       "title": "Мемориальный комплекс Досжан Хазрета",
-      "url": "museum/68da37a08aa2b1051-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "г. Алматы": [
-    {
-      "title": "Национальный музей искусств Республики Казахстан имени А. Кастеева",
-      "url": "museum/68da37adf0a2e8a5d-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Национальный центральный музей Республики Казахстан",
-      "url": "museum/68da379a81b2b0288-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "Жетысуская область": [
-    {
-      "title": "Историко-краеведческий музей имени Кабанбай батыра",
-      "url": "museum/68da379c235e9b385-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Историко-краеведческий музей имени Мұхамеджан Тынышбайұлы области Жетісу",
-      "url": "museum/68da379a6e9009d96-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Исторический музей Лепсы",
-      "url": "museum/68da379e90efbec27-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Мемориальный музей «Алтынемел» имени Шокана Уалиханова",
-      "url": "museum/68da379551e751d7b-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Мемориальный музей Мукана Толебаева",
-      "url": "museum/68da379cd2fd0f719-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Мемориальный музей Нурмолды Алдабергенова",
-      "url": "museum/68da379e681c85372-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "г. Астана": [
-    {
-      "title": "Государственный военно-исторический музей Вооруженных Сил Республики Казахстан",
-      "url": "museum/68da379da9894247d-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Музей Сакена Сейфуллина",
-      "url": "museum/68da37a0228ab7ad4-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    },
-    {
-      "title": "Национальный музей Республики Казахстан",
-      "url": "museum/68da379b4b4fb9d59-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da37a08aa2b1051-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/73a017cf-9a02-48d2-934a-8f212b1198f8.webp"
     }
   ],
   "Атырауская область": [
     {
       "title": "Курмангазинский районный музей",
-      "url": "museum/68da37a829d4ba8ba-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da37a829d4ba8ba-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/e83a8fab-a7fd-45fa-90a7-c5db255cf073.jpg"
     },
     {
       "title": "Музей «Атамұра»",
-      "url": "museum/68da37a30a4315500-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da37a30a4315500-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/63636b8d-99b9-4df1-9f8d-55320a36378a.jpg"
     },
     {
       "title": "Музей «Әскери &#8212; Даңқ» имени Борана Нысанбаева",
-      "url": "museum/68da379989c6d0d77-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da379989c6d0d77-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/fdeb3609-8397-4b4f-a1ca-0f99ce06f9b0.jpeg"
     },
     {
       "title": "Музей художественного и декоративно-прикладного искуства имени Шаймардана Сариева",
-      "url": "museum/68da379fb31102f01-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da379fb31102f01-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/c4cd3b91-5411-4735-beed-c1fd5f6c0f38.jpeg"
     },
     {
       "title": "Сельский музей Х. Ергалиева",
-      "url": "museum/68da379567fd2142f-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "Западно-Казахстанская область": [
-    {
-      "title": "Западно – Казахстанский областной историко-краеведческий музей",
-      "url": "museum/68da37953dc2ba2fb-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "Северо-Казахстанская область": [
-    {
-      "title": "Северо-Казахстанский областной историко-краеведческий музей",
-      "url": "museum/68da37991b650f90c-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "Карагандинская область": [
-    {
-      "title": "Историко-краеведческий музей Нуринского района",
-      "url": "museum/68da37a38ad71628d-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da379567fd2142f-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/4344bde6-8561-4b52-ac16-66e2cce5e0d2.jfif"
     }
   ],
   "Восточно-Казахстанская область": [
     {
       "title": "Восточно-Казахстанский областной историко-краеведческий музей",
-      "url": "museum/68da379debd6c8acf-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "г. Шымкент": [
-    {
-      "title": "Музей Ерлік",
-      "url": "museum/68da37a0b5275ef21-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
-    }
-  ],
-  "Улытауская область": [
-    {
-      "title": "Музей истории горного и плавильного дела  в поселке Жезды имени Макена Торегельдина",
-      "url": "museum/68da379ae14ca48bc-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da379debd6c8acf-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/24679cec-0967-42e5-96ec-f286ee05b571.jpeg"
     }
   ],
   "Жамбылская область": [
     {
       "title": "Историко-культурный  музей-заповедник  «Ежелгі Тараз ескерткіштері»",
-      "url": "museum/68da37a0610a510c6-ru/index.html",
-      "image": "wp-content/uploads/sites/11/2025/12/museum.jpg"
+      "url": "museum/68da37a0610a510c6-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/b457e4cb-1f6d-4c98-b5a2-98bf67eed92d.jpeg"
+    }
+  ],
+  "Жетысуская область": [
+    {
+      "title": "Историко-краеведческий музей имени Мұхамеджан Тынышбайұлы области Жетісу",
+      "url": "museum/68da379a6e9009d96-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/bbcf8c29-efda-47e3-ac25-2e6fcb1b1ec7.jpg"
+    },
+    {
+      "title": "Исторический музей Лепсы",
+      "url": "museum/68da379e90efbec27-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/14fff73e-e5ce-4ff9-8a69-37f53c08cef7.jpg"
+    },
+    {
+      "title": "Мемориальный музей «Алтынемел» имени Шокана Уалиханова",
+      "url": "museum/68da379551e751d7b-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/d8cd8191-2298-4758-9299-3b61adc86a5b.jpg"
+    },
+    {
+      "title": "Мемориальный музей Мукана Толебаева",
+      "url": "museum/68da379cd2fd0f719-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/4e9ca6de-a3fe-4b65-8dda-26c37b7797b9.jpeg"
+    },
+    {
+      "title": "Мемориальный музей Нурмолды Алдабергенова",
+      "url": "museum/68da379e681c85372-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/57b2ee9b-be14-4c74-984d-de73c785cadc.jpg"
+    }
+  ],
+  "Западно-Казахстанская область": [
+    {
+      "title": "Западно – Казахстанский областной историко-краеведческий музей",
+      "url": "museum/68da37953dc2ba2fb-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/7f8b707c-745f-4216-9ce7-a587e7b1582c.jpg"
+    }
+  ],
+  "Карагандинская область": [
+    {
+      "title": "Историко-краеведческий музей Нуринского района",
+      "url": "museum/68da37a38ad71628d-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/d3356d42-cd23-4de2-8504-d1a6a27d87f6.png"
+    }
+  ],
+  "Северо-Казахстанская область": [
+    {
+      "title": "Северо-Казахстанский областной историко-краеведческий музей",
+      "url": "museum/68da37991b650f90c-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/061269fc-9f87-4bff-8871-7f2512fcdeb3.jpg"
+    }
+  ],
+  "Туркестанская область": [
+    {
+      "title": "Государственный археологический  музей-заповедник «Отрар»",
+      "url": "museum/68da379e2685a18d9-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/12f01542-9916-49bf-adfe-6a1d41bb3479.jpg"
+    },
+    {
+      "title": "Жетысайский районный музей",
+      "url": "museum/68da37a07245725a2-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/f054f78b-b696-49a9-b21f-6fa4de0c3808.jpeg"
+    },
+    {
+      "title": "Музей имени Н. Ондасынова",
+      "url": "museum/68da37a156b085060-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/a94c7f05-2615-47e3-b21e-61e4b22d275c.jpeg"
+    }
+  ],
+  "Улытауская область": [
+    {
+      "title": "Музей истории горного и плавильного дела  в поселке Жезды имени Макена Торегельдина",
+      "url": "museum/68da379ae14ca48bc-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/694a4e765452f061a"
+    }
+  ],
+  "г. Алматы": [
+    {
+      "title": "Национальный музей искусств Республики Казахстан имени А. Кастеева",
+      "url": "museum/68da37adf0a2e8a5d-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/694e06a9-c099-467a-9472-810dbacfd8f3.jpeg"
+    },
+    {
+      "title": "Национальный центральный музей Республики Казахстан",
+      "url": "museum/68da379a81b2b0288-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/694938e08e55eb967"
+    }
+  ],
+  "г. Астана": [
+    {
+      "title": "Государственный военно-исторический музей Вооруженных Сил Республики Казахстан",
+      "url": "museum/68da379da9894247d-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/f8a24bdb-dcf0-4eba-9cd1-7d543ad5338c.jpg"
+    },
+    {
+      "title": "Музей Сакена Сейфуллина",
+      "url": "museum/68da37a0228ab7ad4-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/a0f59d15-ce06-4c38-ae50-1c480f3a1e16.jpeg"
+    }
+  ],
+  "г. Шымкент": [
+    {
+      "title": "Музей Ерлік",
+      "url": "museum/68da37a0b5275ef21-ru/",
+      "image": "https://crm.e-museum.kz/emuseum/museum/MuseumGal/f3d4f39f-7134-4f63-bfb7-c9f6e9ce5efb.jpeg"
     }
   ]
 }

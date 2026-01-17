@@ -46,20 +46,23 @@
         
         var s2text = select2Texts[lang] || select2Texts['ru'];
         
-        // Инициализация Select2
-        $('.select2-news').select2({
-            placeholder: s2text.placeholder,
-            allowClear: true,
-            width: '100%',
-            language: {
-                noResults: function() {
-                    return s2text.noResults;
-                },
-                searching: function() {
-                    return s2text.searching;
+        var hasSelect2 = $.fn.select2;
+        if (hasSelect2) {
+            // Инициализация Select2
+            $('.select2-news').select2({
+                placeholder: s2text.placeholder,
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return s2text.noResults;
+                    },
+                    searching: function() {
+                        return s2text.searching;
+                    }
                 }
-            }
-        });
+            });
+        }
         
         // Проверяем cookie (приоритет над sessionStorage)
         var cookieMuseum = getCookie('news_museum_filter');
@@ -79,7 +82,7 @@
         }
         
         $('#news-search').val(savedSearch);
-        $('#news-museum').val(savedMuseum).trigger('change.select2');
+        $('#news-museum').val(savedMuseum).trigger(hasSelect2 ? 'change.select2' : 'change');
         
         // Загрузка при старте
         filterNews();
@@ -109,7 +112,7 @@
         // Сброс фильтров
         $('#news-reset').on('click', function() {
             $('#news-search').val('');
-            $('#news-museum').val('').trigger('change.select2');
+            $('#news-museum').val('').trigger(hasSelect2 ? 'change.select2' : 'change');
             sessionStorage.removeItem('news_search');
             sessionStorage.removeItem('news_museum');
             filterNews();

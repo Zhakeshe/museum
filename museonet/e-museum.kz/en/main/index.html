@@ -2265,21 +2265,23 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/%40fancyapps/ui%405.0/dist/fancybox/fancybox.umd.js"></script>
 <script>
-Fancybox.bind("[data-fancybox]", {
-  Html: {
-    video: {
-      autoplay: true,
-      controls: false
+if (window.Fancybox && Fancybox.bind) {
+  Fancybox.bind("[data-fancybox]", {
+    Html: {
+      video: {
+        autoplay: true,
+        controls: false
+      }
     }
-  }
-});
+  });
+}
 </script>		<footer data-elementor-type="footer" data-elementor-id="31281" class="elementor elementor-31281 elementor-location-footer" data-elementor-post-type="elementor_library">
 			<div class="elementor-element elementor-element-29efd56 e-grid e-con-full e-con e-parent" data-id="29efd56" data-element_type="container">
 				<div class="elementor-element elementor-element-36ebf21 elementor-widget elementor-widget-html" data-id="36ebf21" data-element_type="widget" data-widget_type="html.default">
 				<div class="elementor-widget-container">
 					<div class="first-column-div">
     
-    <a href="index.html"><img class="logo-bottom" src="../../wp-content/uploads/sites/11/2025/12/logo2.png"></a>
+    <a href="index.html"><img class="logo-bottom" src="../../wp-content/uploads/sites/11/2026/01/museo-logo.svg" alt="Museonet"></a>
 
 <div class="copy">Museonet © 2025.<br>
 All rights reserved.</div>
