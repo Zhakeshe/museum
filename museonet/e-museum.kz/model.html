@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>E-Museum | 3D модельді қарау</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070d;
+      --glass: rgba(255, 255, 255, 0.08);
+      --text: #f5f7ff;
+      --muted: #aab1c6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Manrope", system-ui, sans-serif;
+      background: radial-gradient(circle at top, rgba(110, 231, 249, 0.18), transparent 50%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 32px;
+    }
+
+    .viewer {
+      width: min(900px, 92vw);
+      height: min(520px, 70vh);
+      border-radius: 24px;
+      overflow: hidden;
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 18px 40px rgba(3, 7, 18, 0.55);
+    }
+
+    .meta {
+      max-width: 840px;
+      text-align: center;
+    }
+
+    .meta p {
+      color: var(--muted);
+    }
+
+    a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="meta">
+    <h1>Экспонат: Керамикалық құмыра</h1>
+    <p>3D модельді айналдырып қараңыз. Бұл бетте нақты экспонатты толық 360° шолу мүмкіндігі бар.</p>
+    <p><a href="index.html">← Басты бетке қайту</a></p>
+  </div>
+  <div class="viewer">
+    <model-viewer
+      src="https://modelviewer.dev/shared-assets/models/TeaSet.glb"
+      alt="Керамикалық құмыраның 3D моделі"
+      camera-controls
+      auto-rotate
+      ar
+      shadow-intensity="0.8"
+      style="width: 100%; height: 100%; background: transparent;"
+    ></model-viewer>
+  </div>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</body>
+</html>
