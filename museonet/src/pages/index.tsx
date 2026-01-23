@@ -5,354 +5,222 @@ import Footer from '../components/Footer';
 
 const HomePage: React.FC = () => {
   return (
-    <>
+    <div className="page">
       <Head>
-        <title>Главная - e-museum.kz</title>
+        <title>Archeo — Археология әлемі</title>
         <meta
           name="description"
-          content="Виртуальный музей «E-museum» — портал, где культурное наследие Казахстана оживает в цифровом пространстве"
+          content="Археология әлемін зерттеуге арналған тыныш, заманауи платформа."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta charSet="UTF-8" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="hfeed site" id="page">
-        <Header />
+      <Header />
 
-        <div id="content" className="site-content">
-          <div className="ast-container">
-            <div id="primary" className="content-area primary">
-              <main id="main" className="site-main">
-                <article
-                  className="post-442 page type-page status-publish ast-article-single"
-                  id="post-442"
-                  itemType="https://schema.org/CreativeWork"
-                  itemScope
-                >
-                  <header className="entry-header ast-no-thumbnail ast-no-title ast-header-without-markup"></header>
-
-                  <div className="entry-content clear" itemProp="text">
-                    <div
-                      data-elementor-type="wp-page"
-                      data-elementor-id="442"
-                      className="elementor elementor-442"
-                      data-elementor-post-type="page"
-                    >
-                      {/* Main Content Sections */}
-                      <div
-                        className="elementor-element elementor-element-9cd1ebf dark-section e-flex e-con-boxed e-con e-parent"
-                        data-id="9cd1ebf"
-                        data-element_type="container"
-                      >
-                        <div className="e-con-inner">
-                          {/* Add your main content sections here */}
-                          <section id="museumkaz" className="section">
-                            <h2>Музеи Казахстана</h2>
-                            <p>Исследуйте богатую коллекцию музеев Казахстана</p>
-                          </section>
-
-                          <section id="models3dkaz" className="section">
-                            <h2>3D модели</h2>
-                            <p>Интерактивные 3D модели экспонатов</p>
-                          </section>
-
-                          <section id="museumexhibitkaz" className="section">
-                            <h2>Государственный каталог</h2>
-                            <p>Каталог музейных экспонатов</p>
-                          </section>
-
-                          <section id="newskaz" className="section">
-                            <h2>Новости</h2>
-                            <p>Последние новости из мира культуры</p>
-                          </section>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              </main>
+      <main>
+        <section className="hero">
+          <div className="container hero-content">
+            <span className="eyebrow">Археология мұрасы</span>
+            <h1>Археология әлемі</h1>
+            <p>
+              Тарихтың нәзік қабаттарын ашатын цифрлық зертхана.
+            </p>
+            <div className="hero-actions">
+              <a className="button button-primary" href="#features">
+                Зерттеу
+              </a>
+              <a className="button button-secondary" href="#about-preview">
+                Көбірек білу
+              </a>
             </div>
           </div>
-        </div>
+        </section>
 
-        <Footer />
-      </div>
+        <section className="section" id="features">
+          <div className="container">
+            <div className="section-heading">
+              <h2>Негізгі бағыттар</h2>
+              <p>
+                Археологиялық зерттеулерді, артефактілерді және білім беру жобаларын бір жерде жинақтадық.
+              </p>
+            </div>
+            <div className="cards-grid">
+              {[
+                {
+                  title: 'Экспедициялар',
+                  description: 'Маусымдық қазба жұмыстарының қысқа шолуы.',
+                },
+                {
+                  title: 'Артефактілер',
+                  description: 'Қордағы сирек жәдігерлердің сандық каталогы.',
+                },
+                {
+                  title: 'Ойындар',
+                  description: 'Жұмсақ геймификация арқылы білімді бекіту.',
+                },
+                {
+                  title: 'Музейлер',
+                  description: 'Қазақстандағы жетекші археологиялық орталықтар.',
+                },
+              ].map((card) => (
+                <div className="card feature-card" key={card.title}>
+                  <div className="icon-circle" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M4 15.5c3.5-1.5 6.5-4.5 8-8m0 0 3 3m-3-3 3-3M5 19h14" />
+                    </svg>
+                  </div>
+                  <h3>{card.title}</h3>
+                  <p>{card.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      <style jsx global>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
+        <section className="section section--tight" id="about-preview">
+          <div className="container">
+            <div className="section-heading">
+              <h2>Музейлер шолуы</h2>
+              <p>Археологиялық коллекциялары бай үш маңызды нүкте.</p>
+            </div>
+            <div className="museum-list">
+              {[
+                { name: 'Ұлттық музей', location: 'Астана', link: 'Толығырақ' },
+                { name: 'Отырар қорығы', location: 'Түркістан', link: 'Толығырақ' },
+                { name: 'Алтын адам павильоны', location: 'Алматы', link: 'Толығырақ' },
+              ].map((item) => (
+                <div className="card museum-card" key={item.name}>
+                  <div>
+                    <h3>{item.name}</h3>
+                    <p>{item.location}</p>
+                  </div>
+                  <a className="text-link" href="/museums">
+                    {item.link}
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
 
-        body {
-          font-family: 'Nunito Sans', sans-serif;
-          line-height: 1.65;
-          color: #334155;
-        }
+      <Footer />
 
-        .hfeed.site {
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-        }
-
-        #content.site-content {
-          flex: 1;
-        }
-
-        .ast-container {
-          max-width: 1240px;
-          margin: 0 auto;
-          padding: 0 20px;
-        }
-
-        .section {
-          padding: 3em 0;
-          margin-bottom: 2em;
-        }
-
-        .section h2 {
-          font-size: 2.25rem;
-          font-weight: 600;
-          margin-bottom: 1em;
-          color: #1e293b;
-        }
-
-        .section p {
-          font-size: 1rem;
-          line-height: 1.65;
-        }
-
-        /* Header Styles */
-        header.elementor-602 {
-          background-color: #ffffff;
-          border-bottom: 1px solid #d1d5db;
-          padding: 1em 0;
-        }
-
-        /* Footer Styles */
-        footer.elementor-1081 {
-          background-color: #f0f5fa;
-          padding: 2em 0;
-          border-top: 1px solid #d1d5db;
-        }
-
-        .footer-menu {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5em;
-        }
-
-        .footer-menu a {
-          color: #334155;
-          text-decoration: none;
-          transition: color 0.2s;
-        }
-
-        .footer-menu a:hover {
-          color: #046bd2;
-        }
-
-        .adress {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5em;
-        }
-
-        .adress-line {
+      <style jsx>{`
+        .hero {
+          min-height: 70vh;
           display: flex;
           align-items: center;
-          gap: 0.5em;
+          background-image: linear-gradient(
+              110deg,
+              rgba(246, 241, 232, 0.92) 10%,
+              rgba(217, 195, 162, 0.5) 55%,
+              rgba(246, 241, 232, 0.82) 100%
+            ),
+            url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80');
+          background-size: cover;
+          background-position: center;
         }
 
-        .elementor-social-icons-wrapper {
+        .hero-content {
+          padding: 120px 0 100px;
           display: flex;
-          gap: 1em;
+          flex-direction: column;
+          gap: 20px;
+          max-width: 620px;
         }
 
-        .elementor-social-icon {
-          width: 40px;
-          height: 40px;
+        .hero h1 {
+          font-size: clamp(44px, 4vw, 52px);
+          line-height: 1.1;
+          font-weight: 700;
+        }
+
+        .hero p {
+          font-size: 18px;
+          color: rgba(43, 43, 43, 0.75);
+        }
+
+        .hero-actions {
+          display: flex;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+
+        .cards-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 24px;
+        }
+
+        .feature-card h3 {
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+
+        .feature-card p {
+          color: rgba(43, 43, 43, 0.7);
+          font-size: 15px;
+        }
+
+        .icon-circle {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          background: rgba(217, 195, 162, 0.35);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #334155;
-          transition: color 0.2s;
+          margin-bottom: 16px;
+          color: var(--accent);
         }
 
-        .elementor-social-icon:hover {
-          color: #046bd2;
+        .icon-circle svg {
+          width: 20px;
+          height: 20px;
         }
 
-        /* Burger Menu Styles */
-        .kz-burger-menu {
-          display: none;
-          flex-direction: column;
-          cursor: pointer;
-          gap: 4px;
-          z-index: 1001;
-          background: transparent;
-          border: none;
-          padding: 0;
+        .museum-list {
+          display: grid;
+          gap: 16px;
         }
 
-        .kz-burger-line {
-          width: 25px;
-          height: 3px;
-          background-color: #1e293b;
-          transition: all 0.3s;
-        }
-
-        .kz-burger-menu.active .kz-burger-line:nth-child(1) {
-          transform: rotate(45deg) translate(5px, 5px);
-        }
-
-        .kz-burger-menu.active .kz-burger-line:nth-child(2) {
-          opacity: 0;
-        }
-
-        .kz-burger-menu.active .kz-burger-line:nth-child(3) {
-          transform: rotate(-45deg) translate(7px, -6px);
-        }
-
-        .kz-fullscreen-menu {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100vh;
-          z-index: 1000;
-          background-color: rgba(0, 0, 0, 0.95);
-        }
-
-        .kz-fullscreen-menu.active {
+        .museum-card {
           display: flex;
-        }
-
-        .kz-menu-left {
-          flex: 0 0 60%;
-          padding: 3em;
-          display: flex;
-          flex-direction: column;
+          align-items: center;
           justify-content: space-between;
         }
 
-        .kz-menu-nav {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5em;
-        }
-
-        .kz-menu-link {
-          font-size: 2.5rem;
-          color: #ffffff;
-          text-decoration: none;
+        .museum-card h3 {
+          font-size: 18px;
           font-weight: 600;
-          transition: color 0.3s;
-          animation: slideIn 0.3s ease-out;
-          animation-delay: calc(var(--i) * 0.1s);
+          margin-bottom: 6px;
         }
 
-        .kz-menu-link:hover {
-          color: #046bd2;
+        .museum-card p {
+          color: rgba(43, 43, 43, 0.65);
         }
 
-        @keyframes slideIn {
-          from {
-          opacity: 0;
-          transform: translateX(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      .kz-menu-right {
-        flex: 0 0 40%;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-      }
-
-      .kz-menu-right-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
-
-      .kz-menu-right-content {
-        position: relative;
-        z-index: 1;
-        color: #ffffff;
-        padding: 3em;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .kz-menu-right-content h2 {
-        font-size: 2.5rem;
-        margin-bottom: 0.5em;
-      }
-
-      .kz-menu-close {
-        position: absolute;
-        top: 2em;
-        right: 2em;
-        width: 30px;
-        height: 30px;
-        cursor: pointer;
-        z-index: 1001;
-        background: transparent;
-        border: none;
-        padding: 0;
-      }
-
-      .kz-menu-close span {
-        display: block;
-        width: 100%;
-        height: 3px;
-        background-color: #ffffff;
-        position: absolute;
-        top: 50%;
-      }
-
-      .kz-menu-close span:first-child {
-        transform: rotate(45deg);
-      }
-
-      .kz-menu-close span:last-child {
-        transform: rotate(-45deg);
-      }
-
-      @media (max-width: 921px) {
-        .kz-burger-menu {
-          display: flex;
+        .text-link {
+          color: var(--accent);
+          font-size: 14px;
+          font-weight: 500;
         }
 
-        .kz-fullscreen-menu {
-          flex-direction: column;
-        }
+        @media (max-width: 700px) {
+          .hero-content {
+            padding: 96px 0 80px;
+          }
 
-        .kz-menu-left {
-          flex: 1;
-          width: 100%;
+          .museum-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+          }
         }
-
-        .kz-menu-right {
-          display: none;
-        }
-      }
       `}</style>
-    </>
+    </div>
   );
 };
 
