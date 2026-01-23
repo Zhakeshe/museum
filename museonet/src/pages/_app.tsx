@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
+import { LanguageProvider } from '../contexts/LanguageContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -9,7 +10,9 @@ const inter = Inter({
 const App = ({ Component, pageProps }: AppProps) => {
   return (
     <div className={inter.className}>
-      <Component {...pageProps} />
+      <LanguageProvider>
+        <Component {...pageProps} />
+      </LanguageProvider>
       <style jsx global>{`
         :root {
           --sand: #d9c3a2;

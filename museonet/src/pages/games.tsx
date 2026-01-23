@@ -2,6 +2,7 @@ import React from 'react';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const games = [
   { title: 'Қабаттар құпиясы', level: 'Beginner', text: 'Қазба кезеңдерін таныстыру.' },
@@ -13,11 +14,32 @@ const games = [
 ];
 
 const GamesPage: React.FC = () => {
+  const { language } = useLanguage();
+  const pageTitle =
+    language === 'kk' ? 'Ойындар — museonet' : language === 'ru' ? 'Игры — museonet' : 'Games — museonet';
+  const heading =
+    language === 'kk' ? 'Ойындар' : language === 'ru' ? 'Игры' : 'Games';
+  const subtext =
+    language === 'kk'
+      ? 'Күрделілік деңгейі бойынша сүзгі таңдаңыз.'
+      : language === 'ru'
+        ? 'Выберите фильтр по уровню сложности.'
+        : 'Choose a difficulty filter.';
+
   return (
     <div className="page">
       <Head>
-        <title>Ойындар — museonet</title>
-        <meta name="description" content="Археологияға арналған білім беру ойындары." />
+        <title>{pageTitle}</title>
+        <meta
+          name="description"
+          content={
+            language === 'kk'
+              ? 'Археологияға арналған білім беру ойындары.'
+              : language === 'ru'
+                ? 'Обучающие игры по археологии.'
+                : 'Educational archaeology games.'
+          }
+        />
       </Head>
 
       <Header />
@@ -28,9 +50,9 @@ const GamesPage: React.FC = () => {
             <div className="section-heading">
               <div>
                 <span className="eyebrow">Оқу форматы</span>
-                <h2>Ойындар</h2>
+                <h2>{heading}</h2>
               </div>
-              <p>Күрделілік деңгейі бойынша сүзгі таңдаңыз.</p>
+              <p>{subtext}</p>
             </div>
 
             <div className="filters">

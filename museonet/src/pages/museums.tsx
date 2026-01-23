@@ -2,6 +2,7 @@ import React from 'react';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const museums = [
   { name: 'Археология ғылыми орталығы', city: 'Астана', desc: 'Қазба есептері мен қор сақтау.' },
@@ -11,11 +12,32 @@ const museums = [
 ];
 
 const MuseumsPage: React.FC = () => {
+  const { language } = useLanguage();
+  const pageTitle =
+    language === 'kk' ? 'Музейлер — museonet' : language === 'ru' ? 'Музеи — museonet' : 'Museums — museonet';
+  const heading =
+    language === 'kk' ? 'Музейлер' : language === 'ru' ? 'Музеи' : 'Museums';
+  const subtext =
+    language === 'kk'
+      ? 'Аймақ немесе тип бойынша сүзгілеңіз.'
+      : language === 'ru'
+        ? 'Фильтруйте по региону или типу.'
+        : 'Filter by region or type.';
+
   return (
     <div className="page">
       <Head>
-        <title>Музейлер — museonet</title>
-        <meta name="description" content="Археологиялық музейлер тізімі." />
+        <title>{pageTitle}</title>
+        <meta
+          name="description"
+          content={
+            language === 'kk'
+              ? 'Археологиялық музейлер тізімі.'
+              : language === 'ru'
+                ? 'Список археологических музеев.'
+                : 'List of archaeology museums.'
+          }
+        />
       </Head>
 
       <Header />
@@ -26,13 +48,22 @@ const MuseumsPage: React.FC = () => {
             <div className="section-heading">
               <div>
                 <span className="eyebrow">Каталог</span>
-                <h2>Музейлер</h2>
+                <h2>{heading}</h2>
               </div>
-              <p>Аймақ немесе тип бойынша сүзгілеңіз.</p>
+              <p>{subtext}</p>
             </div>
 
             <div className="search-row">
-              <input className="input" placeholder="Музей атауын іздеу" />
+              <input
+                className="input"
+                placeholder={
+                  language === 'kk'
+                    ? 'Музей атауын іздеу'
+                    : language === 'ru'
+                      ? 'Поиск музея'
+                      : 'Search museum'
+                }
+              />
               <div className="filters">
                 <span className="chip is-active">Region</span>
                 <span className="chip">Type</span>

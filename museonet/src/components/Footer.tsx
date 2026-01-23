@@ -1,15 +1,33 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Footer: React.FC = () => {
+  const { language } = useLanguage();
+  const copy = useMemo(
+    () => ({
+      kk: {
+        note: 'Виртуалды музейлер желісі · археологиялық мұра, білім және зерттеу кеңістігі.',
+        rights: '© 2026 museonet. Барлық құқықтар қорғалған.',
+      },
+      ru: {
+        note: 'Сеть виртуальных музеев · археологическое наследие, образование и исследования.',
+        rights: '© 2026 museonet. Все права защищены.',
+      },
+      en: {
+        note: 'Virtual museum network · archaeology heritage, learning, and research.',
+        rights: '© 2026 museonet. All rights reserved.',
+      },
+    }),
+    [],
+  );
+
   return (
     <footer className="site-footer">
       <div className="container footer-inner">
         <div>
           <div className="footer-logo">museonet</div>
-          <p className="footer-note">
-            Виртуалды музейлер желісі · археологиялық мұра, білім және зерттеу кеңістігі.
-          </p>
+          <p className="footer-note">{copy[language].note}</p>
         </div>
 
         <div className="footer-links">
@@ -19,7 +37,7 @@ const Footer: React.FC = () => {
           <Link href="/login">Кіру</Link>
         </div>
 
-        <div className="footer-copy">© 2026 museonet. Барлық құқықтар қорғалған.</div>
+        <div className="footer-copy">{copy[language].rights}</div>
       </div>
       <style jsx>{`
         .site-footer {

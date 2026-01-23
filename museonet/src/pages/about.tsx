@@ -1,17 +1,43 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const AboutPage: React.FC = () => {
+  const { language } = useLanguage();
+  const copy = useMemo(
+    () => ({
+      kk: {
+        title: 'Біз туралы — museonet',
+        eyebrow: 'Жоба туралы',
+        heading: 'museonet туралы',
+        lead:
+          'museonet — археологияны қоғамға жақындататын, ғылыми дерекке негізделген виртуалды музей. Біз зерттеу нәтижелерін көрнекі әрі түсінікті форматқа айналдырамыз және платформаны үш тілде ұсынамыз: қазақша, орысша және ағылшынша.',
+      },
+      ru: {
+        title: 'О проекте — museonet',
+        eyebrow: 'О проекте',
+        heading: 'О museonet',
+        lead:
+          'museonet — виртуальный музей, приближающий археологию к обществу и основанный на научных данных. Мы делаем исследования наглядными и доступными на казахском, русском и английском языках.',
+      },
+      en: {
+        title: 'About — museonet',
+        eyebrow: 'About the project',
+        heading: 'About museonet',
+        lead:
+          'museonet is a virtual museum built on scientific data to bring archaeology closer to everyone. We publish research in Kazakh, Russian, and English with clear, visual storytelling.',
+      },
+    }),
+    [],
+  );
+
   return (
     <div className="page">
       <Head>
-        <title>Біз туралы — museonet</title>
-        <meta
-          name="description"
-          content="museonet жобасының миссиясы мен тарихы туралы қысқаша ақпарат."
-        />
+        <title>{copy[language].title}</title>
+        <meta name="description" content={copy[language].lead} />
       </Head>
 
       <Header />
@@ -19,13 +45,9 @@ const AboutPage: React.FC = () => {
       <main>
         <section className="section about-hero">
           <div className="container">
-            <span className="eyebrow">Жоба туралы</span>
-            <h1>museonet туралы</h1>
-            <p className="lead">
-              museonet — археологияны қоғамға жақындататын, ғылыми дерекке негізделген виртуалды музей.
-              Біз зерттеу нәтижелерін көрнекі әрі түсінікті форматқа айналдырамыз және платформаны үш
-              тілде ұсынамыз: қазақша, орысша және ағылшынша.
-            </p>
+            <span className="eyebrow">{copy[language].eyebrow}</span>
+            <h1>{copy[language].heading}</h1>
+            <p className="lead">{copy[language].lead}</p>
           </div>
         </section>
 
@@ -34,16 +56,32 @@ const AboutPage: React.FC = () => {
             <div className="info-grid">
               {[
                 {
-                  title: 'Mission',
-                  text: 'Археологиялық мұраны сақтау және жаңа буынға жеткізу.',
+                  title: language === 'kk' ? 'Mission' : language === 'ru' ? 'Миссия' : 'Mission',
+                  text:
+                    language === 'kk'
+                      ? 'Археологиялық мұраны сақтау және жаңа буынға жеткізу.'
+                      : language === 'ru'
+                        ? 'Сохранение археологического наследия и его передача новым поколениям.'
+                        : 'Preserving archaeology heritage for future generations.',
                 },
                 {
-                  title: 'Team',
-                  text: 'Ғалымдар, дизайнерлер және кураторлардан құралған шағын топ.',
+                  title: language === 'kk' ? 'Team' : language === 'ru' ? 'Команда' : 'Team',
+                  text:
+                    language === 'kk'
+                      ? 'Ғалымдар, дизайнерлер және кураторлардан құралған шағын топ.'
+                      : language === 'ru'
+                        ? 'Небольшая команда ученых, дизайнеров и кураторов.'
+                        : 'A small team of researchers, designers, and curators.',
                 },
                 {
-                  title: 'Our Story',
-                  text: 'Жоба зертхана жұмыстарынан басталып, ұлттық музейлермен серіктестікке ұласты.',
+                  title:
+                    language === 'kk' ? 'Our Story' : language === 'ru' ? 'История' : 'Our Story',
+                  text:
+                    language === 'kk'
+                      ? 'Жоба зертхана жұмыстарынан басталып, ұлттық музейлермен серіктестікке ұласты.'
+                      : language === 'ru'
+                        ? 'Проект начался с лабораторных исследований и вырос в партнерскую сеть.'
+                        : 'The project began in labs and grew into a national partnership.',
                 },
               ].map((item) => (
                 <div className="card" key={item.title}>

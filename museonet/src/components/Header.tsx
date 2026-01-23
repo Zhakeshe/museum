@@ -1,17 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const navItems = [
-  { label: 'Басты бет', href: '/' },
-  { label: 'Біз туралы', href: '/about' },
-  { label: 'Ойындар', href: '/games' },
-  { label: 'Музейлер', href: '/museums' },
+  { key: 'home', href: '/' },
+  { key: 'about', href: '/about' },
+  { key: 'games', href: '/games' },
+  { key: 'museums', href: '/museums' },
 ];
 
 const Header: React.FC = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const { language, setLanguage } = useLanguage();
+  const labels = useMemo(
+    () => ({
+      kk: {
+        home: 'Басты бет',
+        about: 'Біз туралы',
+        games: 'Ойындар',
+        museums: 'Музейлер',
+        login: 'Кіру',
+        aria: 'Негізгі навигация',
+      },
+      ru: {
+        home: 'Главная',
+        about: 'О проекте',
+        games: 'Игры',
+        museums: 'Музеи',
+        login: 'Войти',
+        aria: 'Главная навигация',
+      },
+      en: {
+        home: 'Home',
+        about: 'About',
+        games: 'Games',
+        museums: 'Museums',
+        login: 'Login',
+        aria: 'Main navigation',
+      },
+    }),
+    [],
+  );
 
   useEffect(() => {
     const handleRouteChange = () => setIsOpen(false);
@@ -37,7 +68,7 @@ const Header: React.FC = () => {
           <span></span>
         </button>
 
-        <nav className={`main-nav ${isOpen ? 'is-open' : ''}`} aria-label="Негізгі навигация">
+        <nav className={`main-nav ${isOpen ? 'is-open' : ''}`} aria-label={labels[language].aria}>
           <ul>
             {navItems.map((item) => {
               const isActive = router.pathname === item.href;
@@ -48,25 +79,37 @@ const Header: React.FC = () => {
                     className={`nav-link ${isActive ? 'is-active' : ''}`}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    {item.label}
+                    {labels[language][item.key as keyof typeof labels.kk]}
                   </Link>
                 </li>
               );
             })}
             <li>
               <Link href="/login" className="nav-button">
-                Кіру
+                {labels[language].login}
               </Link>
             </li>
             <li>
               <div className="lang-switch" role="group" aria-label="Language switch">
-                <button type="button" className="lang-chip is-active">
+                <button
+                  type="button"
+                  className={`lang-chip ${language === 'kk' ? 'is-active' : ''}`}
+                  onClick={() => setLanguage('kk')}
+                >
                   Қаз
                 </button>
-                <button type="button" className="lang-chip">
+                <button
+                  type="button"
+                  className={`lang-chip ${language === 'ru' ? 'is-active' : ''}`}
+                  onClick={() => setLanguage('ru')}
+                >
                   Рус
                 </button>
-                <button type="button" className="lang-chip">
+                <button
+                  type="button"
+                  className={`lang-chip ${language === 'en' ? 'is-active' : ''}`}
+                  onClick={() => setLanguage('en')}
+                >
                   Eng
                 </button>
               </div>
