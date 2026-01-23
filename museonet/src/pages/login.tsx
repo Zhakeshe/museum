@@ -7,8 +7,8 @@ const LoginPage: React.FC = () => {
   return (
     <div className="page">
       <Head>
-        <title>Кіру — Archeo</title>
-        <meta name="description" content="Archeo жобасына кіру парағы." />
+        <title>Кіру — museonet</title>
+        <meta name="description" content="museonet жобасына кіру парағы." />
       </Head>
 
       <Header />

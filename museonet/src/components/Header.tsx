@@ -23,7 +23,7 @@ const Header: React.FC = () => {
     <header className="site-header">
       <div className="container header-inner">
         <Link href="/" className="logo">
-          ARCHEO
+          museonet
         </Link>
 
         <button
@@ -58,6 +58,19 @@ const Header: React.FC = () => {
                 Кіру
               </Link>
             </li>
+            <li>
+              <div className="lang-switch" role="group" aria-label="Language switch">
+                <button type="button" className="lang-chip is-active">
+                  Қаз
+                </button>
+                <button type="button" className="lang-chip">
+                  Рус
+                </button>
+                <button type="button" className="lang-chip">
+                  Eng
+                </button>
+              </div>
+            </li>
           </ul>
         </nav>
       </div>
@@ -90,6 +103,34 @@ const Header: React.FC = () => {
           list-style: none;
           gap: 24px;
           align-items: center;
+        }
+
+        .lang-switch {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 8px;
+          border-radius: 999px;
+          border: 1px solid rgba(181, 139, 100, 0.25);
+          background: rgba(255, 255, 255, 0.65);
+        }
+
+        .lang-chip {
+          border: none;
+          background: transparent;
+          font-size: 12px;
+          font-weight: 600;
+          color: rgba(43, 43, 43, 0.7);
+          padding: 4px 6px;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: background 0.25s ease-out, color 0.25s ease-out;
+        }
+
+        .lang-chip.is-active,
+        .lang-chip:hover {
+          background: rgba(138, 106, 69, 0.15);
+          color: var(--accent);
         }
 
         .nav-link {

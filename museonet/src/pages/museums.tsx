@@ -14,7 +14,7 @@ const MuseumsPage: React.FC = () => {
   return (
     <div className="page">
       <Head>
-        <title>Музейлер — Archeo</title>
+        <title>Музейлер — museonet</title>
         <meta name="description" content="Археологиялық музейлер тізімі." />
       </Head>
 

@@ -16,7 +16,7 @@ const GamesPage: React.FC = () => {
   return (
     <div className="page">
       <Head>
-        <title>Ойындар — Archeo</title>
+        <title>Ойындар — museonet</title>
         <meta name="description" content="Археологияға арналған білім беру ойындары." />
       </Head>
 

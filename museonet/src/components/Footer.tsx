@@ -6,8 +6,10 @@ const Footer: React.FC = () => {
     <footer className="site-footer">
       <div className="container footer-inner">
         <div>
-          <div className="footer-logo">ARCHEO</div>
-          <p className="footer-note">Археология жобасы · Қазақстан</p>
+          <div className="footer-logo">museonet</div>
+          <p className="footer-note">
+            Виртуалды музейлер желісі · археологиялық мұра, білім және зерттеу кеңістігі.
+          </p>
         </div>
 
         <div className="footer-links">
@@ -17,7 +19,7 @@ const Footer: React.FC = () => {
           <Link href="/login">Кіру</Link>
         </div>
 
-        <div className="footer-copy">© 2026 Archeo. Барлық құқықтар қорғалған.</div>
+        <div className="footer-copy">© 2026 museonet. Барлық құқықтар қорғалған.</div>
       </div>
       <style jsx>{`
         .site-footer {

@@ -7,10 +7,10 @@ const AboutPage: React.FC = () => {
   return (
     <div className="page">
       <Head>
-        <title>Біз туралы — Archeo</title>
+        <title>Біз туралы — museonet</title>
         <meta
           name="description"
-          content="Archeo жобасының миссиясы мен тарихы туралы қысқаша ақпарат."
+          content="museonet жобасының миссиясы мен тарихы туралы қысқаша ақпарат."
         />
       </Head>
 
@@ -20,10 +20,11 @@ const AboutPage: React.FC = () => {
         <section className="section about-hero">
           <div className="container">
             <span className="eyebrow">Жоба туралы</span>
-            <h1>Біз туралы</h1>
+            <h1>museonet туралы</h1>
             <p className="lead">
-              Археологияны қоғамға жақындататын, ғылыми дерекке негізделген цифрлық кеңістік құрудамыз.
-              Біз зерттеу нәтижелерін көрнекі әрі түсінікті форматқа айналдырамыз.
+              museonet — археологияны қоғамға жақындататын, ғылыми дерекке негізделген виртуалды музей.
+              Біз зерттеу нәтижелерін көрнекі әрі түсінікті форматқа айналдырамыз және платформаны үш
+              тілде ұсынамыз: қазақша, орысша және ағылшынша.
             </p>
           </div>
         </section>

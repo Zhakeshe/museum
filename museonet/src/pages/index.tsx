@@ -7,10 +7,10 @@ const HomePage: React.FC = () => {
   return (
     <div className="page">
       <Head>
-        <title>Archeo — Археология әлемі</title>
+        <title>museonet — Виртуалды музей</title>
         <meta
           name="description"
-          content="Археология әлемін зерттеуге арналған тыныш, заманауи платформа."
+          content="museonet — археологиялық мұра мен мәдени тарихты көптілді цифрлық форматта ұсынатын виртуалды музей."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -20,10 +20,11 @@ const HomePage: React.FC = () => {
       <main>
         <section className="hero">
           <div className="container hero-content">
-            <span className="eyebrow">Археология мұрасы</span>
-            <h1>Археология әлемі</h1>
+            <span className="eyebrow">Виртуалды музей</span>
+            <h1>Археология әлемі — museonet</h1>
             <p>
-              Тарихтың нәзік қабаттарын ашатын цифрлық зертхана.
+              Тарихтың нәзік қабаттарын ашатын көптілді цифрлық музей. Экспедициялар, артефактілер
+              және ғылыми зерттеу материалдары бір кеңістікте жинақталады.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" href="#features">
@@ -41,26 +42,28 @@ const HomePage: React.FC = () => {
             <div className="section-heading">
               <h2>Негізгі бағыттар</h2>
               <p>
-                Археологиялық зерттеулерді, артефактілерді және білім беру жобаларын бір жерде жинақтадық.
+                museonet — қазақ, орыс және ағылшын тілдерінде қолжетімді виртуалды музей. Біз
+                археологиялық зерттеулерді, артефактілерді және білім беру жобаларын бір жерде
+                жинақтадық.
               </p>
             </div>
             <div className="cards-grid">
               {[
                 {
                   title: 'Экспедициялар',
-                  description: 'Маусымдық қазба жұмыстарының қысқа шолуы.',
+                  description: 'Маусымдық қазбалардың күнделігі, маршрут және далалық есептер.',
                 },
                 {
                   title: 'Артефактілер',
-                  description: 'Қордағы сирек жәдігерлердің сандық каталогы.',
+                  description: 'Қордағы сирек жәдігерлердің 3D және фото каталогы.',
                 },
                 {
                   title: 'Ойындар',
-                  description: 'Жұмсақ геймификация арқылы білімді бекіту.',
+                  description: 'Студенттерге арналған зертханалық тапсырмалар мен симуляциялар.',
                 },
                 {
                   title: 'Музейлер',
-                  description: 'Қазақстандағы жетекші археологиялық орталықтар.',
+                  description: 'Қазақстандағы музейлердің ғылыми жобалары мен көрмелері.',
                 },
               ].map((card) => (
                 <div className="card feature-card" key={card.title}>
@@ -81,7 +84,7 @@ const HomePage: React.FC = () => {
           <div className="container">
             <div className="section-heading">
               <h2>Музейлер шолуы</h2>
-              <p>Археологиялық коллекциялары бай үш маңызды нүкте.</p>
+              <p>Археологиялық коллекциялары бай үш маңызды нүкте және тұрақты серіктестер.</p>
             </div>
             <div className="museum-list">
               {[
