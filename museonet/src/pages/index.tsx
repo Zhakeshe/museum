@@ -25,6 +25,7 @@ const HomePage: React.FC = () => {
         museumsText:
           'Серіктес музейлердің таңдаулы коллекциялары, қысқаша сипаттамалар және толық ақпаратқа өтетін сілтемелер.',
         detail: 'Толығырақ',
+        fullInfo: 'Толық ақпарат',
         locationLabel: 'Орналасуы',
         carouselTitle: '285 музей тізімі',
         carouselText:
@@ -52,6 +53,7 @@ const HomePage: React.FC = () => {
         museumsText:
           'Избранные коллекции музеев-партнеров с коротким описанием и быстрым переходом к деталям.',
         detail: 'Подробнее',
+        fullInfo: 'Полная информация',
         locationLabel: 'Локация',
         carouselTitle: 'Каталог 285 музеев',
         carouselText:
@@ -79,6 +81,7 @@ const HomePage: React.FC = () => {
         museumsText:
           'Selected partner collections with short descriptions and quick access to details.',
         detail: 'Details',
+        fullInfo: 'Full details',
         locationLabel: 'Location',
         carouselTitle: '285 museum list',
         carouselText:
@@ -549,6 +552,9 @@ const HomePage: React.FC = () => {
                     <div className="marquee-photo"></div>
                     <h4>{museum.name}</h4>
                     <p>{museum.description}</p>
+                    <button className="button button-secondary" type="button">
+                      {content[language].fullInfo}
+                    </button>
                   </div>
                 ))}
               </div>
@@ -724,19 +730,69 @@ const HomePage: React.FC = () => {
 
         .museum-marquee,
         .artifact-marquee {
-          overflow: hidden;
+          overflow-x: auto;
+          overflow-y: hidden;
           padding: 12px 0;
           border-radius: 16px;
           border: 1px solid rgba(181, 139, 100, 0.2);
           background: rgba(255, 255, 255, 0.6);
+          scroll-snap-type: x mandatory;
+          position: relative;
+          scrollbar-width: none;
+        }
+
+        .museum-marquee::-webkit-scrollbar,
+        .artifact-marquee::-webkit-scrollbar {
+          display: none;
+        }
+
+        .museum-marquee::before,
+        .museum-marquee::after,
+        .artifact-marquee::before,
+        .artifact-marquee::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          width: 80px;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .museum-marquee::before,
+        .artifact-marquee::before {
+          left: 0;
+          background: linear-gradient(90deg, rgba(246, 241, 232, 0.95), rgba(246, 241, 232, 0));
+        }
+
+        .museum-marquee::after,
+        .artifact-marquee::after {
+          right: 0;
+          background: linear-gradient(270deg, rgba(246, 241, 232, 0.95), rgba(246, 241, 232, 0));
         }
 
         .marquee-track,
         .artifact-track {
           display: flex;
           gap: 16px;
-          animation: marquee 45s linear infinite;
+          animation: marquee 90s linear infinite;
           width: max-content;
+          scroll-snap-align: start;
+        }
+
+        .museum-marquee:hover .marquee-track,
+        .artifact-marquee:hover .artifact-track {
+          animation-play-state: paused;
+        }
+
+        .museum-marquee:hover,
+        .artifact-marquee:hover {
+          cursor: grab;
+        }
+
+        .museum-marquee:active,
+        .artifact-marquee:active {
+          cursor: grabbing;
         }
 
         .marquee-card,
@@ -744,6 +800,8 @@ const HomePage: React.FC = () => {
           width: 240px;
           flex-shrink: 0;
           padding: 20px;
+          display: grid;
+          gap: 10px;
         }
 
         .marquee-photo,
