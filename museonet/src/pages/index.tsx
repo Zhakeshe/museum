@@ -775,7 +775,7 @@ const HomePage: React.FC = () => {
         .artifact-track {
           display: flex;
           gap: 16px;
-          animation: marquee 90s linear infinite;
+          animation: marquee 140s linear infinite;
           width: max-content;
           scroll-snap-align: start;
         }
@@ -802,6 +802,25 @@ const HomePage: React.FC = () => {
           padding: 20px;
           display: grid;
           gap: 10px;
+          transform: scale(0.9);
+          transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+          opacity: 0.7;
+        }
+
+        .marquee-card:nth-child(6n + 2) {
+          transform: scale(0.95);
+          opacity: 0.85;
+        }
+
+        .marquee-card:nth-child(6n + 3) {
+          transform: scale(1);
+          opacity: 1;
+          box-shadow: 0 20px 36px rgba(43, 43, 43, 0.12);
+        }
+
+        .marquee-card:nth-child(6n + 4) {
+          transform: scale(0.95);
+          opacity: 0.85;
         }
 
         .marquee-photo,
