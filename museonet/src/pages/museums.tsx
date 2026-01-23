@@ -1,99 +1,179 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-const recommendedMuseums = [
+const museumsData = [
   {
-    name: 'Атырау облыстық тарихи-өлкетану музейі',
-    location: 'Атырау, Қазақстан',
-    category: 'Өлкетану',
-    description: 'Каспий өңірінің тарихы мен археологиялық мұрасына арналған негізгі коллекция.',
-  },
-  {
-    name: 'Әзірет Сұлтан музей-қорығы',
-    location: 'Түркістан, Қазақстан',
-    category: 'Қорық-музей',
-    description: 'Қасиетті Түркістан кешенінің экспозициялары мен археологиялық қорлары.',
-  },
-  {
-    name: 'Алтын адам павильоны',
-    location: 'Алматы, Қазақстан',
-    category: 'Археология',
-    description: 'Сақ дәуірінің жәдігерлері мен символдық реконструкциялары.',
-  },
-  {
-    name: 'Жаркент мешіті музейі',
-    location: 'Жетісу, Қазақстан',
-    category: 'Сәулет',
-    description: 'Сәулеттік мұра, ағаш ою өнері және өңірлік тарих.',
-  },
-  {
-    name: 'Ұлттық музей',
-    location: 'Астана, Қазақстан',
-    category: 'Ұлттық музей',
-    description: 'Қазақстан тарихының негізгі кезеңдерін қамтитын үлкен экспозиция.',
-  },
-  {
-    name: 'Отырар музей-қорығы',
-    location: 'Түркістан, Қазақстан',
-    category: 'Қорық-музей',
-    description: 'Ортағасырлық қалалар археологиясы және қазба материалдары.',
-  },
-];
-
-const museumCards = [
-  {
+    id: 1,
     name: 'Ақтөбе облыстық тарихи-өлкетану музейі',
     location: 'Ақтөбе, Қазақстан',
+    city: 'Ақтөбе',
+    region: 'Ақтөбе облысы',
     category: 'Өлкетану',
     description: 'Өңір тарихы, этнография және археология экспозициялары.',
     hours: '09:00–18:00',
     badge: 'Ұсынылады',
+    price: 'Тегін',
+    kids: true,
+    rating: 4.6,
+    phone: '+7 (7132) 00-00-00',
+    website: 'https://museonet.kz',
   },
   {
+    id: 2,
     name: 'Ботай музей-қорығы',
     location: 'СҚО, Қазақстан',
+    city: 'Айыртау',
+    region: 'СҚО',
     category: 'Археология',
     description: 'Ежелгі қоныстар мен жылқы мәдениеті туралы ғылыми экспозиция.',
     hours: '10:00–19:00',
     badge: '⭐ 4.8',
+    price: 'Ақылы',
+    kids: true,
+    rating: 4.8,
+    phone: '+7 (7152) 11-11-11',
+    website: 'https://museonet.kz',
   },
   {
+    id: 3,
     name: 'Шым қала тарихи-мәдени кешені',
     location: 'Шымкент, Қазақстан',
+    city: 'Шымкент',
+    region: 'Шымкент',
     category: 'Тарих',
     description: 'Қаланың ежелгі тарихын ашатын интерактивті залдар.',
     hours: '09:30–18:30',
     badge: 'Ұсынылады',
+    price: 'Тегін',
+    kids: true,
+    rating: 4.5,
+    phone: '+7 (7252) 22-22-22',
+    website: 'https://museonet.kz',
   },
   {
+    id: 4,
     name: 'Көкшетау тарих музейі',
     location: 'Көкшетау, Қазақстан',
+    city: 'Көкшетау',
+    region: 'Ақмола облысы',
     category: 'Өлкетану',
     description: 'Аймақтың археологиялық және мәдени құндылықтары.',
     hours: '10:00–18:00',
     badge: '⭐ 4.6',
+    price: 'Ақылы',
+    kids: false,
+    rating: 4.6,
+    phone: '+7 (7162) 33-33-33',
+    website: 'https://museonet.kz',
   },
   {
+    id: 5,
     name: 'Сарайшык музей-қорығы',
     location: 'Атырау, Қазақстан',
+    city: 'Атырау',
+    region: 'Атырау облысы',
     category: 'Қорық-музей',
     description: 'Алтын Орда дәуірінің археологиялық мұралары.',
     hours: '09:00–17:30',
     badge: 'Ұсынылады',
+    price: 'Тегін',
+    kids: true,
+    rating: 4.7,
+    phone: '+7 (7122) 44-44-44',
+    website: 'https://museonet.kz',
   },
   {
+    id: 6,
     name: 'Кастеев өнер музейі',
     location: 'Алматы, Қазақстан',
+    city: 'Алматы',
+    region: 'Алматы',
     category: 'Өнер',
     description: 'Классикалық және заманауи өнер коллекциялары.',
     hours: '10:00–19:00',
     badge: '⭐ 4.9',
+    price: 'Ақылы',
+    kids: false,
+    rating: 4.9,
+    phone: '+7 (727) 55-55-55',
+    website: 'https://museonet.kz',
   },
 ];
 
+const recommendedMuseums = museumsData.slice(0, 6);
+const categories = ['Үй-музей', 'Археология', 'Өнер', 'Қорық-музей', 'Өлкетану', 'Тарих'];
+
 const MuseumsPage: React.FC = () => {
+  const [search, setSearch] = useState('');
+  const [region, setRegion] = useState('Барлығы');
+  const [city, setCity] = useState('Барлығы');
+  const [category, setCategory] = useState('Барлығы');
+  const [price, setPrice] = useState('Барлығы');
+  const [kids, setKids] = useState(false);
+  const [sort, setSort] = useState('Танымал');
+  const [view, setView] = useState<'grid' | 'list' | 'map'>('grid');
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [selected, setSelected] = useState<typeof museumsData[0] | null>(null);
+
+  const regions = useMemo(
+    () => ['Барлығы', ...new Set(museumsData.map((item) => item.region))],
+    [],
+  );
+  const cities = useMemo(
+    () => ['Барлығы', ...new Set(museumsData.map((item) => item.city))],
+    [],
+  );
+
+  const filteredMuseums = useMemo(() => {
+    const normalizedSearch = search.toLowerCase();
+    let items = museumsData.filter((item) => {
+      const matchesSearch =
+        item.name.toLowerCase().includes(normalizedSearch) ||
+        item.location.toLowerCase().includes(normalizedSearch);
+      const matchesRegion = region === 'Барлығы' || item.region === region;
+      const matchesCity = city === 'Барлығы' || item.city === city;
+      const matchesCategory = category === 'Барлығы' || item.category === category;
+      const matchesPrice = price === 'Барлығы' || item.price === price;
+      const matchesKids = !kids || item.kids;
+      return (
+        matchesSearch &&
+        matchesRegion &&
+        matchesCity &&
+        matchesCategory &&
+        matchesPrice &&
+        matchesKids
+      );
+    });
+
+    if (sort === 'Жаңа') {
+      items = [...items].reverse();
+    }
+    if (sort === 'А-Я') {
+      items = [...items].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sort === 'Танымал') {
+      items = [...items].sort((a, b) => b.rating - a.rating);
+    }
+
+    return items;
+  }, [search, region, city, category, price, kids, sort]);
+
+  const toggleFavorite = (id: number) => {
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
+
+  const resetFilters = () => {
+    setSearch('');
+    setRegion('Барлығы');
+    setCity('Барлығы');
+    setCategory('Барлығы');
+    setPrice('Барлығы');
+    setKids(false);
+    setSort('Танымал');
+  };
+
   return (
     <div className="page">
       <Head>
@@ -122,7 +202,13 @@ const MuseumsPage: React.FC = () => {
               </label>
               <div className="search-input">
                 <span>🔍</span>
-                <input id="search" type="search" placeholder="Музей атауын іздеу…" />
+                <input
+                  id="search"
+                  type="search"
+                  placeholder="Музей атауын іздеу…"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -131,31 +217,68 @@ const MuseumsPage: React.FC = () => {
         <section className="filter-bar">
           <div className="container filter-grid">
             <div className="filter-group">
-              <div className="dropdown">Өңір ▾</div>
-              <div className="dropdown">Қала ▾</div>
+              <select className="dropdown" value={region} onChange={(event) => setRegion(event.target.value)}>
+                {regions.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <select className="dropdown" value={city} onChange={(event) => setCity(event.target.value)}>
+                {cities.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
               <div className="chip-row">
-                <span className="chip is-active">Үй-музей</span>
-                <span className="chip">Археология</span>
-                <span className="chip">Өнер</span>
-                <span className="chip">Қорық-музей</span>
+                {['Барлығы', ...categories].map((item) => (
+                  <button
+                    key={item}
+                    className={`chip ${category === item ? 'is-active' : ''}`}
+                    onClick={() => setCategory(item)}
+                    type="button"
+                  >
+                    {item}
+                  </button>
+                ))}
               </div>
               <div className="price-toggle">
-                <button className="toggle is-active">Тегін</button>
-                <button className="toggle">Ақылы</button>
+                {['Барлығы', 'Тегін', 'Ақылы'].map((item) => (
+                  <button
+                    key={item}
+                    className={`toggle ${price === item ? 'is-active' : ''}`}
+                    onClick={() => setPrice(item)}
+                    type="button"
+                  >
+                    {item}
+                  </button>
+                ))}
               </div>
-              <div className="switch">
+              <button className={`switch ${kids ? 'is-active' : ''}`} type="button" onClick={() => setKids(!kids)}>
                 <span>Балаларға лайық</span>
                 <div className="switch-track">
                   <div className="switch-thumb"></div>
                 </div>
-              </div>
+              </button>
             </div>
             <div className="filter-actions">
-              <div className="dropdown">Сұрыптау: Танымал ▾</div>
+              <select className="dropdown" value={sort} onChange={(event) => setSort(event.target.value)}>
+                <option value="Танымал">Сұрыптау: Танымал</option>
+                <option value="Жаңа">Сұрыптау: Жаңа</option>
+                <option value="А-Я">Сұрыптау: А-Я</option>
+              </select>
               <div className="view-toggle">
-                <button className="view-btn is-active">Grid</button>
-                <button className="view-btn">List</button>
-                <button className="view-btn">Map</button>
+                {['grid', 'list', 'map'].map((item) => (
+                  <button
+                    key={item}
+                    className={`view-btn ${view === item ? 'is-active' : ''}`}
+                    onClick={() => setView(item as 'grid' | 'list' | 'map')}
+                    type="button"
+                  >
+                    {item.toUpperCase()}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -188,12 +311,16 @@ const MuseumsPage: React.FC = () => {
                     <p className="location">📍 {museum.location}</p>
                     <p className="desc">{museum.description}</p>
                     <div className="meta">
-                      <span>⏰ 09:00–18:00</span>
-                      <span>Ұсынылады</span>
+                      <span>⏰ {museum.hours}</span>
+                      <span>{museum.badge}</span>
                     </div>
                     <div className="card-actions">
-                      <button className="button button-primary">Толық ақпарат</button>
-                      <button className="icon-btn">♡</button>
+                      <button className="button button-primary" onClick={() => setSelected(museum)}>
+                        Толық ақпарат
+                      </button>
+                      <button className="icon-btn" type="button" onClick={() => toggleFavorite(museum.id)}>
+                        {favorites.includes(museum.id) ? '❤' : '♡'}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -208,29 +335,43 @@ const MuseumsPage: React.FC = () => {
               <h2>Барлық музейлер</h2>
               <p>Іздеу нәтижелерін кеңейту үшін қосымша параметрлерді қолданыңыз.</p>
             </div>
-            <div className="grid">
-              {museumCards.map((museum) => (
-                <div className="card museum-card" key={museum.name}>
-                  <div className="card-image">
-                    <div className="image-overlay"></div>
-                    <span className="chip chip-image">{museum.category}</span>
-                  </div>
-                  <div className="card-body">
-                    <h3>{museum.name}</h3>
-                    <p className="location">📍 {museum.location}</p>
-                    <p className="desc">{museum.description}</p>
-                    <div className="meta">
-                      <span>⏰ {museum.hours}</span>
-                      <span>{museum.badge}</span>
+            {filteredMuseums.length === 0 ? (
+              <div className="empty-state">
+                <h2>Нәтиже табылмады</h2>
+                <p>Басқа сүзгілерді қолданып көріңіз немесе параметрлерді тазартыңыз.</p>
+                <button className="button button-secondary" onClick={resetFilters}>
+                  Фильтрді тазалау
+                </button>
+              </div>
+            ) : (
+              <div className={`grid ${view}`}>
+                {filteredMuseums.map((museum) => (
+                  <div className="card museum-card" key={museum.id}>
+                    <div className="card-image">
+                      <div className="image-overlay"></div>
+                      <span className="chip chip-image">{museum.category}</span>
                     </div>
-                    <div className="card-actions">
-                      <button className="button button-primary">Толық ақпарат</button>
-                      <button className="icon-btn">♡</button>
+                    <div className="card-body">
+                      <h3>{museum.name}</h3>
+                      <p className="location">📍 {museum.location}</p>
+                      <p className="desc">{museum.description}</p>
+                      <div className="meta">
+                        <span>⏰ {museum.hours}</span>
+                        <span>{museum.badge}</span>
+                      </div>
+                      <div className="card-actions">
+                        <button className="button button-primary" onClick={() => setSelected(museum)}>
+                          Толық ақпарат
+                        </button>
+                        <button className="icon-btn" type="button" onClick={() => toggleFavorite(museum.id)}>
+                          {favorites.includes(museum.id) ? '❤' : '♡'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             <div className="load-more">
               <button className="button button-secondary">Жүктеу</button>
             </div>
@@ -256,49 +397,50 @@ const MuseumsPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="section">
-          <div className="container empty-state">
-            <h2>Нәтиже табылмады</h2>
-            <p>Басқа сүзгілерді қолданып көріңіз немесе параметрлерді тазартыңыз.</p>
-            <button className="button button-secondary">Фильтрді тазалау</button>
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="container">
-            <div className="detail-modal">
-              <div className="modal-hero">
-                <div className="modal-gallery"></div>
-                <div className="modal-info">
-                  <h2>Алтын адам павильоны</h2>
-                  <p>📍 Алматы, Қазақстан</p>
-                  <p>⏰ 09:00–18:00</p>
-                  <p>☎️ +7 (000) 000-00-00</p>
-                  <p>🌐 museonet.kz</p>
-                  <button className="button button-primary">Картада ашу</button>
+        {selected && (
+          <section className="section">
+            <div className="container">
+              <div className="detail-modal">
+                <div className="modal-hero">
+                  <div className="modal-gallery"></div>
+                  <div className="modal-info">
+                    <h2>{selected.name}</h2>
+                    <p>📍 {selected.location}</p>
+                    <p>⏰ {selected.hours}</p>
+                    <p>☎️ {selected.phone}</p>
+                    <p>🌐 {selected.website}</p>
+                    <a
+                      className="button button-primary"
+                      href={`https://2gis.kz/search/${encodeURIComponent(selected.name)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Картада ашу
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <div className="modal-sections">
-                <div>
-                  <h3>Сипаттама</h3>
-                  <p>Сақ дәуірінің мәдени мұрасын таныстыратын негізгі экспозициялар.</p>
-                </div>
-                <div>
-                  <h3>Экспозициялар</h3>
-                  <p>Артефактілер, интерактивті залдар және мультимедиалық контент.</p>
-                </div>
-                <div>
-                  <h3>Билеттер</h3>
-                  <p>Ересек — 1500 тг, студент — 800 тг, балалар — тегін.</p>
-                </div>
-                <div>
-                  <h3>Қалай жетуге болады</h3>
-                  <p>Қалалық маршруттар, қоғамдық көлік және жеке автотұрақ.</p>
+                <div className="modal-sections">
+                  <div>
+                    <h3>Сипаттама</h3>
+                    <p>{selected.description}</p>
+                  </div>
+                  <div>
+                    <h3>Экспозициялар</h3>
+                    <p>Артефактілер, интерактивті залдар және мультимедиалық контент.</p>
+                  </div>
+                  <div>
+                    <h3>Билеттер</h3>
+                    <p>{selected.price === 'Тегін' ? 'Кіру тегін.' : 'Ересек — 1500 тг, студент — 800 тг.'}</p>
+                  </div>
+                  <div>
+                    <h3>Қалай жетуге болады</h3>
+                    <p>Қалалық маршруттар, қоғамдық көлік және жеке автотұрақ.</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
 
       <Footer />
@@ -428,6 +570,16 @@ const MuseumsPage: React.FC = () => {
           align-items: center;
           gap: 8px;
           font-size: 14px;
+          border: none;
+          background: transparent;
+        }
+
+        .switch.is-active .switch-track {
+          background: var(--accent);
+        }
+
+        .switch.is-active .switch-thumb {
+          left: 23px;
         }
 
         .switch-track {
@@ -436,6 +588,7 @@ const MuseumsPage: React.FC = () => {
           background: #e5d9c7;
           border-radius: 999px;
           position: relative;
+          transition: background 0.2s ease;
         }
 
         .switch-thumb {
@@ -447,6 +600,7 @@ const MuseumsPage: React.FC = () => {
           top: 3px;
           left: 3px;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+          transition: left 0.2s ease;
         }
 
         .filter-actions {
@@ -518,6 +672,14 @@ const MuseumsPage: React.FC = () => {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
           gap: 24px;
+        }
+
+        .grid.list {
+          grid-template-columns: 1fr;
+        }
+
+        .grid.map {
+          grid-template-columns: 1fr;
         }
 
         .museum-card {
@@ -628,6 +790,7 @@ const MuseumsPage: React.FC = () => {
           border-radius: 24px;
           padding: 32px;
           box-shadow: var(--shadow-soft);
+          animation: fadeIn 0.3s ease;
         }
 
         .modal-hero {
@@ -661,6 +824,17 @@ const MuseumsPage: React.FC = () => {
           }
           50% {
             opacity: 1;
+          }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
 

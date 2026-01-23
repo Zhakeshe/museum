@@ -488,6 +488,48 @@ const HomePage: React.FC = () => {
           </div>
         </section>
 
+        <section className="section directory-preview">
+          <div className="container preview-grid">
+            <div>
+              <h2>Музейлер тізімі</h2>
+              <p className="preview-subtitle">
+                Жылдам іздеу, категориялар және ұсынылатын музейлер карталары.
+              </p>
+              <div className="preview-stats">285 музей • 17 өңір • 12 категория</div>
+            </div>
+            <div className="preview-search">
+              <div className="search-input">
+                <span>🔍</span>
+                <input type="search" placeholder="Музей атауын іздеу…" />
+              </div>
+              <div className="chip-row">
+                {['Үй-музей', 'Археология', 'Өнер', 'Қорық-музей'].map((item) => (
+                  <span className="chip" key={item}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="container preview-cards">
+            {featuredMuseums.slice(0, 3).map((item) => (
+              <div className="card museum-card" key={item.name}>
+                <div className="museum-photo"></div>
+                <div>
+                  <h3>{item.name}</h3>
+                  <p>
+                    {content[language].locationLabel}: {item.location}
+                  </p>
+                  <span>{item.description}</span>
+                </div>
+                <button className="button button-primary" type="button">
+                  {content[language].detail}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="section" id="features">
           <div className="container">
             <div className="section-heading">
@@ -651,6 +693,46 @@ const HomePage: React.FC = () => {
           display: flex;
           gap: 16px;
           flex-wrap: wrap;
+        }
+
+        .directory-preview {
+          background: rgba(255, 255, 255, 0.5);
+          border-top: 1px solid rgba(181, 139, 100, 0.2);
+          border-bottom: 1px solid rgba(181, 139, 100, 0.2);
+        }
+
+        .preview-grid {
+          display: grid;
+          grid-template-columns: 1.1fr 1fr;
+          gap: 32px;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+
+        .preview-subtitle {
+          color: rgba(43, 43, 43, 0.7);
+          margin-top: 8px;
+        }
+
+        .preview-stats {
+          margin-top: 12px;
+          font-size: 14px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .preview-search {
+          display: grid;
+          gap: 16px;
+          background: rgba(255, 255, 255, 0.8);
+          padding: 20px;
+          border-radius: 16px;
+          border: 1px solid rgba(181, 139, 100, 0.2);
+        }
+
+        .preview-cards {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 24px;
         }
 
         .about-banner {
@@ -918,6 +1000,10 @@ const HomePage: React.FC = () => {
           .about-banner {
             flex-direction: column;
             align-items: flex-start;
+          }
+
+          .preview-grid {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>
