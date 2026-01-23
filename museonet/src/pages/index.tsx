@@ -774,10 +774,11 @@ const HomePage: React.FC = () => {
         .marquee-track,
         .artifact-track {
           display: flex;
-          gap: 16px;
-          animation: marquee 140s linear infinite;
+          gap: 18px;
+          animation: marquee 210s linear infinite;
           width: max-content;
           scroll-snap-align: start;
+          perspective: 1200px;
         }
 
         .museum-marquee:hover .marquee-track,
@@ -802,25 +803,43 @@ const HomePage: React.FC = () => {
           padding: 20px;
           display: grid;
           gap: 10px;
-          transform: scale(0.9);
-          transition: transform 0.4s ease-out, opacity 0.4s ease-out;
-          opacity: 0.7;
+          transform: scale(0.86) translateZ(0);
+          transition: transform 0.6s ease-out, opacity 0.6s ease-out, box-shadow 0.6s ease-out;
+          opacity: 0.6;
+          position: relative;
+          overflow: hidden;
+          animation: glowPulse 6s ease-in-out infinite;
+        }
+
+        .marquee-card::after,
+        .artifact-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at top, rgba(255, 255, 255, 0.3), transparent 60%);
+          opacity: 0;
+          transition: opacity 0.6s ease-out;
+          pointer-events: none;
         }
 
         .marquee-card:nth-child(6n + 2) {
-          transform: scale(0.95);
-          opacity: 0.85;
+          transform: scale(0.93);
+          opacity: 0.8;
         }
 
         .marquee-card:nth-child(6n + 3) {
-          transform: scale(1);
+          transform: scale(1.08);
           opacity: 1;
-          box-shadow: 0 20px 36px rgba(43, 43, 43, 0.12);
+          box-shadow: 0 26px 46px rgba(43, 43, 43, 0.16);
+        }
+
+        .marquee-card:nth-child(6n + 3)::after {
+          opacity: 1;
         }
 
         .marquee-card:nth-child(6n + 4) {
-          transform: scale(0.95);
-          opacity: 0.85;
+          transform: scale(0.93);
+          opacity: 0.8;
         }
 
         .marquee-photo,
@@ -870,11 +889,24 @@ const HomePage: React.FC = () => {
         }
 
         @keyframes marquee {
-          from {
+          0% {
             transform: translateX(0);
           }
-          to {
+          50% {
+            transform: translateX(-25%);
+          }
+          100% {
             transform: translateX(-50%);
+          }
+        }
+
+        @keyframes glowPulse {
+          0%,
+          100% {
+            box-shadow: 0 14px 30px rgba(43, 43, 43, 0.08);
+          }
+          50% {
+            box-shadow: 0 18px 34px rgba(43, 43, 43, 0.12);
           }
         }
 
