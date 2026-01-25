@@ -12,6 +12,7 @@ const museumsData = [
     region: 'Ақтөбе облысы',
     category: 'Өлкетану',
     description: 'Өңір тарихы, этнография және археология экспозициялары.',
+    address: 'Әбілқайыр хан даңғылы, 12',
     hours: '09:00–18:00',
     badge: 'Ұсынылады',
     price: 'Тегін',
@@ -28,6 +29,7 @@ const museumsData = [
     region: 'СҚО',
     category: 'Археология',
     description: 'Ежелгі қоныстар мен жылқы мәдениеті туралы ғылыми экспозиция.',
+    address: 'Ботай ауылы, орталық көше 1',
     hours: '10:00–19:00',
     badge: '⭐ 4.8',
     price: 'Ақылы',
@@ -44,6 +46,7 @@ const museumsData = [
     region: 'Шымкент',
     category: 'Тарих',
     description: 'Қаланың ежелгі тарихын ашатын интерактивті залдар.',
+    address: 'Қонаев даңғылы, 45',
     hours: '09:30–18:30',
     badge: 'Ұсынылады',
     price: 'Тегін',
@@ -60,6 +63,7 @@ const museumsData = [
     region: 'Ақмола облысы',
     category: 'Өлкетану',
     description: 'Аймақтың археологиялық және мәдени құндылықтары.',
+    address: 'Абылай хан даңғылы, 20',
     hours: '10:00–18:00',
     badge: '⭐ 4.6',
     price: 'Ақылы',
@@ -76,6 +80,7 @@ const museumsData = [
     region: 'Атырау облысы',
     category: 'Қорық-музей',
     description: 'Алтын Орда дәуірінің археологиялық мұралары.',
+    address: 'Сарайшык қалашығы, музей кешені',
     hours: '09:00–17:30',
     badge: 'Ұсынылады',
     price: 'Тегін',
@@ -92,6 +97,7 @@ const museumsData = [
     region: 'Алматы',
     category: 'Өнер',
     description: 'Классикалық және заманауи өнер коллекциялары.',
+    address: 'Достық даңғылы, 44',
     hours: '10:00–19:00',
     badge: '⭐ 4.9',
     price: 'Ақылы',
@@ -309,6 +315,7 @@ const MuseumsPage: React.FC = () => {
                   <div className="card-body">
                     <h3>{museum.name}</h3>
                     <p className="location">📍 {museum.location}</p>
+                    <p className="address">Мекенжай: {museum.address}</p>
                     <p className="desc">{museum.description}</p>
                     <div className="meta">
                       <span>⏰ {museum.hours}</span>
@@ -354,6 +361,7 @@ const MuseumsPage: React.FC = () => {
                     <div className="card-body">
                       <h3>{museum.name}</h3>
                       <p className="location">📍 {museum.location}</p>
+                      <p className="address">Мекенжай: {museum.address}</p>
                       <p className="desc">{museum.description}</p>
                       <div className="meta">
                         <span>⏰ {museum.hours}</span>
@@ -405,8 +413,9 @@ const MuseumsPage: React.FC = () => {
                   <div className="modal-gallery"></div>
                   <div className="modal-info">
                     <h2>{selected.name}</h2>
-                    <p>📍 {selected.location}</p>
-                    <p>⏰ {selected.hours}</p>
+                  <p>📍 {selected.location}</p>
+                  <p>Мекенжай: {selected.address}</p>
+                  <p>⏰ {selected.hours}</p>
                     <p>☎️ {selected.phone}</p>
                     <p>🌐 {selected.website}</p>
                     <a
@@ -720,6 +729,11 @@ const MuseumsPage: React.FC = () => {
         .location {
           color: rgba(43, 43, 43, 0.6);
           font-size: 14px;
+        }
+
+        .address {
+          color: rgba(43, 43, 43, 0.6);
+          font-size: 13px;
         }
 
         .desc {
