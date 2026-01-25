@@ -82,8 +82,6 @@ const museumsData = Array.from({ length: 285 }, (_, index) => {
   };
 });
 
-const recommendedMuseums = museumsData.slice(0, 8);
-
 const MuseumsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [region, setRegion] = useState('Барлығы');
@@ -95,6 +93,7 @@ const MuseumsPage: React.FC = () => {
   const [view, setView] = useState<'grid' | 'list' | 'map'>('grid');
   const [favorites, setFavorites] = useState<number[]>([]);
   const [selected, setSelected] = useState<typeof museumsData[0] | null>(null);
+  const [showFilters, setShowFilters] = useState(true);
 
   const regionOptions = useMemo(
     () => ['Барлығы', ...new Set(museumsData.map((item) => item.region))],
@@ -196,140 +195,99 @@ const MuseumsPage: React.FC = () => {
         <section className="filter-bar">
           <div className="container filter-head">
             <div className="filter-label">Сүзгілеу параметрлері</div>
-            <button className="filter-reset" type="button" onClick={resetFilters}>
-              Фильтрді тазалау
-            </button>
+            <div className="filter-actions-head">
+              <button className="filter-toggle" type="button" onClick={() => setShowFilters(!showFilters)}>
+                {showFilters ? 'Фильтрді жасыру' : 'Фильтрді көрсету'}
+              </button>
+              <button className="filter-reset" type="button" onClick={resetFilters}>
+                Фильтрді тазалау
+              </button>
+            </div>
           </div>
-          <div className="container filter-panel">
-            <div className="filter-grid">
-              <div className="filter-group">
-                <select className="dropdown" value={region} onChange={(event) => setRegion(event.target.value)}>
-                  {regionOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-                <select className="dropdown" value={city} onChange={(event) => setCity(event.target.value)}>
-                  {cityOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-                <div className="chip-row">
-                  {['Барлығы', ...categories].map((item) => (
-                    <button
-                      key={item}
-                      className={`chip ${category === item ? 'is-active' : ''}`}
-                      onClick={() => setCategory(item)}
-                      type="button"
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-                <div className="price-toggle">
-                  {['Барлығы', 'Тегін', 'Ақылы'].map((item) => (
-                    <button
-                      key={item}
-                      className={`toggle ${price === item ? 'is-active' : ''}`}
-                      onClick={() => setPrice(item)}
-                      type="button"
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  className={`switch ${kids ? 'is-active' : ''}`}
-                  type="button"
-                  onClick={() => setKids(!kids)}
-                >
-                  <span>Балаларға лайық</span>
-                  <div className="switch-track">
-                    <div className="switch-thumb"></div>
+          {showFilters && (
+            <div className="container filter-panel">
+              <div className="filter-grid">
+                <div className="filter-group">
+                  <select className="dropdown" value={region} onChange={(event) => setRegion(event.target.value)}>
+                    {regionOptions.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                  <select className="dropdown" value={city} onChange={(event) => setCity(event.target.value)}>
+                    {cityOptions.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="chip-row">
+                    {['Барлығы', ...categories].map((item) => (
+                      <button
+                        key={item}
+                        className={`chip ${category === item ? 'is-active' : ''}`}
+                        onClick={() => setCategory(item)}
+                        type="button"
+                      >
+                        {item}
+                      </button>
+                    ))}
                   </div>
-                </button>
-              </div>
-              <div className="filter-actions">
-                <select className="dropdown" value={sort} onChange={(event) => setSort(event.target.value)}>
-                  <option value="Танымал">Сұрыптау: Танымал</option>
-                  <option value="Жаңа">Сұрыптау: Жаңа</option>
-                  <option value="А-Я">Сұрыптау: А-Я</option>
-                </select>
-                <div className="view-toggle">
-                  {['grid', 'list', 'map'].map((item) => (
-                    <button
-                      key={item}
-                      className={`view-btn ${view === item ? 'is-active' : ''}`}
-                      onClick={() => setView(item as 'grid' | 'list' | 'map')}
-                      type="button"
-                    >
-                      {item === 'grid' ? 'Тор' : item === 'list' ? 'Тізім' : 'Карта'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          <button className="mobile-filter">Фильтрлер</button>
-        </section>
-
-        <section className="section">
-          <div className="container">
-            <div className="section-heading">
-              <h2>Ұсынылатын музейлер</h2>
-              <div className="carousel-controls">
-                <button className="circle-btn">‹</button>
-                <div className="dots">
-                  <span className="dot is-active"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                </div>
-                <button className="circle-btn">›</button>
-              </div>
-            </div>
-            <div className="carousel">
-              {recommendedMuseums.map((museum) => (
-                <div className="card museum-card" key={museum.id}>
-                  <div
-                    className="card-image"
-                    style={{
-                      backgroundImage: `linear-gradient(135deg, hsla(${museum.hue}, 45%, 78%, 0.85), hsla(${museum.hue}, 32%, 88%, 0.9))`,
-                    }}
+                  <div className="price-toggle">
+                    {['Барлығы', 'Тегін', 'Ақылы'].map((item) => (
+                      <button
+                        key={item}
+                        className={`toggle ${price === item ? 'is-active' : ''}`}
+                        onClick={() => setPrice(item)}
+                        type="button"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className={`switch ${kids ? 'is-active' : ''}`}
+                    type="button"
+                    onClick={() => setKids(!kids)}
                   >
-                    <div className="image-overlay"></div>
-                    <span className="chip chip-image">{museum.category}</span>
-                  </div>
-                  <div className="card-body">
-                    <h3>{museum.name}</h3>
-                    <p className="location">📍 {museum.location}</p>
-                    <p className="address">Мекенжай: {museum.address}</p>
-                    <p className="desc">{museum.description}</p>
-                    <div className="meta">
-                      <span>⏰ {museum.hours}</span>
-                      <span>{museum.badge}</span>
+                    <span>Балаларға лайық</span>
+                    <div className="switch-track">
+                      <div className="switch-thumb"></div>
                     </div>
-                    <div className="card-actions">
-                      <button className="button button-primary" onClick={() => setSelected(museum)}>
-                        Толық ақпарат
+                  </button>
+                </div>
+                <div className="filter-actions">
+                  <select className="dropdown" value={sort} onChange={(event) => setSort(event.target.value)}>
+                    <option value="Танымал">Сұрыптау: Танымал</option>
+                    <option value="Жаңа">Сұрыптау: Жаңа</option>
+                    <option value="А-Я">Сұрыптау: А-Я</option>
+                  </select>
+                  <div className="view-toggle">
+                    {['grid', 'list', 'map'].map((item) => (
+                      <button
+                        key={item}
+                        className={`view-btn ${view === item ? 'is-active' : ''}`}
+                        onClick={() => setView(item as 'grid' | 'list' | 'map')}
+                        type="button"
+                      >
+                        {item === 'grid' ? 'Тор' : item === 'list' ? 'Тізім' : 'Карта'}
                       </button>
-                      <button className="icon-btn" type="button" onClick={() => toggleFavorite(museum.id)}>
-                        {favorites.includes(museum.id) ? '❤' : '♡'}
-                      </button>
-                    </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
+          )}
+          <button className="mobile-filter" type="button" onClick={() => setShowFilters(!showFilters)}>
+            {showFilters ? 'Фильтрді жасыру' : 'Фильтрді көрсету'}
+          </button>
         </section>
 
         <section className="section">
           <div className="container">
             <div className="section-heading">
-              <h2>Барлық музейлер</h2>
+              <h2>Фильтр нәтижелері</h2>
               <p>Іздеу нәтижелерін кеңейту үшін қосымша параметрлерді қолданыңыз.</p>
             </div>
             {filteredMuseums.length === 0 ? (
@@ -344,15 +302,15 @@ const MuseumsPage: React.FC = () => {
               <div className={`grid ${view}`}>
                 {filteredMuseums.map((museum) => (
                   <div className="card museum-card" key={museum.id}>
-                  <div
-                    className="card-image"
-                    style={{
-                      backgroundImage: `linear-gradient(135deg, hsla(${museum.hue}, 45%, 78%, 0.85), hsla(${museum.hue}, 32%, 88%, 0.9))`,
-                    }}
-                  >
-                    <div className="image-overlay"></div>
-                    <span className="chip chip-image">{museum.category}</span>
-                  </div>
+                    <div
+                      className="card-image"
+                      style={{
+                        backgroundImage: `linear-gradient(135deg, hsla(${museum.hue}, 45%, 78%, 0.85), hsla(${museum.hue}, 32%, 88%, 0.9))`,
+                      }}
+                    >
+                      <div className="image-overlay"></div>
+                      <span className="chip chip-image">{museum.category}</span>
+                    </div>
                     <div className="card-body">
                       <h3>{museum.name}</h3>
                       <p className="location">📍 {museum.location}</p>
@@ -377,25 +335,6 @@ const MuseumsPage: React.FC = () => {
             )}
             <div className="load-more">
               <button className="button button-secondary">Жүктеу</button>
-            </div>
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="container">
-            <div className="section-heading">
-              <h2>Жүктелу күйі</h2>
-              <p>Жүйе жаңа мәліметтерді дайындап жатыр.</p>
-            </div>
-            <div className="grid">
-              {[1, 2, 3].map((item) => (
-                <div className="card skeleton" key={item}>
-                  <div className="skeleton-image"></div>
-                  <div className="skeleton-line"></div>
-                  <div className="skeleton-line short"></div>
-                  <div className="skeleton-line"></div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
@@ -564,6 +503,29 @@ const MuseumsPage: React.FC = () => {
           color: rgba(43, 43, 43, 0.55);
         }
 
+        .filter-actions-head {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .filter-toggle {
+          border-radius: 999px;
+          border: 1px solid rgba(120, 86, 47, 0.35);
+          background: rgba(255, 255, 255, 0.95);
+          padding: 8px 16px;
+          font-size: 13px;
+          color: rgba(104, 74, 38, 0.92);
+          box-shadow: 0 8px 18px rgba(120, 87, 50, 0.12);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .filter-toggle:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 18px rgba(120, 87, 50, 0.18);
+        }
+
         .filter-reset {
           border-radius: 999px;
           border: 1px solid rgba(160, 134, 96, 0.4);
@@ -599,9 +561,11 @@ const MuseumsPage: React.FC = () => {
         .dropdown {
           padding: 10px 16px;
           border-radius: 999px;
-          border: 1px solid var(--line);
+          border: 1px solid rgba(210, 191, 169, 0.9);
           background: #fff;
           font-size: 14px;
+          color: rgba(67, 50, 30, 0.9);
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
         }
 
         .chip-row {
@@ -610,18 +574,38 @@ const MuseumsPage: React.FC = () => {
           flex-wrap: wrap;
         }
 
+        .chip {
+          border-radius: 999px;
+          padding: 7px 14px;
+          border: 1px solid rgba(205, 186, 162, 0.9);
+          background: #fffaf4;
+          font-size: 13px;
+          color: rgba(92, 64, 33, 0.9);
+          transition: all 0.2s ease;
+        }
+
+        .chip.is-active {
+          background: var(--accent);
+          color: #fff;
+          border-color: var(--accent);
+          box-shadow: 0 8px 16px rgba(158, 108, 50, 0.25);
+        }
+
         .price-toggle {
           display: flex;
           border-radius: 999px;
           overflow: hidden;
-          border: 1px solid var(--line);
+          border: 1px solid rgba(205, 186, 162, 0.9);
+          background: #fffaf4;
         }
 
         .toggle {
           padding: 8px 14px;
-          background: #fff;
+          background: transparent;
           border: none;
           font-size: 14px;
+          color: rgba(92, 64, 33, 0.9);
+          transition: all 0.2s ease;
         }
 
         .toggle.is-active {
@@ -635,7 +619,10 @@ const MuseumsPage: React.FC = () => {
           gap: 8px;
           font-size: 14px;
           border: none;
-          background: transparent;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 999px;
+          padding: 6px 12px;
+          border: 1px solid rgba(205, 186, 162, 0.8);
         }
 
         .switch.is-active .switch-track {
@@ -681,55 +668,22 @@ const MuseumsPage: React.FC = () => {
         .view-btn {
           padding: 8px 12px;
           border-radius: 999px;
-          border: 1px solid var(--line);
-          background: #fff;
+          border: 1px solid rgba(205, 186, 162, 0.9);
+          background: #fffaf4;
           font-size: 13px;
+          color: rgba(92, 64, 33, 0.9);
+          transition: all 0.2s ease;
         }
 
         .view-btn.is-active {
           background: var(--accent);
           color: #fff;
           border-color: var(--accent);
+          box-shadow: 0 8px 16px rgba(158, 108, 50, 0.25);
         }
 
         .mobile-filter {
           display: none;
-        }
-
-        .carousel {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-          gap: 24px;
-        }
-
-        .carousel-controls {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .circle-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          border: 1px solid var(--line);
-          background: #fff;
-        }
-
-        .dots {
-          display: flex;
-          gap: 6px;
-        }
-
-        .dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #d8c8b5;
-        }
-
-        .dot.is-active {
-          background: var(--accent);
         }
 
         .grid {
@@ -841,29 +795,6 @@ const MuseumsPage: React.FC = () => {
           margin-top: 32px;
         }
 
-        .skeleton {
-          display: grid;
-          gap: 12px;
-        }
-
-        .skeleton-image {
-          height: 180px;
-          border-radius: 16px;
-          background: #eee4d8;
-          animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .skeleton-line {
-          height: 12px;
-          border-radius: 8px;
-          background: #eee4d8;
-          animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .skeleton-line.short {
-          width: 70%;
-        }
-
         .empty-state {
           text-align: center;
           background: #fff;
@@ -947,16 +878,6 @@ const MuseumsPage: React.FC = () => {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 20px;
-        }
-
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 0.6;
-          }
-          50% {
-            opacity: 1;
-          }
         }
 
         @keyframes fadeIn {
