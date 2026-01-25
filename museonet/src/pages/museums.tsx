@@ -3,113 +3,84 @@ import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-const museumsData = [
-  {
-    id: 1,
-    name: 'Ақтөбе облыстық тарихи-өлкетану музейі',
-    location: 'Ақтөбе, Қазақстан',
-    city: 'Ақтөбе',
-    region: 'Ақтөбе облысы',
-    category: 'Өлкетану',
-    description: 'Өңір тарихы, этнография және археология экспозициялары.',
-    address: 'Әбілқайыр хан даңғылы, 12',
-    hours: '09:00–18:00',
-    badge: 'Ұсынылады',
-    price: 'Тегін',
-    kids: true,
-    rating: 4.6,
-    phone: '+7 (7132) 00-00-00',
-    website: 'https://museonet.kz',
-  },
-  {
-    id: 2,
-    name: 'Ботай музей-қорығы',
-    location: 'СҚО, Қазақстан',
-    city: 'Айыртау',
-    region: 'СҚО',
-    category: 'Археология',
-    description: 'Ежелгі қоныстар мен жылқы мәдениеті туралы ғылыми экспозиция.',
-    address: 'Ботай ауылы, орталық көше 1',
-    hours: '10:00–19:00',
-    badge: '⭐ 4.8',
-    price: 'Ақылы',
-    kids: true,
-    rating: 4.8,
-    phone: '+7 (7152) 11-11-11',
-    website: 'https://museonet.kz',
-  },
-  {
-    id: 3,
-    name: 'Шым қала тарихи-мәдени кешені',
-    location: 'Шымкент, Қазақстан',
-    city: 'Шымкент',
-    region: 'Шымкент',
-    category: 'Тарих',
-    description: 'Қаланың ежелгі тарихын ашатын интерактивті залдар.',
-    address: 'Қонаев даңғылы, 45',
-    hours: '09:30–18:30',
-    badge: 'Ұсынылады',
-    price: 'Тегін',
-    kids: true,
-    rating: 4.5,
-    phone: '+7 (7252) 22-22-22',
-    website: 'https://museonet.kz',
-  },
-  {
-    id: 4,
-    name: 'Көкшетау тарих музейі',
-    location: 'Көкшетау, Қазақстан',
-    city: 'Көкшетау',
-    region: 'Ақмола облысы',
-    category: 'Өлкетану',
-    description: 'Аймақтың археологиялық және мәдени құндылықтары.',
-    address: 'Абылай хан даңғылы, 20',
-    hours: '10:00–18:00',
-    badge: '⭐ 4.6',
-    price: 'Ақылы',
-    kids: false,
-    rating: 4.6,
-    phone: '+7 (7162) 33-33-33',
-    website: 'https://museonet.kz',
-  },
-  {
-    id: 5,
-    name: 'Сарайшык музей-қорығы',
-    location: 'Атырау, Қазақстан',
-    city: 'Атырау',
-    region: 'Атырау облысы',
-    category: 'Қорық-музей',
-    description: 'Алтын Орда дәуірінің археологиялық мұралары.',
-    address: 'Сарайшык қалашығы, музей кешені',
-    hours: '09:00–17:30',
-    badge: 'Ұсынылады',
-    price: 'Тегін',
-    kids: true,
-    rating: 4.7,
-    phone: '+7 (7122) 44-44-44',
-    website: 'https://museonet.kz',
-  },
-  {
-    id: 6,
-    name: 'Кастеев өнер музейі',
-    location: 'Алматы, Қазақстан',
-    city: 'Алматы',
-    region: 'Алматы',
-    category: 'Өнер',
-    description: 'Классикалық және заманауи өнер коллекциялары.',
-    address: 'Достық даңғылы, 44',
-    hours: '10:00–19:00',
-    badge: '⭐ 4.9',
-    price: 'Ақылы',
-    kids: false,
-    rating: 4.9,
-    phone: '+7 (727) 55-55-55',
-    website: 'https://museonet.kz',
-  },
+const baseMuseumNames = [
+  'Ақтөбе облыстық тарихи-өлкетану музейі',
+  'Ботай музей-қорығы',
+  'Шым қала тарихи-мәдени кешені',
+  'Көкшетау тарих музейі',
+  'Сарайшык музей-қорығы',
+  'Кастеев өнер музейі',
+  'Ұлттық музей',
+  'Әзірет Сұлтан музей-қорығы',
+  'Таңбалы музей-қорығы',
+  'Берел музей-қорығы',
+  'Отырар музей-қорығы',
+  'Есік музей-қорығы',
+  'Жаркент мешіті музейі',
+  'Атырау облыстық өнер музейі',
+  'Павлодар облыстық өлкетану музейі',
 ];
 
-const recommendedMuseums = museumsData.slice(0, 6);
+const regions = [
+  'Ақтөбе облысы',
+  'Атырау облысы',
+  'Алматы',
+  'Астана',
+  'Шымкент',
+  'Түркістан облысы',
+  'Ақмола облысы',
+  'Жетісу облысы',
+  'СҚО',
+  'Қарағанды облысы',
+  'Павлодар облысы',
+  'ШҚО',
+];
+
+const cities = [
+  'Ақтөбе',
+  'Атырау',
+  'Алматы',
+  'Астана',
+  'Шымкент',
+  'Түркістан',
+  'Көкшетау',
+  'Талдықорған',
+  'Петропавл',
+  'Қарағанды',
+  'Павлодар',
+  'Өскемен',
+];
+
 const categories = ['Үй-музей', 'Археология', 'Өнер', 'Қорық-музей', 'Өлкетану', 'Тарих'];
+
+const museumsData = Array.from({ length: 285 }, (_, index) => {
+  const nameBase = baseMuseumNames[index % baseMuseumNames.length];
+  const region = regions[index % regions.length];
+  const city = cities[index % cities.length];
+  const category = categories[index % categories.length];
+  const rating = 4 + (index % 10) / 10;
+  const price = index % 3 === 0 ? 'Тегін' : 'Ақылы';
+
+  return {
+    id: index + 1,
+    name: baseMuseumNames.filter((item) => item === nameBase).length > 1 ? `${nameBase} №${index + 1}` : nameBase,
+    location: `${city}, Қазақстан`,
+    city,
+    region,
+    category,
+    description: 'Қордағы негізгі жәдігерлер, экспозициялар және виртуалды тур материалдары.',
+    address: `Негізгі көше, ${index + 5}`,
+    hours: '09:00–18:00',
+    badge: rating > 4.6 ? 'Ұсынылады' : `⭐ ${rating.toFixed(1)}`,
+    price,
+    kids: index % 2 === 0,
+    rating,
+    phone: `+7 (7${index % 9}2) 00-00-${String(index % 100).padStart(2, '0')}`,
+    website: 'https://museonet.kz',
+  };
+});
+
+const recommendedMuseums = museumsData.slice(0, 8);
 
 const MuseumsPage: React.FC = () => {
   const [search, setSearch] = useState('');
@@ -123,11 +94,11 @@ const MuseumsPage: React.FC = () => {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [selected, setSelected] = useState<typeof museumsData[0] | null>(null);
 
-  const regions = useMemo(
+  const regionOptions = useMemo(
     () => ['Барлығы', ...new Set(museumsData.map((item) => item.region))],
     [],
   );
-  const cities = useMemo(
+  const cityOptions = useMemo(
     () => ['Барлығы', ...new Set(museumsData.map((item) => item.city))],
     [],
   );
@@ -224,14 +195,14 @@ const MuseumsPage: React.FC = () => {
           <div className="container filter-grid">
             <div className="filter-group">
               <select className="dropdown" value={region} onChange={(event) => setRegion(event.target.value)}>
-                {regions.map((item) => (
+                {regionOptions.map((item) => (
                   <option key={item} value={item}>
                     {item}
                   </option>
                 ))}
               </select>
               <select className="dropdown" value={city} onChange={(event) => setCity(event.target.value)}>
-                {cities.map((item) => (
+                {cityOptions.map((item) => (
                   <option key={item} value={item}>
                     {item}
                   </option>
@@ -282,7 +253,7 @@ const MuseumsPage: React.FC = () => {
                     onClick={() => setView(item as 'grid' | 'list' | 'map')}
                     type="button"
                   >
-                    {item.toUpperCase()}
+                    {item === 'grid' ? 'Тор' : item === 'list' ? 'Тізім' : 'Карта'}
                   </button>
                 ))}
               </div>
@@ -307,7 +278,7 @@ const MuseumsPage: React.FC = () => {
             </div>
             <div className="carousel">
               {recommendedMuseums.map((museum) => (
-                <div className="card museum-card" key={museum.name}>
+                <div className="card museum-card" key={museum.id}>
                   <div className="card-image">
                     <div className="image-overlay"></div>
                     <span className="chip chip-image">{museum.category}</span>
@@ -413,9 +384,9 @@ const MuseumsPage: React.FC = () => {
                   <div className="modal-gallery"></div>
                   <div className="modal-info">
                     <h2>{selected.name}</h2>
-                  <p>📍 {selected.location}</p>
-                  <p>Мекенжай: {selected.address}</p>
-                  <p>⏰ {selected.hours}</p>
+                    <p>📍 {selected.location}</p>
+                    <p>Мекенжай: {selected.address}</p>
+                    <p>⏰ {selected.hours}</p>
                     <p>☎️ {selected.phone}</p>
                     <p>🌐 {selected.website}</p>
                     <a
@@ -424,6 +395,24 @@ const MuseumsPage: React.FC = () => {
                       target="_blank"
                       rel="noreferrer"
                     >
+                      <span className="gis-badge">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" fill="#21B36B" />
+                          <path
+                            d="M7 12.5c1.6-3.2 5-4.2 10-2.5"
+                            stroke="#fff"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M9 15c2.2-1.2 4.7-1.4 7.5-.6"
+                            stroke="#fff"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        2GIS
+                      </span>
                       Картада ашу
                     </a>
                   </div>
@@ -823,6 +812,16 @@ const MuseumsPage: React.FC = () => {
         .modal-info p {
           margin: 6px 0;
           color: rgba(43, 43, 43, 0.7);
+        }
+
+        .gis-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 2px 8px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.2);
+          margin-right: 6px;
         }
 
         .modal-sections {
