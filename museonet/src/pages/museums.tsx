@@ -168,11 +168,13 @@ const MuseumsPage: React.FC = () => {
         <section className="directory-hero">
           <div className="container hero-grid">
             <div>
-              <h1>Музейлер тізімі</h1>
+              <h1 className="hero-title">
+                🏛️ Музейлер тізімі <span className="sparkle">✨</span>
+              </h1>
               <p className="subtitle">
                 Қазақстандағы музейлерді өңір, қала және тақырып бойынша тез табыңыз.
               </p>
-              <div className="stats">285 музей • 17 өңір • 12 категория</div>
+              <div className="stats stats-badge">✨ 285 музей • 17 өңір • 12 категория</div>
             </div>
             <div className="search-panel">
               <label className="search-label" htmlFor="search">
@@ -194,13 +196,13 @@ const MuseumsPage: React.FC = () => {
 
         <section className="filter-bar">
           <div className="container filter-head">
-            <div className="filter-label">Сүзгілеу параметрлері</div>
+            <div className="filter-label">🧭 Сүзгілеу параметрлері</div>
             <div className="filter-actions-head">
               <button className="filter-toggle" type="button" onClick={() => setShowFilters(!showFilters)}>
-                {showFilters ? 'Фильтрді жасыру' : 'Фильтрді көрсету'}
+                {showFilters ? '🙈 Фильтрді жасыру' : '👀 Фильтрді көрсету'}
               </button>
               <button className="filter-reset" type="button" onClick={resetFilters}>
-                Фильтрді тазалау
+                🔄 Фильтрді тазалау
               </button>
             </div>
           </div>
@@ -251,7 +253,7 @@ const MuseumsPage: React.FC = () => {
                     type="button"
                     onClick={() => setKids(!kids)}
                   >
-                    <span>Балаларға лайық</span>
+                    <span>👶 Балаларға лайық</span>
                     <div className="switch-track">
                       <div className="switch-thumb"></div>
                     </div>
@@ -280,22 +282,22 @@ const MuseumsPage: React.FC = () => {
             </div>
           )}
           <button className="mobile-filter" type="button" onClick={() => setShowFilters(!showFilters)}>
-            {showFilters ? 'Фильтрді жасыру' : 'Фильтрді көрсету'}
+            {showFilters ? '🙈 Фильтрді жасыру' : '👀 Фильтрді көрсету'}
           </button>
         </section>
 
         <section className="section">
           <div className="container">
             <div className="section-heading">
-              <h2>Фильтр нәтижелері</h2>
+              <h2>🎯 Фильтр нәтижелері</h2>
               <p>Іздеу нәтижелерін кеңейту үшін қосымша параметрлерді қолданыңыз.</p>
             </div>
             {filteredMuseums.length === 0 ? (
               <div className="empty-state">
-                <h2>Нәтиже табылмады</h2>
+                <h2>😕 Нәтиже табылмады</h2>
                 <p>Басқа сүзгілерді қолданып көріңіз немесе параметрлерді тазартыңыз.</p>
                 <button className="button button-secondary" onClick={resetFilters}>
-                  Фильтрді тазалау
+                  🔄 Фильтрді тазалау
                 </button>
               </div>
             ) : (
@@ -322,7 +324,7 @@ const MuseumsPage: React.FC = () => {
                       </div>
                       <div className="card-actions">
                         <button className="button button-primary" onClick={() => setSelected(museum)}>
-                          Толық ақпарат
+                          Толық ақпарат ✨
                         </button>
                         <button className="icon-btn" type="button" onClick={() => toggleFavorite(museum.id)}>
                           {favorites.includes(museum.id) ? '❤' : '♡'}
@@ -334,7 +336,7 @@ const MuseumsPage: React.FC = () => {
               </div>
             )}
             <div className="load-more">
-              <button className="button button-secondary">Жүктеу</button>
+              <button className="button button-secondary">Жүктеу ⬇️</button>
             </div>
           </div>
         </section>
@@ -430,6 +432,19 @@ const MuseumsPage: React.FC = () => {
           margin-bottom: 12px;
         }
 
+        .hero-title {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+        }
+
+        .sparkle {
+          display: inline-flex;
+          animation: sparkle 2.6s ease-in-out infinite;
+        }
+
         .subtitle {
           color: rgba(43, 43, 43, 0.7);
           font-size: 18px;
@@ -442,12 +457,25 @@ const MuseumsPage: React.FC = () => {
           color: rgba(43, 43, 43, 0.6);
         }
 
+        .stats-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 14px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, rgba(255, 250, 240, 0.95), rgba(255, 255, 255, 0.9));
+          border: 1px solid rgba(210, 191, 169, 0.7);
+          box-shadow: 0 10px 20px rgba(182, 135, 74, 0.15);
+          animation: float 4s ease-in-out infinite;
+        }
+
         .search-panel {
           background: var(--surface);
           padding: 20px;
           border-radius: 16px;
           border: 1px solid var(--line);
           box-shadow: var(--shadow-soft);
+          animation: panelGlow 6s ease-in-out infinite;
         }
 
         .search-label {
@@ -513,7 +541,7 @@ const MuseumsPage: React.FC = () => {
         .filter-toggle {
           border-radius: 999px;
           border: 1px solid rgba(120, 86, 47, 0.35);
-          background: rgba(255, 255, 255, 0.95);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 246, 233, 0.95));
           padding: 8px 16px;
           font-size: 13px;
           color: rgba(104, 74, 38, 0.92);
@@ -529,7 +557,7 @@ const MuseumsPage: React.FC = () => {
         .filter-reset {
           border-radius: 999px;
           border: 1px solid rgba(160, 134, 96, 0.4);
-          background: rgba(255, 255, 255, 0.85);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 240, 219, 0.9));
           padding: 8px 16px;
           font-size: 13px;
           color: rgba(115, 86, 47, 0.9);
@@ -542,6 +570,7 @@ const MuseumsPage: React.FC = () => {
           padding: 14px 16px;
           border: 1px solid rgba(216, 203, 186, 0.7);
           box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 10px 24px rgba(43, 43, 43, 0.08);
+          animation: fadeSlide 0.35s ease;
         }
 
         .filter-grid {
@@ -584,6 +613,11 @@ const MuseumsPage: React.FC = () => {
           transition: all 0.2s ease;
         }
 
+        .chip:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 14px rgba(158, 108, 50, 0.18);
+        }
+
         .chip.is-active {
           background: var(--accent);
           color: #fff;
@@ -611,6 +645,10 @@ const MuseumsPage: React.FC = () => {
         .toggle.is-active {
           background: var(--accent);
           color: #fff;
+        }
+
+        .toggle:hover {
+          background: rgba(215, 190, 160, 0.35);
         }
 
         .switch {
@@ -675,6 +713,11 @@ const MuseumsPage: React.FC = () => {
           transition: all 0.2s ease;
         }
 
+        .view-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 14px rgba(158, 108, 50, 0.18);
+        }
+
         .view-btn.is-active {
           background: var(--accent);
           color: #fff;
@@ -707,11 +750,28 @@ const MuseumsPage: React.FC = () => {
           padding: 18px;
           box-shadow: 0 16px 26px rgba(43, 43, 43, 0.08);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          position: relative;
+          overflow: hidden;
         }
 
         .museum-card:hover {
           transform: translateY(-6px);
           box-shadow: 0 24px 36px rgba(43, 43, 43, 0.12);
+        }
+
+        .museum-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 22px;
+          background: linear-gradient(135deg, rgba(255, 240, 216, 0.18), rgba(255, 255, 255, 0));
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+        }
+
+        .museum-card:hover::before {
+          opacity: 1;
         }
 
         .card-image {
@@ -721,6 +781,19 @@ const MuseumsPage: React.FC = () => {
           background: linear-gradient(135deg, rgba(217, 195, 162, 0.4), rgba(190, 182, 169, 0.3));
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .card-image::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .museum-card:hover .card-image::before {
+          opacity: 0.7;
         }
 
         .card-image::after {
@@ -779,6 +852,26 @@ const MuseumsPage: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 12px;
+        }
+
+        .card-actions .button {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .card-actions .button::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -120%;
+          width: 120%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+          transition: transform 0.6s ease;
+        }
+
+        .card-actions .button:hover::after {
+          transform: translateX(200%);
         }
 
         .icon-btn {
@@ -888,6 +981,66 @@ const MuseumsPage: React.FC = () => {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+
+        @keyframes sparkle {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 0.7;
+          }
+          50% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+        }
+
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
+
+        @keyframes panelGlow {
+          0%,
+          100% {
+            box-shadow: var(--shadow-soft);
+          }
+          50% {
+            box-shadow: 0 18px 28px rgba(160, 110, 52, 0.18);
+          }
+        }
+
+        @keyframes fadeSlide {
+          from {
+            opacity: 0;
+            transform: translateY(-6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .stats-badge,
+          .sparkle,
+          .search-panel,
+          .filter-panel {
+            animation: none;
+          }
+
+          .museum-card,
+          .view-btn,
+          .chip,
+          .filter-toggle,
+          .card-actions .button {
+            transition: none;
           }
         }
 
