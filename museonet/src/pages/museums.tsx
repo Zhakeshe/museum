@@ -60,10 +60,11 @@ const museumsData = Array.from({ length: 285 }, (_, index) => {
   const category = categories[index % categories.length];
   const rating = 4 + (index % 10) / 10;
   const price = index % 3 === 0 ? 'Тегін' : 'Ақылы';
+  const hue = 18 + (index % 8) * 12;
 
   return {
     id: index + 1,
-    name: baseMuseumNames.filter((item) => item === nameBase).length > 1 ? `${nameBase} №${index + 1}` : nameBase,
+    name: `${nameBase} №${index + 1}`,
     location: `${city}, Қазақстан`,
     city,
     region,
@@ -75,6 +76,7 @@ const museumsData = Array.from({ length: 285 }, (_, index) => {
     price,
     kids: index % 2 === 0,
     rating,
+    hue,
     phone: `+7 (7${index % 9}2) 00-00-${String(index % 100).padStart(2, '0')}`,
     website: 'https://museonet.kz',
   };
@@ -192,6 +194,7 @@ const MuseumsPage: React.FC = () => {
         </section>
 
         <section className="filter-bar">
+          <div className="container filter-label">Сүзгілеу параметрлері</div>
           <div className="container filter-grid">
             <div className="filter-group">
               <select className="dropdown" value={region} onChange={(event) => setRegion(event.target.value)}>
@@ -279,7 +282,12 @@ const MuseumsPage: React.FC = () => {
             <div className="carousel">
               {recommendedMuseums.map((museum) => (
                 <div className="card museum-card" key={museum.id}>
-                  <div className="card-image">
+                  <div
+                    className="card-image"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, hsla(${museum.hue}, 45%, 78%, 0.85), hsla(${museum.hue}, 32%, 88%, 0.9))`,
+                    }}
+                  >
                     <div className="image-overlay"></div>
                     <span className="chip chip-image">{museum.category}</span>
                   </div>
@@ -325,10 +333,15 @@ const MuseumsPage: React.FC = () => {
               <div className={`grid ${view}`}>
                 {filteredMuseums.map((museum) => (
                   <div className="card museum-card" key={museum.id}>
-                    <div className="card-image">
-                      <div className="image-overlay"></div>
-                      <span className="chip chip-image">{museum.category}</span>
-                    </div>
+                  <div
+                    className="card-image"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, hsla(${museum.hue}, 45%, 78%, 0.85), hsla(${museum.hue}, 32%, 88%, 0.9))`,
+                    }}
+                  >
+                    <div className="image-overlay"></div>
+                    <span className="chip chip-image">{museum.category}</span>
+                  </div>
                     <div className="card-body">
                       <h3>{museum.name}</h3>
                       <p className="location">📍 {museum.location}</p>
@@ -377,67 +390,74 @@ const MuseumsPage: React.FC = () => {
         </section>
 
         {selected && (
-          <section className="section">
-            <div className="container">
-              <div className="detail-modal">
-                <div className="modal-hero">
-                  <div className="modal-gallery"></div>
-                  <div className="modal-info">
-                    <h2>{selected.name}</h2>
-                    <p>📍 {selected.location}</p>
-                    <p>Мекенжай: {selected.address}</p>
-                    <p>⏰ {selected.hours}</p>
-                    <p>☎️ {selected.phone}</p>
-                    <p>🌐 {selected.website}</p>
-                    <a
-                      className="button button-primary"
-                      href={`https://2gis.kz/search/${encodeURIComponent(selected.name)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <span className="gis-badge">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                          <circle cx="12" cy="12" r="10" fill="#21B36B" />
-                          <path
-                            d="M7 12.5c1.6-3.2 5-4.2 10-2.5"
-                            stroke="#fff"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                          />
-                          <path
-                            d="M9 15c2.2-1.2 4.7-1.4 7.5-.6"
-                            stroke="#fff"
-                            strokeWidth="1.6"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                        2GIS
-                      </span>
-                      Картада ашу
-                    </a>
-                  </div>
+          <div className="modal-overlay" role="dialog" aria-modal="true">
+            <button className="modal-backdrop" type="button" onClick={() => setSelected(null)} />
+            <div className="detail-modal">
+              <button className="modal-close" type="button" onClick={() => setSelected(null)}>
+                ✕
+              </button>
+              <div className="modal-hero">
+                <div
+                  className="modal-gallery"
+                  style={{
+                    backgroundImage: `linear-gradient(135deg, hsla(${selected.hue}, 45%, 78%, 0.85), hsla(${selected.hue}, 32%, 88%, 0.9))`,
+                  }}
+                ></div>
+                <div className="modal-info">
+                  <h2>{selected.name}</h2>
+                  <p>📍 {selected.location}</p>
+                  <p>Мекенжай: {selected.address}</p>
+                  <p>⏰ {selected.hours}</p>
+                  <p>☎️ {selected.phone}</p>
+                  <p>🌐 {selected.website}</p>
+                  <a
+                    className="button button-primary"
+                    href={`https://2gis.kz/search/${encodeURIComponent(selected.name)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span className="gis-badge">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" fill="#21B36B" />
+                        <path
+                          d="M7 12.5c1.6-3.2 5-4.2 10-2.5"
+                          stroke="#fff"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M9 15c2.2-1.2 4.7-1.4 7.5-.6"
+                          stroke="#fff"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      2GIS
+                    </span>
+                    Картада ашу
+                  </a>
                 </div>
-                <div className="modal-sections">
-                  <div>
-                    <h3>Сипаттама</h3>
-                    <p>{selected.description}</p>
-                  </div>
-                  <div>
-                    <h3>Экспозициялар</h3>
-                    <p>Артефактілер, интерактивті залдар және мультимедиалық контент.</p>
-                  </div>
-                  <div>
-                    <h3>Билеттер</h3>
-                    <p>{selected.price === 'Тегін' ? 'Кіру тегін.' : 'Ересек — 1500 тг, студент — 800 тг.'}</p>
-                  </div>
-                  <div>
-                    <h3>Қалай жетуге болады</h3>
-                    <p>Қалалық маршруттар, қоғамдық көлік және жеке автотұрақ.</p>
-                  </div>
+              </div>
+              <div className="modal-sections">
+                <div>
+                  <h3>Сипаттама</h3>
+                  <p>{selected.description}</p>
+                </div>
+                <div>
+                  <h3>Экспозициялар</h3>
+                  <p>Артефактілер, интерактивті залдар және мультимедиалық контент.</p>
+                </div>
+                <div>
+                  <h3>Билеттер</h3>
+                  <p>{selected.price === 'Тегін' ? 'Кіру тегін.' : 'Ересек — 1500 тг, студент — 800 тг.'}</p>
+                </div>
+                <div>
+                  <h3>Қалай жетуге болады</h3>
+                  <p>Қалалық маршруттар, қоғамдық көлік және жеке автотұрақ.</p>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
         )}
       </main>
 
@@ -514,6 +534,15 @@ const MuseumsPage: React.FC = () => {
           border-top: 1px solid var(--line);
           border-bottom: 1px solid var(--line);
           padding: 12px 0;
+          box-shadow: 0 12px 24px rgba(43, 43, 43, 0.05);
+        }
+
+        .filter-label {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.18em;
+          color: rgba(43, 43, 43, 0.55);
+          margin-bottom: 10px;
         }
 
         .filter-grid {
@@ -697,6 +726,14 @@ const MuseumsPage: React.FC = () => {
           overflow: hidden;
         }
 
+        .card-image::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.35), transparent 45%);
+          opacity: 0.8;
+        }
+
         .image-overlay {
           position: absolute;
           inset: 0;
@@ -794,6 +831,41 @@ const MuseumsPage: React.FC = () => {
           padding: 32px;
           box-shadow: var(--shadow-soft);
           animation: fadeIn 0.3s ease;
+          position: relative;
+          max-width: 960px;
+          width: min(960px, 92vw);
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(43, 43, 43, 0.45);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 200;
+          padding: 24px;
+        }
+
+        .modal-backdrop {
+          position: absolute;
+          inset: 0;
+          background: transparent;
+          border: none;
+        }
+
+        .modal-close {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 1px solid var(--line);
+          background: #fff;
+          font-size: 16px;
         }
 
         .modal-hero {
