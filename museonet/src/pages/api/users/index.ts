@@ -1,27 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getUsers, saveUsers } from '../../../lib/dataStore';
+import { createUser, fetchUsers } from '../../../lib/db';
 
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
-    return res.status(200).json(getUsers());
+    const users = await fetchUsers();
+    return res.status(200).json(users);
   }
 
   if (req.method === 'POST') {
-    const users = getUsers();
-    const payload = req.body;
-    const nextId = users.length ? Math.max(...users.map((user) => user.id)) + 1 : 1;
-    const newUser = {
-      id: nextId,
-      name: payload.name,
-      email: payload.email,
-      points: payload.points ?? 20,
-      role: payload.role ?? 'user',
-      status: payload.status ?? 'active',
-      visits: payload.visits ?? 0,
-      lastActive: payload.lastActive ?? '—',
-    };
-    const updated = [...users, newUser];
-    saveUsers(updated);
+    const newUser = await createUser(req.body ?? {});
     return res.status(201).json(newUser);
   }
 

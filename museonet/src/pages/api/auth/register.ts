@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getUsers, saveUsers } from '../../../lib/dataStore';
+import { createUser, findUserByEmail } from '../../../lib/db';
 
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -11,25 +11,12 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ message: 'Missing fields' });
   }
 
-  const users = getUsers();
-  const exists = users.some((user) => user.email === email);
-  if (exists) {
+  const existing = await findUserByEmail(email);
+  if (existing) {
     return res.status(409).json({ message: 'User already exists' });
   }
 
-  const nextId = users.length ? Math.max(...users.map((user) => user.id)) + 1 : 1;
-  const newUser = {
-    id: nextId,
-    name,
-    email,
-    points: 20,
-    role: 'user',
-    status: 'active',
-    visits: 0,
-    lastActive: '—',
-  };
-  const updated = [...users, newUser];
-  saveUsers(updated);
+  const newUser = await createUser({ name, email, points: 20, role: 'user', status: 'active', visits: 0 });
   return res.status(201).json(newUser);
 };
 

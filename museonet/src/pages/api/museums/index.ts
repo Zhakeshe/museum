@@ -1,21 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getMuseums, saveMuseums } from '../../../lib/dataStore';
+import { createMuseum, fetchMuseums } from '../../../lib/db';
 
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'GET') {
-    return res.status(200).json(getMuseums());
+    const museums = await fetchMuseums();
+    return res.status(200).json(museums);
   }
 
   if (req.method === 'POST') {
-    const museums = getMuseums();
-    const payload = req.body;
-    const nextId = museums.length ? Math.max(...museums.map((m) => m.id)) + 1 : 1;
-    const newMuseum = {
-      ...payload,
-      id: nextId,
-    };
-    const updated = [...museums, newMuseum];
-    saveMuseums(updated);
+    const newMuseum = await createMuseum(req.body ?? {});
     return res.status(201).json(newMuseum);
   }
 
