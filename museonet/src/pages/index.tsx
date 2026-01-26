@@ -255,6 +255,50 @@ const HomePage: React.FC = () => {
           )}
         </section>
 
+        <section className="digital-experience">
+          <div className="container">
+            <div className="digital-header">
+              <h2>Цифрлық мұра кеңістігі</h2>
+              <p>
+                3D модельдер, музейные предметы және виртуалные туры — бәрі бір платформада. Контент
+                архивтері мен экспедициялық материалдар цифрландырылып, зерттеуге дайын тұрады.
+              </p>
+            </div>
+            <div className="digital-grid">
+              <article className="digital-card">
+                <h3>3D моделдер</h3>
+                <p>Артефактілердің 360° модельдері, масштабтауға және зерттеуге ыңғайлы формат.</p>
+              </article>
+              <article className="digital-card">
+                <h3>Музейные предметы</h3>
+                <p>Қордағы негізгі экспонаттар мен тарихи жәдігерлердің цифрлық паспорттары.</p>
+              </article>
+              <article className="digital-card">
+                <h3>Виртуалные туры</h3>
+                <p>Иммерсивті турлар арқылы музей залдарын онлайн аралап шығыңыз.</p>
+              </article>
+            </div>
+            <div className="digital-stats">
+              <div className="stat-card">
+                <span className="stat-value">285</span>
+                <span className="stat-label">Музейных экспонатов</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">66,000</span>
+                <span className="stat-label">3D моделей</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">750</span>
+                <span className="stat-label">Виртуальных туров</span>
+              </div>
+              <div className="stat-card">
+                <span className="stat-value">15</span>
+                <span className="stat-label">Экспедиций</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="design-system">
           <div className="container">
             <h2>Дизайн нұсқаулығы</h2>
@@ -673,6 +717,99 @@ const HomePage: React.FC = () => {
           box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
+        .digital-experience {
+          padding: 96px 0;
+        }
+
+        .digital-header {
+          max-width: 680px;
+          margin-bottom: 32px;
+        }
+
+        .digital-header h2 {
+          font-size: 32px;
+          line-height: 40px;
+          margin-bottom: 12px;
+        }
+
+        .digital-header p {
+          color: rgba(43, 43, 43, 0.7);
+          line-height: 26px;
+        }
+
+        .digital-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 24px;
+        }
+
+        .digital-card {
+          background: #fff;
+          border-radius: 24px;
+          padding: 24px;
+          border: 1px solid rgba(180, 106, 60, 0.18);
+          box-shadow: 0 14px 28px rgba(64, 42, 18, 0.08);
+          transition: transform 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .digital-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 32px rgba(64, 42, 18, 0.12);
+        }
+
+        .digital-card h3 {
+          margin-bottom: 10px;
+          font-size: 20px;
+        }
+
+        .digital-card p {
+          color: rgba(43, 43, 43, 0.7);
+          line-height: 24px;
+        }
+
+        .digital-stats {
+          margin-top: 32px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+        }
+
+        .stat-card {
+          background: linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(249, 241, 231, 0.9));
+          border-radius: 20px;
+          padding: 20px;
+          text-align: center;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 10px 20px rgba(64, 42, 18, 0.08);
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .stat-card:nth-child(2) {
+          animation-delay: 0.4s;
+        }
+
+        .stat-card:nth-child(3) {
+          animation-delay: 0.8s;
+        }
+
+        .stat-card:nth-child(4) {
+          animation-delay: 1.2s;
+        }
+
+        .stat-value {
+          font-size: 32px;
+          font-weight: 700;
+          color: #b46a3c;
+          display: block;
+          margin-bottom: 4px;
+        }
+
+        .stat-label {
+          font-size: 13px;
+          color: rgba(43, 43, 43, 0.65);
+          letter-spacing: 0.02em;
+        }
+
         .design-system {
           padding: 80px 0;
         }
@@ -738,6 +875,16 @@ const HomePage: React.FC = () => {
           gap: 16px;
         }
 
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-6px);
+          }
+        }
+
         @keyframes shimmer {
           0% {
             background-position: 0% 50%;
@@ -769,6 +916,10 @@ const HomePage: React.FC = () => {
           h1 {
             font-size: 36px;
             line-height: 44px;
+          }
+
+          .digital-experience {
+            padding: 64px 0;
           }
         }
       `}</style>

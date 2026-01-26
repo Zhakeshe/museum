@@ -16,6 +16,10 @@ const LoginPage: React.FC = () => {
       : language === 'ru'
         ? 'Введите данные для доступа в личный кабинет.'
         : 'Enter your details to access the account.';
+  const registerLabel =
+    language === 'kk' ? 'Тіркелу' : language === 'ru' ? 'Регистрация' : 'Sign up';
+  const googleLabel =
+    language === 'kk' ? 'Google арқылы кіру' : language === 'ru' ? 'Войти через Google' : 'Sign in with Google';
 
   return (
     <div className="page">
@@ -64,8 +68,11 @@ const LoginPage: React.FC = () => {
                         ? 'Забыли пароль?'
                         : 'Forgot password?'}
                   </a>
+                  <a className="register-link" href="/">
+                    {registerLabel}
+                  </a>
                   <button className="button button-secondary" type="button">
-                    Google
+                    {googleLabel}
                   </button>
                 </div>
               </form>
@@ -122,6 +129,10 @@ const LoginPage: React.FC = () => {
         .login-links a {
           font-size: 14px;
           color: var(--accent);
+        }
+
+        .register-link {
+          font-weight: 600;
         }
       `}</style>
     </div>

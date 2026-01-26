@@ -1,0 +1,476 @@
+import React, { useMemo, useState } from 'react';
+import Head from 'next/head';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
+type Museum = {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  gisLink: string;
+  image: string;
+};
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  points: number;
+  role: 'user' | 'admin';
+  status: 'active' | 'banned';
+  visits: number;
+  lastActive: string;
+};
+
+const initialMuseums: Museum[] = Array.from({ length: 8 }, (_, index) => ({
+  id: index + 1,
+  name: `Музей №${index + 1}`,
+  address: `Негізгі көше, ${index + 12}`,
+  phone: `+7 (700) 00-0${index}${index}`,
+  gisLink: 'https://2gis.kz',
+  image: '',
+}));
+
+const initialUsers: User[] = [
+  {
+    id: 1,
+    name: 'Айдана Ж.',
+    email: 'aidana@museonet.kz',
+    points: 20,
+    role: 'admin',
+    status: 'active',
+    visits: 18,
+    lastActive: '2024-05-12',
+  },
+  {
+    id: 2,
+    name: 'Ерлан Т.',
+    email: 'erlan@museonet.kz',
+    points: 20,
+    role: 'user',
+    status: 'active',
+    visits: 6,
+    lastActive: '2024-05-10',
+  },
+  {
+    id: 3,
+    name: 'Ақбота К.',
+    email: 'akbota@museonet.kz',
+    points: 20,
+    role: 'user',
+    status: 'banned',
+    visits: 2,
+    lastActive: '2024-04-30',
+  },
+];
+
+const AdminPage: React.FC = () => {
+  const [museums, setMuseums] = useState(initialMuseums);
+  const [users, setUsers] = useState(initialUsers);
+  const [newUser, setNewUser] = useState({ name: '', email: '' });
+
+  const totalMuseums = useMemo(() => 285, []);
+
+  const handleMuseumChange = (id: number, field: keyof Museum, value: string) => {
+    setMuseums((prev) => prev.map((museum) => (museum.id === id ? { ...museum, [field]: value } : museum)));
+  };
+
+  const handleUserRole = (id: number) => {
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === id ? { ...user, role: user.role === 'admin' ? 'user' : 'admin' } : user,
+      ),
+    );
+  };
+
+  const handleUserStatus = (id: number) => {
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === id ? { ...user, status: user.status === 'banned' ? 'active' : 'banned' } : user,
+      ),
+    );
+  };
+
+  const handleUserCreate = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!newUser.name || !newUser.email) {
+      return;
+    }
+    setUsers((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        name: newUser.name,
+        email: newUser.email,
+        points: 20,
+        role: 'user',
+        status: 'active',
+        visits: 0,
+        lastActive: '—',
+      },
+    ]);
+    setNewUser({ name: '', email: '' });
+  };
+
+  return (
+    <div className="page">
+      <Head>
+        <title>Админ панель — museonet</title>
+        <meta name="description" content="museonet әкімші панелі: музейлер мен пайдаланушыларды басқару." />
+      </Head>
+
+      <Header />
+
+      <main>
+        <section className="admin-hero">
+          <div className="container hero-grid">
+            <div>
+              <h1>Админ панель</h1>
+              <p>Музейлерді, қолданушыларды және статистиканы бір жерден бақылаңыз.</p>
+            </div>
+            <div className="stats-panel">
+              <div>
+                <span className="stat-value">{totalMuseums}</span>
+                <span className="stat-label">Музей</span>
+              </div>
+              <div>
+                <span className="stat-value">{users.length}</span>
+                <span className="stat-label">Қолданушы</span>
+              </div>
+              <div>
+                <span className="stat-value">20</span>
+                <span className="stat-label">Бастапқы балл</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="admin-section">
+          <div className="container">
+            <h2>Музейлерді басқару</h2>
+            <p>Әр музейдің атауы, байланысы, 2GIS сілтемесі және суретін жаңарта аласыз.</p>
+            <div className="admin-grid">
+              {museums.map((museum) => (
+                <div className="admin-card" key={museum.id}>
+                  <div className="card-header">
+                    <h3>{museum.name}</h3>
+                    <span className="badge">ID {museum.id}</span>
+                  </div>
+                  <label>
+                    Атауы
+                    <input
+                      value={museum.name}
+                      onChange={(event) => handleMuseumChange(museum.id, 'name', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Мекенжай
+                    <input
+                      value={museum.address}
+                      onChange={(event) => handleMuseumChange(museum.id, 'address', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Нөмір
+                    <input
+                      value={museum.phone}
+                      onChange={(event) => handleMuseumChange(museum.id, 'phone', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    2GIS сілтемесі
+                    <input
+                      value={museum.gisLink}
+                      onChange={(event) => handleMuseumChange(museum.id, 'gisLink', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Сурет (сілтеме)
+                    <input
+                      value={museum.image}
+                      onChange={(event) => handleMuseumChange(museum.id, 'image', event.target.value)}
+                      placeholder="https://..."
+                    />
+                  </label>
+                  <label>
+                    Сурет (локал)
+                    <input type="file" />
+                  </label>
+                  <button className="button button-primary" type="button">
+                    Сақтау
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="admin-section">
+          <div className="container">
+            <div className="users-head">
+              <div>
+                <h2>Қолданушыларды басқару</h2>
+                <p>Бан беру, баннан алу, админ құқықтарын тағайындау және статистиканы көру.</p>
+              </div>
+              <form className="user-form" onSubmit={handleUserCreate}>
+                <input
+                  placeholder="Аты-жөні"
+                  value={newUser.name}
+                  onChange={(event) => setNewUser((prev) => ({ ...prev, name: event.target.value }))}
+                />
+                <input
+                  placeholder="Email"
+                  value={newUser.email}
+                  onChange={(event) => setNewUser((prev) => ({ ...prev, email: event.target.value }))}
+                />
+                <button className="button button-primary" type="submit">
+                  Аккаунт жасау
+                </button>
+              </form>
+            </div>
+            <div className="users-table">
+              <div className="users-row users-head-row">
+                <span>Қолданушы</span>
+                <span>Рөл</span>
+                <span>Балл</span>
+                <span>Статус</span>
+                <span>Сапар</span>
+                <span>Соңғы белсенділік</span>
+                <span>Басқару</span>
+              </div>
+              {users.map((user) => (
+                <div className="users-row" key={user.id}>
+                  <span>
+                    <strong>{user.name}</strong>
+                    <small>{user.email}</small>
+                  </span>
+                  <span>{user.role === 'admin' ? 'Админ' : 'Қолданушы'}</span>
+                  <span>{user.points} балл</span>
+                  <span>{user.status === 'banned' ? 'Блоктаулы' : 'Белсенді'}</span>
+                  <span>{user.visits}</span>
+                  <span>{user.lastActive}</span>
+                  <span className="user-actions">
+                    <button type="button" className="button button-secondary" onClick={() => handleUserRole(user.id)}>
+                      {user.role === 'admin' ? 'Админді алу' : 'Админ беру'}
+                    </button>
+                    <button type="button" className="button button-outline" onClick={() => handleUserStatus(user.id)}>
+                      {user.status === 'banned' ? 'Баннан алу' : 'Бан беру'}
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+
+      <style jsx>{`
+        :global(body) {
+          background: #f6f1e9;
+          color: #2b2b2b;
+        }
+
+        .admin-hero {
+          padding: 64px 0 32px;
+        }
+
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1.2fr 1fr;
+          gap: 32px;
+          align-items: center;
+        }
+
+        h1 {
+          font-size: 38px;
+          margin-bottom: 12px;
+        }
+
+        .stats-panel {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          background: #fff;
+          border-radius: 20px;
+          padding: 20px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
+        }
+
+        .stat-value {
+          font-size: 28px;
+          font-weight: 700;
+          color: #b46a3c;
+        }
+
+        .stat-label {
+          font-size: 13px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .admin-section {
+          padding: 48px 0;
+        }
+
+        .admin-section h2 {
+          font-size: 28px;
+          margin-bottom: 12px;
+        }
+
+        .admin-section p {
+          color: rgba(43, 43, 43, 0.7);
+        }
+
+        .admin-grid {
+          margin-top: 24px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 20px;
+        }
+
+        .admin-card {
+          background: #fff;
+          border-radius: 20px;
+          padding: 20px;
+          border: 1px solid rgba(180, 106, 60, 0.15);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
+          display: grid;
+          gap: 12px;
+        }
+
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .badge {
+          font-size: 12px;
+          padding: 4px 8px;
+          border-radius: 999px;
+          background: rgba(180, 106, 60, 0.12);
+        }
+
+        label {
+          display: grid;
+          gap: 6px;
+          font-size: 13px;
+          color: rgba(43, 43, 43, 0.7);
+        }
+
+        input {
+          border-radius: 12px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          padding: 10px 12px;
+          font-size: 14px;
+        }
+
+        .users-head {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+
+        .user-form {
+          display: grid;
+          gap: 10px;
+          min-width: 260px;
+        }
+
+        .users-table {
+          margin-top: 24px;
+          display: grid;
+          gap: 12px;
+        }
+
+        .users-row {
+          display: grid;
+          grid-template-columns: 1.4fr 0.6fr 0.6fr 0.7fr 0.5fr 0.8fr 1.2fr;
+          gap: 12px;
+          align-items: center;
+          background: #fff;
+          border-radius: 16px;
+          padding: 14px 16px;
+          border: 1px solid rgba(180, 106, 60, 0.1);
+          font-size: 13px;
+        }
+
+        .users-head-row {
+          background: transparent;
+          border: none;
+          font-weight: 600;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .users-row strong {
+          display: block;
+          font-size: 14px;
+        }
+
+        .users-row small {
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .user-actions {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .button {
+          border-radius: 999px;
+          padding: 10px 18px;
+          font-size: 13px;
+          border: none;
+          cursor: pointer;
+        }
+
+        .button-primary {
+          background: #b46a3c;
+          color: #fff;
+          box-shadow: 0 8px 16px rgba(180, 106, 60, 0.25);
+        }
+
+        .button-secondary {
+          background: #fff;
+          color: #7b4c2a;
+          border: 1px solid rgba(180, 106, 60, 0.25);
+        }
+
+        .button-outline {
+          background: rgba(180, 106, 60, 0.1);
+          color: #7b4c2a;
+          border: 1px solid rgba(180, 106, 60, 0.25);
+        }
+
+        @media (max-width: 1100px) {
+          .users-row {
+            grid-template-columns: 1.4fr 0.6fr 0.6fr;
+            grid-auto-rows: auto;
+          }
+
+          .users-row span:nth-child(n + 4) {
+            grid-column: 1 / -1;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .hero-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .stats-panel {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default AdminPage;

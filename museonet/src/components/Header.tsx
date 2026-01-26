@@ -8,6 +8,7 @@ const navItems = [
   { key: 'about', href: '/about' },
   { key: 'games', href: '/games' },
   { key: 'museums', href: '/museums' },
+  { key: 'admin', href: '/admin' },
 ];
 
 const Header: React.FC = () => {
@@ -21,6 +22,7 @@ const Header: React.FC = () => {
         about: 'Біз туралы',
         games: 'Ойындар',
         museums: 'Музейлер',
+        admin: 'Админ',
         login: 'Кіру',
         aria: 'Негізгі навигация',
       },
@@ -29,6 +31,7 @@ const Header: React.FC = () => {
         about: 'О проекте',
         games: 'Игры',
         museums: 'Музеи',
+        admin: 'Админ',
         login: 'Войти',
         aria: 'Главная навигация',
       },
@@ -37,6 +40,7 @@ const Header: React.FC = () => {
         about: 'About',
         games: 'Games',
         museums: 'Museums',
+        admin: 'Admin',
         login: 'Login',
         aria: 'Main navigation',
       },
