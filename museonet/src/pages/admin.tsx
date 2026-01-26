@@ -64,7 +64,7 @@ const AdminPage: React.FC = () => {
   const handleUserRole = async (id: number) => {
     const target = users.find((user) => user.id === id);
     if (!target) return;
-    const updated = { ...target, role: target.role === 'admin' ? 'user' : 'admin' };
+    const updated: User = { ...target, role: target.role === 'admin' ? 'user' : 'admin' };
     await fetch(`/api/users/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -76,7 +76,7 @@ const AdminPage: React.FC = () => {
   const handleUserStatus = async (id: number) => {
     const target = users.find((user) => user.id === id);
     if (!target) return;
-    const updated = { ...target, status: target.status === 'banned' ? 'active' : 'banned' };
+    const updated: User = { ...target, status: target.status === 'banned' ? 'active' : 'banned' };
     await fetch(`/api/users/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
