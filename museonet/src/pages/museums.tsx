@@ -414,8 +414,13 @@ const MuseumsPage: React.FC = () => {
       <Footer />
 
       <style jsx>{`
+        :global(body) {
+          background: #f6f1e9;
+          color: #2b2b2b;
+        }
+
         .directory-hero {
-          padding: 48px 0 24px;
+          padding: 64px 0 32px;
         }
 
         .hero-grid {
@@ -426,7 +431,7 @@ const MuseumsPage: React.FC = () => {
         }
 
         h1 {
-          font-size: 40px;
+          font-size: 38px;
           margin-bottom: 12px;
         }
 
@@ -437,7 +442,7 @@ const MuseumsPage: React.FC = () => {
 
         .subtitle {
           color: rgba(43, 43, 43, 0.7);
-          font-size: 18px;
+          font-size: 17px;
           max-width: 420px;
         }
 
@@ -452,17 +457,17 @@ const MuseumsPage: React.FC = () => {
           align-items: center;
           padding: 6px 14px;
           border-radius: 999px;
-          background: linear-gradient(135deg, rgba(255, 250, 240, 0.95), rgba(255, 255, 255, 0.9));
-          border: 1px solid rgba(210, 191, 169, 0.7);
-          box-shadow: 0 10px 20px rgba(182, 135, 74, 0.15);
+          background: linear-gradient(135deg, rgba(255, 250, 240, 0.95), rgba(255, 255, 255, 0.92));
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 10px 20px rgba(64, 42, 18, 0.08);
         }
 
         .search-panel {
-          background: var(--surface);
+          background: rgba(255, 255, 255, 0.9);
           padding: 20px;
-          border-radius: 16px;
-          border: 1px solid var(--line);
-          box-shadow: var(--shadow-soft);
+          border-radius: 20px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
         .search-label {
@@ -478,9 +483,9 @@ const MuseumsPage: React.FC = () => {
           align-items: center;
           gap: 10px;
           padding: 12px 16px;
-          border-radius: 999px;
-          border: 1px solid var(--line);
-          background: #fff;
+          border-radius: 16px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          background: linear-gradient(180deg, #fff, #fdf9f4);
         }
 
         .search-input input {
@@ -495,11 +500,11 @@ const MuseumsPage: React.FC = () => {
           position: sticky;
           top: 70px;
           z-index: 30;
-          background: linear-gradient(180deg, rgba(245, 240, 232, 0.95), rgba(255, 255, 255, 0.98));
-          border-top: 1px solid rgba(218, 207, 192, 0.6);
-          border-bottom: 1px solid rgba(218, 207, 192, 0.6);
-          padding: 16px 0 20px;
-          box-shadow: 0 16px 28px rgba(43, 43, 43, 0.08);
+          background: #f6f1e9;
+          border-top: 1px solid rgba(180, 106, 60, 0.12);
+          border-bottom: 1px solid rgba(180, 106, 60, 0.12);
+          padding: 20px 0 24px;
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.06);
         }
 
         .filter-head {
@@ -527,12 +532,12 @@ const MuseumsPage: React.FC = () => {
 
         .filter-toggle {
           border-radius: 999px;
-          border: 1px solid rgba(120, 86, 47, 0.35);
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 246, 233, 0.95));
+          border: 1px solid rgba(180, 106, 60, 0.25);
+          background: #fff;
           padding: 8px 16px;
           font-size: 13px;
-          color: rgba(104, 74, 38, 0.92);
-          box-shadow: 0 8px 18px rgba(120, 87, 50, 0.12);
+          color: rgba(90, 60, 32, 0.9);
+          box-shadow: 0 8px 18px rgba(64, 42, 18, 0.08);
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
@@ -543,20 +548,20 @@ const MuseumsPage: React.FC = () => {
 
         .filter-reset {
           border-radius: 999px;
-          border: 1px solid rgba(160, 134, 96, 0.4);
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 240, 219, 0.9));
+          border: 1px solid rgba(180, 106, 60, 0.25);
+          background: rgba(180, 106, 60, 0.08);
           padding: 8px 16px;
           font-size: 13px;
-          color: rgba(115, 86, 47, 0.9);
-          box-shadow: 0 6px 14px rgba(120, 87, 50, 0.12);
+          color: rgba(90, 60, 32, 0.9);
+          box-shadow: 0 6px 14px rgba(64, 42, 18, 0.08);
         }
 
         .filter-panel {
           background: rgba(255, 255, 255, 0.9);
-          border-radius: 18px;
-          padding: 14px 16px;
-          border: 1px solid rgba(216, 203, 186, 0.7);
-          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 10px 24px rgba(43, 43, 43, 0.08);
+          border-radius: 24px;
+          padding: 20px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
         .filter-grid {
@@ -576,7 +581,7 @@ const MuseumsPage: React.FC = () => {
         .dropdown {
           padding: 10px 16px;
           border-radius: 999px;
-          border: 1px solid rgba(210, 191, 169, 0.9);
+          border: 1px solid rgba(180, 106, 60, 0.2);
           background: #fff;
           font-size: 14px;
           color: rgba(67, 50, 30, 0.9);
@@ -591,9 +596,9 @@ const MuseumsPage: React.FC = () => {
 
         .chip {
           border-radius: 999px;
-          padding: 7px 14px;
-          border: 1px solid rgba(205, 186, 162, 0.9);
-          background: #fffaf4;
+          padding: 8px 14px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          background: #fff;
           font-size: 13px;
           color: rgba(92, 64, 33, 0.9);
           transition: all 0.2s ease;
@@ -605,18 +610,18 @@ const MuseumsPage: React.FC = () => {
         }
 
         .chip.is-active {
-          background: var(--accent);
-          color: #fff;
-          border-color: var(--accent);
-          box-shadow: 0 8px 16px rgba(158, 108, 50, 0.25);
+          background: rgba(180, 106, 60, 0.12);
+          color: #7b4c2a;
+          border-color: rgba(180, 106, 60, 0.6);
+          box-shadow: 0 8px 16px rgba(180, 106, 60, 0.15);
         }
 
         .price-toggle {
           display: flex;
           border-radius: 999px;
           overflow: hidden;
-          border: 1px solid rgba(205, 186, 162, 0.9);
-          background: #fffaf4;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          background: #fff;
         }
 
         .toggle {
@@ -629,8 +634,8 @@ const MuseumsPage: React.FC = () => {
         }
 
         .toggle.is-active {
-          background: var(--accent);
-          color: #fff;
+          background: rgba(180, 106, 60, 0.12);
+          color: #7b4c2a;
         }
 
         .toggle:hover {
@@ -643,14 +648,14 @@ const MuseumsPage: React.FC = () => {
           gap: 8px;
           font-size: 14px;
           border: none;
-          background: rgba(255, 255, 255, 0.9);
+          background: #fff;
           border-radius: 999px;
           padding: 6px 12px;
-          border: 1px solid rgba(205, 186, 162, 0.8);
+          border: 1px solid rgba(180, 106, 60, 0.2);
         }
 
         .switch.is-active .switch-track {
-          background: var(--accent);
+          background: #b46a3c;
         }
 
         .switch.is-active .switch-thumb {
@@ -692,8 +697,8 @@ const MuseumsPage: React.FC = () => {
         .view-btn {
           padding: 8px 12px;
           border-radius: 999px;
-          border: 1px solid rgba(205, 186, 162, 0.9);
-          background: #fffaf4;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          background: #fff;
           font-size: 13px;
           color: rgba(92, 64, 33, 0.9);
           transition: all 0.2s ease;
@@ -705,10 +710,10 @@ const MuseumsPage: React.FC = () => {
         }
 
         .view-btn.is-active {
-          background: var(--accent);
-          color: #fff;
-          border-color: var(--accent);
-          box-shadow: 0 8px 16px rgba(158, 108, 50, 0.25);
+          background: rgba(180, 106, 60, 0.12);
+          color: #7b4c2a;
+          border-color: rgba(180, 106, 60, 0.6);
+          box-shadow: 0 8px 16px rgba(180, 106, 60, 0.15);
         }
 
         .mobile-filter {
@@ -731,10 +736,10 @@ const MuseumsPage: React.FC = () => {
 
         .museum-card {
           background: #fff;
-          border-radius: 22px;
-          border: 1px solid rgba(216, 203, 186, 0.7);
+          border-radius: 24px;
+          border: 1px solid rgba(180, 106, 60, 0.15);
           padding: 18px;
-          box-shadow: 0 16px 26px rgba(43, 43, 43, 0.08);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
           position: relative;
           overflow: hidden;
@@ -742,14 +747,14 @@ const MuseumsPage: React.FC = () => {
 
         .museum-card:hover {
           transform: translateY(-6px);
-          box-shadow: 0 24px 36px rgba(43, 43, 43, 0.12);
+          box-shadow: 0 20px 32px rgba(64, 42, 18, 0.12);
         }
 
         .museum-card::before {
           content: '';
           position: absolute;
           inset: 0;
-          border-radius: 22px;
+          border-radius: 24px;
           background: linear-gradient(135deg, rgba(255, 240, 216, 0.18), rgba(255, 255, 255, 0));
           opacity: 0;
           transition: opacity 0.3s ease;
@@ -762,11 +767,11 @@ const MuseumsPage: React.FC = () => {
 
         .card-image {
           position: relative;
-          height: 200px;
-          border-radius: 16px;
+          aspect-ratio: 16 / 9;
+          border-radius: 20px;
           background: linear-gradient(135deg, rgba(217, 195, 162, 0.4), rgba(190, 182, 169, 0.3));
           overflow: hidden;
-          border: 1px solid rgba(255, 255, 255, 0.7);
+          border: 1px solid rgba(180, 106, 60, 0.12);
         }
 
         .card-image::after {
@@ -787,6 +792,8 @@ const MuseumsPage: React.FC = () => {
           position: absolute;
           top: 12px;
           left: 12px;
+          background: rgba(255, 255, 255, 0.9);
+          border: 1px solid rgba(180, 106, 60, 0.2);
         }
 
         .card-body {
@@ -827,11 +834,31 @@ const MuseumsPage: React.FC = () => {
           gap: 12px;
         }
 
+        .button {
+          border-radius: 999px;
+          padding: 10px 20px;
+          font-size: 14px;
+          border: none;
+          cursor: pointer;
+        }
+
+        .button-primary {
+          background: #b46a3c;
+          color: #fff;
+          box-shadow: 0 8px 16px rgba(180, 106, 60, 0.25);
+        }
+
+        .button-secondary {
+          background: #fff;
+          color: #7b4c2a;
+          border: 1px solid rgba(180, 106, 60, 0.25);
+        }
+
         .icon-btn {
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          border: 1px solid var(--line);
+          border: 1px solid rgba(180, 106, 60, 0.25);
           background: #fff;
         }
 
@@ -844,16 +871,16 @@ const MuseumsPage: React.FC = () => {
         .empty-state {
           text-align: center;
           background: #fff;
-          border-radius: 20px;
+          border-radius: 24px;
           padding: 40px;
-          box-shadow: var(--shadow-soft);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
         .detail-modal {
           background: #fff;
           border-radius: 24px;
           padding: 32px;
-          box-shadow: var(--shadow-soft);
+          box-shadow: 0 20px 40px rgba(64, 42, 18, 0.18);
           animation: fadeIn 0.3s ease;
           position: relative;
           max-width: 960px;
