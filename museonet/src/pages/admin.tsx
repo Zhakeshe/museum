@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -23,94 +23,83 @@ type User = {
   lastActive: string;
 };
 
-const initialMuseums: Museum[] = Array.from({ length: 8 }, (_, index) => ({
-  id: index + 1,
-  name: `Музей №${index + 1}`,
-  address: `Негізгі көше, ${index + 12}`,
-  phone: `+7 (700) 00-0${index}${index}`,
-  gisLink: 'https://2gis.kz',
-  image: '',
-}));
-
-const initialUsers: User[] = [
-  {
-    id: 1,
-    name: 'Айдана Ж.',
-    email: 'aidana@museonet.kz',
-    points: 20,
-    role: 'admin',
-    status: 'active',
-    visits: 18,
-    lastActive: '2024-05-12',
-  },
-  {
-    id: 2,
-    name: 'Ерлан Т.',
-    email: 'erlan@museonet.kz',
-    points: 20,
-    role: 'user',
-    status: 'active',
-    visits: 6,
-    lastActive: '2024-05-10',
-  },
-  {
-    id: 3,
-    name: 'Ақбота К.',
-    email: 'akbota@museonet.kz',
-    points: 20,
-    role: 'user',
-    status: 'banned',
-    visits: 2,
-    lastActive: '2024-04-30',
-  },
-];
-
 const AdminPage: React.FC = () => {
-  const [museums, setMuseums] = useState(initialMuseums);
-  const [users, setUsers] = useState(initialUsers);
+  const [museums, setMuseums] = useState<Museum[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [newUser, setNewUser] = useState({ name: '', email: '' });
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
 
   const totalMuseums = useMemo(() => 285, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const [museumsResponse, usersResponse] = await Promise.all([
+        fetch('/api/museums'),
+        fetch('/api/users'),
+      ]);
+      const museumsData = await museumsResponse.json();
+      const usersData = await usersResponse.json();
+      setMuseums(museumsData);
+      setUsers(usersData);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
 
   const handleMuseumChange = (id: number, field: keyof Museum, value: string) => {
     setMuseums((prev) => prev.map((museum) => (museum.id === id ? { ...museum, [field]: value } : museum)));
   };
 
-  const handleUserRole = (id: number) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id ? { ...user, role: user.role === 'admin' ? 'user' : 'admin' } : user,
-      ),
-    );
+  const handleMuseumSave = async (museum: Museum) => {
+    await fetch(`/api/museums/${museum.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(museum),
+    });
+    setMessage('Музей жаңартылды.');
+    setTimeout(() => setMessage(''), 2000);
   };
 
-  const handleUserStatus = (id: number) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === id ? { ...user, status: user.status === 'banned' ? 'active' : 'banned' } : user,
-      ),
-    );
+  const handleUserRole = async (id: number) => {
+    const target = users.find((user) => user.id === id);
+    if (!target) return;
+    const updated = { ...target, role: target.role === 'admin' ? 'user' : 'admin' };
+    await fetch(`/api/users/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    });
+    setUsers((prev) => prev.map((user) => (user.id === id ? updated : user)));
   };
 
-  const handleUserCreate = (event: React.FormEvent) => {
+  const handleUserStatus = async (id: number) => {
+    const target = users.find((user) => user.id === id);
+    if (!target) return;
+    const updated = { ...target, status: target.status === 'banned' ? 'active' : 'banned' };
+    await fetch(`/api/users/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updated),
+    });
+    setUsers((prev) => prev.map((user) => (user.id === id ? updated : user)));
+  };
+
+  const handleUserCreate = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!newUser.name || !newUser.email) {
       return;
     }
-    setUsers((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        name: newUser.name,
-        email: newUser.email,
-        points: 20,
-        role: 'user',
-        status: 'active',
-        visits: 0,
-        lastActive: '—',
-      },
-    ]);
-    setNewUser({ name: '', email: '' });
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser),
+    });
+    if (response.ok) {
+      const created = await response.json();
+      setUsers((prev) => [...prev, created]);
+      setNewUser({ name: '', email: '' });
+    }
   };
 
   return (
@@ -151,12 +140,15 @@ const AdminPage: React.FC = () => {
             <h2>Музейлерді басқару</h2>
             <p>Әр музейдің атауы, байланысы, 2GIS сілтемесі және суретін жаңарта аласыз.</p>
             <div className="admin-grid">
-              {museums.map((museum) => (
-                <div className="admin-card" key={museum.id}>
-                  <div className="card-header">
-                    <h3>{museum.name}</h3>
-                    <span className="badge">ID {museum.id}</span>
-                  </div>
+              {loading ? (
+                <div className="loading-card">Деректер жүктелуде...</div>
+              ) : (
+                museums.map((museum) => (
+                  <div className="admin-card" key={museum.id}>
+                    <div className="card-header">
+                      <h3>{museum.name}</h3>
+                      <span className="badge">ID {museum.id}</span>
+                    </div>
                   <label>
                     Атауы
                     <input
@@ -197,11 +189,12 @@ const AdminPage: React.FC = () => {
                     Сурет (локал)
                     <input type="file" />
                   </label>
-                  <button className="button button-primary" type="button">
-                    Сақтау
-                  </button>
-                </div>
-              ))}
+                    <button className="button button-primary" type="button" onClick={() => handleMuseumSave(museum)}>
+                      Сақтау
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -230,6 +223,7 @@ const AdminPage: React.FC = () => {
               </form>
             </div>
             <div className="users-table">
+              {message && <div className="success-banner">{message}</div>}
               <div className="users-row users-head-row">
                 <span>Қолданушы</span>
                 <span>Рөл</span>
@@ -331,6 +325,14 @@ const AdminPage: React.FC = () => {
           gap: 20px;
         }
 
+        .loading-card {
+          background: #fff;
+          border-radius: 20px;
+          padding: 20px;
+          border: 1px dashed rgba(180, 106, 60, 0.3);
+          color: rgba(43, 43, 43, 0.6);
+        }
+
         .admin-card {
           background: #fff;
           border-radius: 20px;
@@ -386,6 +388,14 @@ const AdminPage: React.FC = () => {
           margin-top: 24px;
           display: grid;
           gap: 12px;
+        }
+
+        .success-banner {
+          padding: 12px 16px;
+          border-radius: 14px;
+          background: rgba(180, 106, 60, 0.1);
+          color: #7b4c2a;
+          border: 1px solid rgba(180, 106, 60, 0.2);
         }
 
         .users-row {
