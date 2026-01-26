@@ -6,6 +6,8 @@ import Footer from '../components/Footer';
 type Museum = {
   id: number;
   name: string;
+  region: string;
+  city: string;
   address: string;
   phone: string;
   gisLink: string;
@@ -29,8 +31,31 @@ const AdminPage: React.FC = () => {
   const [newUser, setNewUser] = useState({ name: '', email: '' });
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [search, setSearch] = useState('');
+  const [region, setRegion] = useState('Барлығы');
+  const [city, setCity] = useState('Барлығы');
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const totalMuseums = useMemo(() => 285, []);
+  const regionOptions = useMemo(
+    () => ['Барлығы', ...new Set(museums.map((item) => item.region))],
+    [museums],
+  );
+  const cityOptions = useMemo(
+    () => ['Барлығы', ...new Set(museums.map((item) => item.city))],
+    [museums],
+  );
+  const filteredMuseums = useMemo(() => {
+    const normalizedSearch = search.toLowerCase();
+    return museums.filter((museum) => {
+      const matchesSearch =
+        museum.name.toLowerCase().includes(normalizedSearch) ||
+        museum.address.toLowerCase().includes(normalizedSearch);
+      const matchesRegion = region === 'Барлығы' || museum.region === region;
+      const matchesCity = city === 'Барлығы' || museum.city === city;
+      return matchesSearch && matchesRegion && matchesCity;
+    });
+  }, [museums, search, region, city]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -59,6 +84,7 @@ const AdminPage: React.FC = () => {
     });
     setMessage('Музей жаңартылды.');
     setTimeout(() => setMessage(''), 2000);
+    setEditingId(null);
   };
 
   const handleUserRole = async (id: number) => {
@@ -139,59 +165,110 @@ const AdminPage: React.FC = () => {
           <div className="container">
             <h2>Музейлерді басқару</h2>
             <p>Әр музейдің атауы, байланысы, 2GIS сілтемесі және суретін жаңарта аласыз.</p>
+            <div className="filter-bar">
+              <div className="filter-group">
+                <input
+                  placeholder="Музей атауын іздеу..."
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+                <select className="dropdown" value={region} onChange={(event) => setRegion(event.target.value)}>
+                  {regionOptions.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+                <select className="dropdown" value={city} onChange={(event) => setCity(event.target.value)}>
+                  {cityOptions.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                className="button button-secondary"
+                type="button"
+                onClick={() => {
+                  setSearch('');
+                  setRegion('Барлығы');
+                  setCity('Барлығы');
+                }}
+              >
+                Фильтрді тазалау
+              </button>
+            </div>
             <div className="admin-grid">
               {loading ? (
                 <div className="loading-card">Деректер жүктелуде...</div>
               ) : (
-                museums.map((museum) => (
+                filteredMuseums.map((museum) => (
                   <div className="admin-card" key={museum.id}>
                     <div className="card-header">
                       <h3>{museum.name}</h3>
                       <span className="badge">ID {museum.id}</span>
                     </div>
-                  <label>
-                    Атауы
-                    <input
-                      value={museum.name}
-                      onChange={(event) => handleMuseumChange(museum.id, 'name', event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Мекенжай
-                    <input
-                      value={museum.address}
-                      onChange={(event) => handleMuseumChange(museum.id, 'address', event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Нөмір
-                    <input
-                      value={museum.phone}
-                      onChange={(event) => handleMuseumChange(museum.id, 'phone', event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    2GIS сілтемесі
-                    <input
-                      value={museum.gisLink}
-                      onChange={(event) => handleMuseumChange(museum.id, 'gisLink', event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Сурет (сілтеме)
-                    <input
-                      value={museum.image}
-                      onChange={(event) => handleMuseumChange(museum.id, 'image', event.target.value)}
-                      placeholder="https://..."
-                    />
-                  </label>
-                  <label>
-                    Сурет (локал)
-                    <input type="file" />
-                  </label>
-                    <button className="button button-primary" type="button" onClick={() => handleMuseumSave(museum)}>
-                      Сақтау
-                    </button>
+                    <div className="meta">
+                      <span>{museum.region}</span>
+                      <span>{museum.city}</span>
+                    </div>
+                    {editingId === museum.id ? (
+                      <>
+                        <label>
+                          Атауы
+                          <input
+                            value={museum.name}
+                            onChange={(event) => handleMuseumChange(museum.id, 'name', event.target.value)}
+                          />
+                        </label>
+                        <label>
+                          Мекенжай
+                          <input
+                            value={museum.address}
+                            onChange={(event) => handleMuseumChange(museum.id, 'address', event.target.value)}
+                          />
+                        </label>
+                        <label>
+                          Нөмір
+                          <input
+                            value={museum.phone}
+                            onChange={(event) => handleMuseumChange(museum.id, 'phone', event.target.value)}
+                          />
+                        </label>
+                        <label>
+                          2GIS сілтемесі
+                          <input
+                            value={museum.gisLink}
+                            onChange={(event) => handleMuseumChange(museum.id, 'gisLink', event.target.value)}
+                          />
+                        </label>
+                        <label>
+                          Сурет (сілтеме)
+                          <input
+                            value={museum.image}
+                            onChange={(event) => handleMuseumChange(museum.id, 'image', event.target.value)}
+                            placeholder="https://..."
+                          />
+                        </label>
+                        <div className="button-row">
+                          <button className="button button-primary" type="button" onClick={() => handleMuseumSave(museum)}>
+                            Сақтау
+                          </button>
+                          <button
+                            className="button button-secondary"
+                            type="button"
+                            onClick={() => setEditingId(null)}
+                          >
+                            Болдырмау
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <button className="button button-primary" type="button" onClick={() => setEditingId(museum.id)}>
+                        Өзгерту
+                      </button>
+                    )}
                   </div>
                 ))
               )}
@@ -325,6 +402,31 @@ const AdminPage: React.FC = () => {
           gap: 20px;
         }
 
+        .filter-bar {
+          margin-top: 20px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .filter-group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .dropdown {
+          padding: 10px 16px;
+          border-radius: 999px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          background: #fff;
+          font-size: 14px;
+          color: rgba(67, 50, 30, 0.9);
+        }
+
         .loading-card {
           background: #fff;
           border-radius: 20px;
@@ -341,6 +443,19 @@ const AdminPage: React.FC = () => {
           box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
           display: grid;
           gap: 12px;
+        }
+
+        .meta {
+          display: flex;
+          gap: 8px;
+          font-size: 12px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .button-row {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
         }
 
         .card-header {
