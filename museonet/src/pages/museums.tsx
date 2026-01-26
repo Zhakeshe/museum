@@ -1,0 +1,988 @@
+import React, { useMemo, useState } from 'react';
+import Head from 'next/head';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
+const baseMuseumNames = [
+  'Ақтөбе облыстық тарихи-өлкетану музейі',
+  'Ботай музей-қорығы',
+  'Шым қала тарихи-мәдени кешені',
+  'Көкшетау тарих музейі',
+  'Сарайшык музей-қорығы',
+  'Кастеев өнер музейі',
+  'Ұлттық музей',
+  'Әзірет Сұлтан музей-қорығы',
+  'Таңбалы музей-қорығы',
+  'Берел музей-қорығы',
+  'Отырар музей-қорығы',
+  'Есік музей-қорығы',
+  'Жаркент мешіті музейі',
+  'Атырау облыстық өнер музейі',
+  'Павлодар облыстық өлкетану музейі',
+];
+
+const regions = [
+  'Ақтөбе облысы',
+  'Атырау облысы',
+  'Алматы',
+  'Астана',
+  'Шымкент',
+  'Түркістан облысы',
+  'Ақмола облысы',
+  'Жетісу облысы',
+  'СҚО',
+  'Қарағанды облысы',
+  'Павлодар облысы',
+  'ШҚО',
+];
+
+const cities = [
+  'Ақтөбе',
+  'Атырау',
+  'Алматы',
+  'Астана',
+  'Шымкент',
+  'Түркістан',
+  'Көкшетау',
+  'Талдықорған',
+  'Петропавл',
+  'Қарағанды',
+  'Павлодар',
+  'Өскемен',
+];
+
+const categories = ['Үй-музей', 'Археология', 'Өнер', 'Қорық-музей', 'Өлкетану', 'Тарих'];
+
+const museumsData = Array.from({ length: 285 }, (_, index) => {
+  const nameBase = baseMuseumNames[index % baseMuseumNames.length];
+  const region = regions[index % regions.length];
+  const city = cities[index % cities.length];
+  const category = categories[index % categories.length];
+  const rating = 4 + (index % 10) / 10;
+  const price = index % 3 === 0 ? 'Тегін' : 'Ақылы';
+  const hue = 18 + (index % 8) * 12;
+
+  return {
+    id: index + 1,
+    name: `${nameBase} №${index + 1}`,
+    location: `${city}, Қазақстан`,
+    city,
+    region,
+    category,
+    description: 'Қордағы негізгі жәдігерлер, экспозициялар және виртуалды тур материалдары.',
+    address: `Негізгі көше, ${index + 5}`,
+    hours: '09:00–18:00',
+    badge: rating > 4.6 ? 'Ұсынылады' : `⭐ ${rating.toFixed(1)}`,
+    price,
+    kids: index % 2 === 0,
+    rating,
+    hue,
+    phone: `+7 (7${index % 9}2) 00-00-${String(index % 100).padStart(2, '0')}`,
+    website: 'https://museonet.kz',
+  };
+});
+
+const MuseumsPage: React.FC = () => {
+  const [search, setSearch] = useState('');
+  const [region, setRegion] = useState('Барлығы');
+  const [city, setCity] = useState('Барлығы');
+  const [category, setCategory] = useState('Барлығы');
+  const [price, setPrice] = useState('Барлығы');
+  const [kids, setKids] = useState(false);
+  const [sort, setSort] = useState('Танымал');
+  const [view, setView] = useState<'grid' | 'list' | 'map'>('grid');
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [selected, setSelected] = useState<typeof museumsData[0] | null>(null);
+  const [showFilters, setShowFilters] = useState(true);
+
+  const regionOptions = useMemo(
+    () => ['Барлығы', ...new Set(museumsData.map((item) => item.region))],
+    [],
+  );
+  const cityOptions = useMemo(
+    () => ['Барлығы', ...new Set(museumsData.map((item) => item.city))],
+    [],
+  );
+
+  const filteredMuseums = useMemo(() => {
+    const normalizedSearch = search.toLowerCase();
+    let items = museumsData.filter((item) => {
+      const matchesSearch =
+        item.name.toLowerCase().includes(normalizedSearch) ||
+        item.location.toLowerCase().includes(normalizedSearch);
+      const matchesRegion = region === 'Барлығы' || item.region === region;
+      const matchesCity = city === 'Барлығы' || item.city === city;
+      const matchesCategory = category === 'Барлығы' || item.category === category;
+      const matchesPrice = price === 'Барлығы' || item.price === price;
+      const matchesKids = !kids || item.kids;
+      return (
+        matchesSearch &&
+        matchesRegion &&
+        matchesCity &&
+        matchesCategory &&
+        matchesPrice &&
+        matchesKids
+      );
+    });
+
+    if (sort === 'Жаңа') {
+      items = [...items].reverse();
+    }
+    if (sort === 'А-Я') {
+      items = [...items].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sort === 'Танымал') {
+      items = [...items].sort((a, b) => b.rating - a.rating);
+    }
+
+    return items;
+  }, [search, region, city, category, price, kids, sort]);
+
+  const toggleFavorite = (id: number) => {
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
+
+  const resetFilters = () => {
+    setSearch('');
+    setRegion('Барлығы');
+    setCity('Барлығы');
+    setCategory('Барлығы');
+    setPrice('Барлығы');
+    setKids(false);
+    setSort('Танымал');
+  };
+
+  return (
+    <div className="page">
+      <Head>
+        <title>Музейлер тізімі — museonet</title>
+        <meta
+          name="description"
+          content="Қазақстандағы музейлердің заманауи каталогы: іздеу, сүзгі, сұрыптау және толық ақпарат."
+        />
+      </Head>
+
+      <Header />
+
+      <main>
+        <section className="directory-hero">
+          <div className="container hero-grid">
+            <div>
+              <h1 className="hero-title">Музейлер тізімі</h1>
+              <p className="subtitle">
+                Қазақстандағы музейлерді өңір, қала және тақырып бойынша тез табыңыз.
+              </p>
+              <div className="stats stats-badge">285 музей • 17 өңір • 12 категория</div>
+            </div>
+            <div className="search-panel">
+              <label className="search-label" htmlFor="search">
+                Іздеу
+              </label>
+              <div className="search-input">
+                <span>🔍</span>
+                <input
+                  id="search"
+                  type="search"
+                  placeholder="Музей атауын іздеу…"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="filter-bar">
+          <div className="container filter-head">
+            <div className="filter-label">Сүзгілеу параметрлері</div>
+            <div className="filter-actions-head">
+              <button className="filter-toggle" type="button" onClick={() => setShowFilters(!showFilters)}>
+                {showFilters ? 'Фильтрді жасыру' : 'Фильтрді көрсету'}
+              </button>
+              <button className="filter-reset" type="button" onClick={resetFilters}>
+                Фильтрді тазалау
+              </button>
+            </div>
+          </div>
+          {showFilters && (
+            <div className="container filter-panel">
+              <div className="filter-grid">
+                <div className="filter-group">
+                  <select className="dropdown" value={region} onChange={(event) => setRegion(event.target.value)}>
+                    {regionOptions.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                  <select className="dropdown" value={city} onChange={(event) => setCity(event.target.value)}>
+                    {cityOptions.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="chip-row">
+                    {['Барлығы', ...categories].map((item) => (
+                      <button
+                        key={item}
+                        className={`chip ${category === item ? 'is-active' : ''}`}
+                        onClick={() => setCategory(item)}
+                        type="button"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="price-toggle">
+                    {['Барлығы', 'Тегін', 'Ақылы'].map((item) => (
+                      <button
+                        key={item}
+                        className={`toggle ${price === item ? 'is-active' : ''}`}
+                        onClick={() => setPrice(item)}
+                        type="button"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className={`switch ${kids ? 'is-active' : ''}`}
+                    type="button"
+                    onClick={() => setKids(!kids)}
+                  >
+                    <span>Балаларға лайық</span>
+                    <div className="switch-track">
+                      <div className="switch-thumb"></div>
+                    </div>
+                  </button>
+                </div>
+                <div className="filter-actions">
+                  <select className="dropdown" value={sort} onChange={(event) => setSort(event.target.value)}>
+                    <option value="Танымал">Сұрыптау: Танымал</option>
+                    <option value="Жаңа">Сұрыптау: Жаңа</option>
+                    <option value="А-Я">Сұрыптау: А-Я</option>
+                  </select>
+                  <div className="view-toggle">
+                    {['grid', 'list', 'map'].map((item) => (
+                      <button
+                        key={item}
+                        className={`view-btn ${view === item ? 'is-active' : ''}`}
+                        onClick={() => setView(item as 'grid' | 'list' | 'map')}
+                        type="button"
+                      >
+                        {item === 'grid' ? 'Тор' : item === 'list' ? 'Тізім' : 'Карта'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <button className="mobile-filter" type="button" onClick={() => setShowFilters(!showFilters)}>
+            {showFilters ? 'Фильтрді жасыру' : 'Фильтрді көрсету'}
+          </button>
+        </section>
+
+        <section className="section">
+          <div className="container">
+            <div className="section-heading">
+              <h2>Фильтр нәтижелері</h2>
+              <p>Іздеу нәтижелерін кеңейту үшін қосымша параметрлерді қолданыңыз.</p>
+            </div>
+            {filteredMuseums.length === 0 ? (
+              <div className="empty-state">
+                <h2>Нәтиже табылмады</h2>
+                <p>Басқа сүзгілерді қолданып көріңіз немесе параметрлерді тазартыңыз.</p>
+                <button className="button button-secondary" onClick={resetFilters}>
+                  Фильтрді тазалау
+                </button>
+              </div>
+            ) : (
+              <div className={`grid ${view}`}>
+                {filteredMuseums.map((museum) => (
+                  <div className="card museum-card" key={museum.id}>
+                    <div
+                      className="card-image"
+                      style={{
+                        backgroundImage: `linear-gradient(135deg, hsla(${museum.hue}, 45%, 78%, 0.85), hsla(${museum.hue}, 32%, 88%, 0.9))`,
+                      }}
+                    >
+                      <div className="image-overlay"></div>
+                      <span className="chip chip-image">{museum.category}</span>
+                    </div>
+                    <div className="card-body">
+                      <h3>{museum.name}</h3>
+                      <p className="location">📍 {museum.location}</p>
+                      <p className="address">Мекенжай: {museum.address}</p>
+                      <p className="desc">{museum.description}</p>
+                      <div className="meta">
+                        <span>⏰ {museum.hours}</span>
+                        <span>{museum.badge}</span>
+                      </div>
+                      <div className="card-actions">
+                        <button className="button button-primary" onClick={() => setSelected(museum)}>
+                          Толық ақпарат
+                        </button>
+                        <button className="icon-btn" type="button" onClick={() => toggleFavorite(museum.id)}>
+                          {favorites.includes(museum.id) ? '❤' : '♡'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="load-more">
+              <button className="button button-secondary">Жүктеу</button>
+            </div>
+          </div>
+        </section>
+
+        {selected && (
+          <div className="modal-overlay" role="dialog" aria-modal="true">
+            <button className="modal-backdrop" type="button" onClick={() => setSelected(null)} />
+            <div className="detail-modal">
+              <button className="modal-close" type="button" onClick={() => setSelected(null)}>
+                ✕
+              </button>
+              <div className="modal-hero">
+                <div
+                  className="modal-gallery"
+                  style={{
+                    backgroundImage: `linear-gradient(135deg, hsla(${selected.hue}, 45%, 78%, 0.85), hsla(${selected.hue}, 32%, 88%, 0.9))`,
+                  }}
+                ></div>
+                <div className="modal-info">
+                  <h2>{selected.name}</h2>
+                  <p>📍 {selected.location}</p>
+                  <p>Мекенжай: {selected.address}</p>
+                  <p>⏰ {selected.hours}</p>
+                  <p>☎️ {selected.phone}</p>
+                  <p>🌐 {selected.website}</p>
+                  <a
+                    className="button button-primary"
+                    href={`https://2gis.kz/search/${encodeURIComponent(selected.name)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span className="gis-badge">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" fill="#21B36B" />
+                        <path
+                          d="M7 12.5c1.6-3.2 5-4.2 10-2.5"
+                          stroke="#fff"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M9 15c2.2-1.2 4.7-1.4 7.5-.6"
+                          stroke="#fff"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      2GIS
+                    </span>
+                    Картада ашу
+                  </a>
+                </div>
+              </div>
+              <div className="modal-sections">
+                <div>
+                  <h3>Сипаттама</h3>
+                  <p>{selected.description}</p>
+                </div>
+                <div>
+                  <h3>Экспозициялар</h3>
+                  <p>Артефактілер, интерактивті залдар және мультимедиалық контент.</p>
+                </div>
+                <div>
+                  <h3>Билеттер</h3>
+                  <p>{selected.price === 'Тегін' ? 'Кіру тегін.' : 'Ересек — 1500 тг, студент — 800 тг.'}</p>
+                </div>
+                <div>
+                  <h3>Қалай жетуге болады</h3>
+                  <p>Қалалық маршруттар, қоғамдық көлік және жеке автотұрақ.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <Footer />
+
+      <style jsx>{`
+        .directory-hero {
+          padding: 48px 0 24px;
+        }
+
+        .hero-grid {
+          display: grid;
+          grid-template-columns: 1.2fr 1fr;
+          gap: 32px;
+          align-items: center;
+        }
+
+        h1 {
+          font-size: 40px;
+          margin-bottom: 12px;
+        }
+
+        .hero-title {
+          font-weight: 700;
+          letter-spacing: 0.01em;
+        }
+
+        .subtitle {
+          color: rgba(43, 43, 43, 0.7);
+          font-size: 18px;
+          max-width: 420px;
+        }
+
+        .stats {
+          margin-top: 16px;
+          font-size: 14px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .stats-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 6px 14px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, rgba(255, 250, 240, 0.95), rgba(255, 255, 255, 0.9));
+          border: 1px solid rgba(210, 191, 169, 0.7);
+          box-shadow: 0 10px 20px rgba(182, 135, 74, 0.15);
+        }
+
+        .search-panel {
+          background: var(--surface);
+          padding: 20px;
+          border-radius: 16px;
+          border: 1px solid var(--line);
+          box-shadow: var(--shadow-soft);
+        }
+
+        .search-label {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.2em;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .search-input {
+          margin-top: 12px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 16px;
+          border-radius: 999px;
+          border: 1px solid var(--line);
+          background: #fff;
+        }
+
+        .search-input input {
+          border: none;
+          width: 100%;
+          font-size: 16px;
+          outline: none;
+          background: transparent;
+        }
+
+        .filter-bar {
+          position: sticky;
+          top: 70px;
+          z-index: 30;
+          background: linear-gradient(180deg, rgba(245, 240, 232, 0.95), rgba(255, 255, 255, 0.98));
+          border-top: 1px solid rgba(218, 207, 192, 0.6);
+          border-bottom: 1px solid rgba(218, 207, 192, 0.6);
+          padding: 16px 0 20px;
+          box-shadow: 0 16px 28px rgba(43, 43, 43, 0.08);
+        }
+
+        .filter-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
+        }
+
+        .filter-label {
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 0.18em;
+          color: rgba(43, 43, 43, 0.55);
+        }
+
+        .filter-actions-head {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .filter-toggle {
+          border-radius: 999px;
+          border: 1px solid rgba(120, 86, 47, 0.35);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 246, 233, 0.95));
+          padding: 8px 16px;
+          font-size: 13px;
+          color: rgba(104, 74, 38, 0.92);
+          box-shadow: 0 8px 18px rgba(120, 87, 50, 0.12);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .filter-toggle:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 18px rgba(120, 87, 50, 0.18);
+        }
+
+        .filter-reset {
+          border-radius: 999px;
+          border: 1px solid rgba(160, 134, 96, 0.4);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 240, 219, 0.9));
+          padding: 8px 16px;
+          font-size: 13px;
+          color: rgba(115, 86, 47, 0.9);
+          box-shadow: 0 6px 14px rgba(120, 87, 50, 0.12);
+        }
+
+        .filter-panel {
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 18px;
+          padding: 14px 16px;
+          border: 1px solid rgba(216, 203, 186, 0.7);
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 10px 24px rgba(43, 43, 43, 0.08);
+        }
+
+        .filter-grid {
+          display: flex;
+          justify-content: space-between;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+
+        .filter-group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .dropdown {
+          padding: 10px 16px;
+          border-radius: 999px;
+          border: 1px solid rgba(210, 191, 169, 0.9);
+          background: #fff;
+          font-size: 14px;
+          color: rgba(67, 50, 30, 0.9);
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .chip-row {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .chip {
+          border-radius: 999px;
+          padding: 7px 14px;
+          border: 1px solid rgba(205, 186, 162, 0.9);
+          background: #fffaf4;
+          font-size: 13px;
+          color: rgba(92, 64, 33, 0.9);
+          transition: all 0.2s ease;
+        }
+
+        .chip:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 14px rgba(158, 108, 50, 0.18);
+        }
+
+        .chip.is-active {
+          background: var(--accent);
+          color: #fff;
+          border-color: var(--accent);
+          box-shadow: 0 8px 16px rgba(158, 108, 50, 0.25);
+        }
+
+        .price-toggle {
+          display: flex;
+          border-radius: 999px;
+          overflow: hidden;
+          border: 1px solid rgba(205, 186, 162, 0.9);
+          background: #fffaf4;
+        }
+
+        .toggle {
+          padding: 8px 14px;
+          background: transparent;
+          border: none;
+          font-size: 14px;
+          color: rgba(92, 64, 33, 0.9);
+          transition: all 0.2s ease;
+        }
+
+        .toggle.is-active {
+          background: var(--accent);
+          color: #fff;
+        }
+
+        .toggle:hover {
+          background: rgba(215, 190, 160, 0.35);
+        }
+
+        .switch {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+          border: none;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 999px;
+          padding: 6px 12px;
+          border: 1px solid rgba(205, 186, 162, 0.8);
+        }
+
+        .switch.is-active .switch-track {
+          background: var(--accent);
+        }
+
+        .switch.is-active .switch-thumb {
+          left: 23px;
+        }
+
+        .switch-track {
+          width: 44px;
+          height: 24px;
+          background: #e5d9c7;
+          border-radius: 999px;
+          position: relative;
+          transition: background 0.2s ease;
+        }
+
+        .switch-thumb {
+          width: 18px;
+          height: 18px;
+          background: #fff;
+          border-radius: 50%;
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+          transition: left 0.2s ease;
+        }
+
+        .filter-actions {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .view-toggle {
+          display: flex;
+          gap: 6px;
+        }
+
+        .view-btn {
+          padding: 8px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(205, 186, 162, 0.9);
+          background: #fffaf4;
+          font-size: 13px;
+          color: rgba(92, 64, 33, 0.9);
+          transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 14px rgba(158, 108, 50, 0.18);
+        }
+
+        .view-btn.is-active {
+          background: var(--accent);
+          color: #fff;
+          border-color: var(--accent);
+          box-shadow: 0 8px 16px rgba(158, 108, 50, 0.25);
+        }
+
+        .mobile-filter {
+          display: none;
+        }
+
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 24px;
+        }
+
+        .grid.list {
+          grid-template-columns: 1fr;
+        }
+
+        .grid.map {
+          grid-template-columns: 1fr;
+        }
+
+        .museum-card {
+          background: #fff;
+          border-radius: 22px;
+          border: 1px solid rgba(216, 203, 186, 0.7);
+          padding: 18px;
+          box-shadow: 0 16px 26px rgba(43, 43, 43, 0.08);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .museum-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 24px 36px rgba(43, 43, 43, 0.12);
+        }
+
+        .museum-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 22px;
+          background: linear-gradient(135deg, rgba(255, 240, 216, 0.18), rgba(255, 255, 255, 0));
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+        }
+
+        .museum-card:hover::before {
+          opacity: 1;
+        }
+
+        .card-image {
+          position: relative;
+          height: 200px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, rgba(217, 195, 162, 0.4), rgba(190, 182, 169, 0.3));
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .card-image::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.35), transparent 45%);
+          opacity: 0.8;
+        }
+
+        .image-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), transparent 60%);
+        }
+
+        .chip-image {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+        }
+
+        .card-body {
+          padding-top: 18px;
+          display: grid;
+          gap: 8px;
+        }
+
+        .museum-card h3 {
+          font-size: 18px;
+        }
+
+        .location {
+          color: rgba(43, 43, 43, 0.6);
+          font-size: 14px;
+        }
+
+        .address {
+          color: rgba(43, 43, 43, 0.6);
+          font-size: 13px;
+        }
+
+        .desc {
+          color: rgba(43, 43, 43, 0.7);
+          font-size: 14px;
+        }
+
+        .meta {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .card-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .icon-btn {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid var(--line);
+          background: #fff;
+        }
+
+        .load-more {
+          display: flex;
+          justify-content: center;
+          margin-top: 32px;
+        }
+
+        .empty-state {
+          text-align: center;
+          background: #fff;
+          border-radius: 20px;
+          padding: 40px;
+          box-shadow: var(--shadow-soft);
+        }
+
+        .detail-modal {
+          background: #fff;
+          border-radius: 24px;
+          padding: 32px;
+          box-shadow: var(--shadow-soft);
+          animation: fadeIn 0.3s ease;
+          position: relative;
+          max-width: 960px;
+          width: min(960px, 92vw);
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(43, 43, 43, 0.45);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 200;
+          padding: 24px;
+        }
+
+        .modal-backdrop {
+          position: absolute;
+          inset: 0;
+          background: transparent;
+          border: none;
+        }
+
+        .modal-close {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 1px solid var(--line);
+          background: #fff;
+          font-size: 16px;
+        }
+
+        .modal-hero {
+          display: grid;
+          grid-template-columns: 1.2fr 1fr;
+          gap: 24px;
+          margin-bottom: 24px;
+        }
+
+        .modal-gallery {
+          height: 220px;
+          border-radius: 18px;
+          background: linear-gradient(135deg, rgba(217, 195, 162, 0.4), rgba(190, 182, 169, 0.35));
+        }
+
+        .modal-info p {
+          margin: 6px 0;
+          color: rgba(43, 43, 43, 0.7);
+        }
+
+        .gis-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 2px 8px;
+          border-radius: 999px;
+          background: rgba(255, 255, 255, 0.2);
+          margin-right: 6px;
+        }
+
+        .modal-sections {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 20px;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .museum-card,
+          .view-btn,
+          .chip,
+          .filter-toggle {
+            transition: none;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .hero-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .filter-panel {
+            padding: 12px;
+          }
+
+          .filter-grid {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .mobile-filter {
+            display: block;
+            margin: 12px auto 0;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: #fff;
+          }
+
+          .modal-hero {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .filter-group,
+          .filter-actions {
+            display: none;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default MuseumsPage;

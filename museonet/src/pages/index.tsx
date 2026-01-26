@@ -1,358 +1,778 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+const categoryFilters = ['Үй-музей', 'Археология', 'Өнер', 'Қорық-музей'];
+const sortOptions = ['Танымал', 'Жаңа', 'A–Я'];
+
+const museums = [
+  {
+    id: 1,
+    name: 'Отырар музей-қорығы',
+    location: 'Түркістан облысы',
+    category: 'Археология',
+    description: 'Қалашық тарихы, көне жазбалар және археологиялық олжалар көрмесі.',
+    hours: '09:00–18:00',
+    rating: 4.8,
+  },
+  {
+    id: 2,
+    name: 'Әзірет Сұлтан музей-қорығы',
+    location: 'Түркістан',
+    category: 'Қорық-музей',
+    description: 'Кесене ансамблі, рухани тарих және мәдени мұра экспозициялары.',
+    hours: '10:00–19:00',
+    rating: 4.7,
+  },
+  {
+    id: 3,
+    name: 'Кастеев өнер музейі',
+    location: 'Алматы',
+    category: 'Өнер',
+    description: 'Қазақ және әлемдік бейнелеу өнері, заманауи көрме залдары.',
+    hours: '10:00–20:00',
+    rating: 4.6,
+  },
+  {
+    id: 4,
+    name: 'Есік музей-қорығы',
+    location: 'Алматы облысы',
+    category: 'Археология',
+    description: 'Алтын адам мұрасы, сақ дәуірінің мәдениеті және қазба материалдары.',
+    hours: '09:30–18:30',
+    rating: 4.9,
+  },
+  {
+    id: 5,
+    name: 'Берел музей-қорығы',
+    location: 'ШҚО',
+    category: 'Қорық-музей',
+    description: 'Берел қорғандары, ат әбзелдері және экспедициялық артефактілер.',
+    hours: '09:00–17:30',
+    rating: 4.5,
+  },
+  {
+    id: 6,
+    name: 'Жаркент мешіті музейі',
+    location: 'Жетісу облысы',
+    category: 'Үй-музей',
+    description: 'Ағаш сәулет үлгісі, қолөнер және рухани мұра жинағы.',
+    hours: '09:00–18:00',
+    rating: 4.4,
+  },
+  {
+    id: 7,
+    name: 'Таңбалы музей-қорығы',
+    location: 'Алматы облысы',
+    category: 'Археология',
+    description: 'Жартастағы суреттер, далалық мәдениет және ашық аспан экспозициясы.',
+    hours: '08:30–18:00',
+    rating: 4.9,
+  },
+  {
+    id: 8,
+    name: 'Ұлттық музей',
+    location: 'Астана',
+    category: 'Өнер',
+    description: 'Ежелгі тарихтан заманауи өнерге дейінгі кең көлемді залдар.',
+    hours: '09:00–20:00',
+    rating: 4.7,
+  },
+];
+
 const HomePage: React.FC = () => {
+  const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState('Барлығы');
+  const [sort, setSort] = useState('Танымал');
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [isLoading, setIsLoading] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  const filteredMuseums = useMemo(() => {
+    const normalized = search.trim().toLowerCase();
+    let items = museums.filter((museum) => {
+      const matchesSearch =
+        museum.name.toLowerCase().includes(normalized) ||
+        museum.location.toLowerCase().includes(normalized);
+      const matchesCategory = activeCategory === 'Барлығы' || museum.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+
+    if (sort === 'Жаңа') {
+      items = [...items].reverse();
+    }
+    if (sort === 'A–Я') {
+      items = [...items].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    if (sort === 'Танымал') {
+      items = [...items].sort((a, b) => b.rating - a.rating);
+    }
+
+    return items;
+  }, [search, activeCategory, sort]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, [search, activeCategory, sort, view]);
+
   return (
-    <>
+    <div className="page">
       <Head>
-        <title>Главная - e-museum.kz</title>
+        <title>museonet — Виртуалды музей</title>
         <meta
           name="description"
-          content="Виртуальный музей «E-museum» — портал, где культурное наследие Казахстана оживает в цифровом пространстве"
+          content="museonet — археология, виртуалды музей және мәдени мұраға арналған цифрлық платформа."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta charSet="UTF-8" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="hfeed site" id="page">
-        <Header />
+      <Header />
 
-        <div id="content" className="site-content">
-          <div className="ast-container">
-            <div id="primary" className="content-area primary">
-              <main id="main" className="site-main">
-                <article
-                  className="post-442 page type-page status-publish ast-article-single"
-                  id="post-442"
-                  itemType="https://schema.org/CreativeWork"
-                  itemScope
-                >
-                  <header className="entry-header ast-no-thumbnail ast-no-title ast-header-without-markup"></header>
+      <main>
+        <section className="hero">
+          <div className="hero-overlay"></div>
+          <div className="container hero-content">
+            <span className="eyebrow">Виртуалды музей</span>
+            <h1>Археология әлемі — museonet</h1>
+            <p>
+              Қазақстан археологиясының мұрасын бір кеңістікте жинақтаған цифрлық платформа. Экспедициялар,
+              коллекциялар және зерттеу материалдары кез келген уақытта қолжетімді.
+            </p>
+            <div className="hero-actions">
+              <button className="button button-primary">Зерттеу</button>
+              <button className="button button-outline">Көбірек білу</button>
+            </div>
+          </div>
+        </section>
 
-                  <div className="entry-content clear" itemProp="text">
-                    <div
-                      data-elementor-type="wp-page"
-                      data-elementor-id="442"
-                      className="elementor elementor-442"
-                      data-elementor-post-type="page"
+        <section className="catalog">
+          <div className="container catalog-grid">
+            <div className="catalog-info">
+              <h2>Музейлер тізімі</h2>
+              <p>
+                Қазақстан бойынша музейлерді тақырып, өңір және танымалдығы бойынша іздеңіз. Әр музей
+                карточкасында негізгі мәліметтер мен байланыс деректері көрсетіледі.
+              </p>
+              <div className="stats-row">
+                <span>285 музей</span>
+                <span>17 өңір</span>
+                <span>12 категория</span>
+              </div>
+            </div>
+            <div className="catalog-controls">
+              <div className="search-field">
+                <input
+                  type="search"
+                  placeholder="Музей атауын немесе қаланы іздеу..."
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+              </div>
+              <div className="filters">
+                <div className="chip-row">
+                  {['Барлығы', ...categoryFilters].map((item) => (
+                    <button
+                      key={item}
+                      className={`chip ${activeCategory === item ? 'is-active' : ''}`}
+                      type="button"
+                      onClick={() => setActiveCategory(item)}
                     >
-                      {/* Main Content Sections */}
-                      <div
-                        className="elementor-element elementor-element-9cd1ebf dark-section e-flex e-con-boxed e-con e-parent"
-                        data-id="9cd1ebf"
-                        data-element_type="container"
+                      {item}
+                    </button>
+                  ))}
+                </div>
+                <div className="filter-actions">
+                  <select value={sort} onChange={(event) => setSort(event.target.value)}>
+                    {sortOptions.map((option) => (
+                      <option key={option} value={option}>
+                        Сұрыптау: {option}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="view-toggle">
+                    {['grid', 'list'].map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        className={view === item ? 'is-active' : ''}
+                        onClick={() => setView(item as 'grid' | 'list')}
                       >
-                        <div className="e-con-inner">
-                          {/* Add your main content sections here */}
-                          <section id="museumkaz" className="section">
-                            <h2>Музеи Казахстана</h2>
-                            <p>Исследуйте богатую коллекцию музеев Казахстана</p>
-                          </section>
+                        {item === 'grid' ? 'Тор' : 'Тізім'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button className="mobile-filter-toggle" type="button" onClick={() => setMobileFiltersOpen(true)}>
+                Фильтрлерді ашу
+              </button>
+            </div>
+          </div>
 
-                          <section id="models3dkaz" className="section">
-                            <h2>3D модели</h2>
-                            <p>Интерактивные 3D модели экспонатов</p>
-                          </section>
-
-                          <section id="museumexhibitkaz" className="section">
-                            <h2>Государственный каталог</h2>
-                            <p>Каталог музейных экспонатов</p>
-                          </section>
-
-                          <section id="newskaz" className="section">
-                            <h2>Новости</h2>
-                            <p>Последние новости из мира культуры</p>
-                          </section>
-                        </div>
-                      </div>
+          {isLoading ? (
+            <div className="container skeleton-grid">
+              {[1, 2, 3].map((item) => (
+                <div className="skeleton-card" key={item}>
+                  <div className="skeleton-thumb"></div>
+                  <div className="skeleton-line"></div>
+                  <div className="skeleton-line short"></div>
+                  <div className="skeleton-line"></div>
+                </div>
+              ))}
+            </div>
+          ) : filteredMuseums.length === 0 ? (
+            <div className="container empty-state">
+              <h3>Нәтиже табылмады</h3>
+              <p>Іздеу шарттарын өзгертіп көріңіз немесе басқа категория таңдаңыз.</p>
+            </div>
+          ) : (
+            <div className={`container museum-grid ${view}`}>
+              {filteredMuseums.map((museum) => (
+                <article className="museum-card" key={museum.id}>
+                  <div className="card-thumb">
+                    <span className="category-chip">{museum.category}</span>
+                  </div>
+                  <div className="card-body">
+                    <h3>{museum.name}</h3>
+                    <p className="location">{museum.location}</p>
+                    <p className="description">{museum.description}</p>
+                    <div className="meta">
+                      <span>{museum.hours}</span>
+                      <span>⭐ {museum.rating.toFixed(1)}</span>
+                    </div>
+                    <div className="card-actions">
+                      <button className="button button-primary">Толық ақпарат</button>
+                      <button className="favorite" type="button" aria-label="Таңдаулыға қосу">
+                        ♡
+                      </button>
                     </div>
                   </div>
                 </article>
-              </main>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="design-system">
+          <div className="container">
+            <h2>Дизайн нұсқаулығы</h2>
+            <div className="design-grid">
+              <div className="design-card">
+                <h3>Типография</h3>
+                <ul>
+                  <li>H1 — 48px / 56px</li>
+                  <li>H2 — 32px / 40px</li>
+                  <li>H3 — 20px / 28px</li>
+                  <li>Body — 16px / 26px</li>
+                  <li>Caption — 13px / 20px</li>
+                </ul>
+              </div>
+              <div className="design-card">
+                <h3>Кеңістік</h3>
+                <ul>
+                  <li>8px модульдік тор</li>
+                  <li>Section padding: 96px (desktop) / 64px (mobile)</li>
+                  <li>Card gap: 24px</li>
+                  <li>Radius: 16–28px</li>
+                </ul>
+              </div>
+              <div className="design-card">
+                <h3>Түс палитрасы</h3>
+                <ul>
+                  <li>Негізгі фон: #F6F1E9</li>
+                  <li>Беткей: #FFFFFF</li>
+                  <li>Акцент: #B46A3C</li>
+                  <li>Мәтін: #2B2B2B</li>
+                  <li>Жиек: rgba(180, 106, 60, 0.2)</li>
+                </ul>
+              </div>
+              <div className="design-card">
+                <h3>Компоненттер</h3>
+                <ul>
+                  <li>CTA: толық және контурлы стиль</li>
+                  <li>Чиптер: rounded-pill, hover көлеңке</li>
+                  <li>Карточка: 16:9 бейне, lift hover</li>
+                  <li>Мобильді фильтр: төменгі sheet</li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <Footer />
-      </div>
+        {mobileFiltersOpen && (
+          <div className="mobile-sheet">
+            <button className="sheet-backdrop" type="button" onClick={() => setMobileFiltersOpen(false)} />
+            <div className="sheet-panel">
+              <div className="sheet-header">
+                <h3>Фильтрлер</h3>
+                <button type="button" onClick={() => setMobileFiltersOpen(false)}>
+                  Жабу
+                </button>
+              </div>
+              <div className="sheet-content">
+                <div className="chip-row">
+                  {['Барлығы', ...categoryFilters].map((item) => (
+                    <button
+                      key={item}
+                      className={`chip ${activeCategory === item ? 'is-active' : ''}`}
+                      type="button"
+                      onClick={() => setActiveCategory(item)}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+                <select value={sort} onChange={(event) => setSort(event.target.value)}>
+                  {sortOptions.map((option) => (
+                    <option key={option} value={option}>
+                      Сұрыптау: {option}
+                    </option>
+                  ))}
+                </select>
+                <div className="view-toggle">
+                  {['grid', 'list'].map((item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      className={view === item ? 'is-active' : ''}
+                      onClick={() => setView(item as 'grid' | 'list')}
+                    >
+                      {item === 'grid' ? 'Тор' : 'Тізім'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button className="button button-primary" onClick={() => setMobileFiltersOpen(false)}>
+                Қолдану
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
 
-      <style jsx global>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+      <Footer />
+
+      <style jsx>{`
+        :global(body) {
+          background: #f6f1e9;
+          color: #2b2b2b;
         }
 
-        body {
-          font-family: 'Nunito Sans', sans-serif;
-          line-height: 1.65;
-          color: #334155;
+        .hero {
+          position: relative;
+          padding: 120px 0;
+          background: linear-gradient(120deg, rgba(74, 48, 28, 0.92), rgba(41, 29, 18, 0.72)),
+            linear-gradient(135deg, #b88a5a 0%, #d8b38b 55%, #f4e7d7 100%);
+          color: #fff;
         }
 
-        .hfeed.site {
+        .hero-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, rgba(25, 20, 14, 0.78), rgba(25, 20, 14, 0.35));
+        }
+
+        .hero-content {
+          position: relative;
+          z-index: 1;
+          max-width: 640px;
+        }
+
+        .eyebrow {
+          text-transform: uppercase;
+          letter-spacing: 0.3em;
+          font-size: 12px;
+          opacity: 0.85;
+        }
+
+        h1 {
+          font-size: 48px;
+          line-height: 56px;
+          margin: 16px 0;
+        }
+
+        .hero p {
+          font-size: 18px;
+          line-height: 28px;
+          margin-bottom: 32px;
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        .hero-actions {
           display: flex;
-          flex-direction: column;
-          min-height: 100vh;
+          gap: 16px;
+          flex-wrap: wrap;
         }
 
-        #content.site-content {
-          flex: 1;
+        .button {
+          border-radius: 999px;
+          padding: 12px 24px;
+          font-size: 15px;
+          border: none;
+          cursor: pointer;
         }
 
-        .ast-container {
-          max-width: 1240px;
-          margin: 0 auto;
-          padding: 0 20px;
+        .button-primary {
+          background: #b46a3c;
+          color: #fff;
+          box-shadow: 0 10px 20px rgba(180, 106, 60, 0.3);
         }
 
-        .section {
-          padding: 3em 0;
-          margin-bottom: 2em;
+        .button-outline {
+          background: transparent;
+          border: 1px solid rgba(255, 255, 255, 0.7);
+          color: #fff;
         }
 
-        .section h2 {
-          font-size: 2.25rem;
-          font-weight: 600;
-          margin-bottom: 1em;
-          color: #1e293b;
+        .catalog {
+          padding: 96px 0;
         }
 
-        .section p {
-          font-size: 1rem;
-          line-height: 1.65;
+        .catalog-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 48px;
+          align-items: start;
         }
 
-        /* Header Styles */
-        header.elementor-602 {
-          background-color: #ffffff;
-          border-bottom: 1px solid #d1d5db;
-          padding: 1em 0;
+        .catalog-info h2 {
+          font-size: 32px;
+          line-height: 40px;
+          margin-bottom: 16px;
         }
 
-        /* Footer Styles */
-        footer.elementor-1081 {
-          background-color: #f0f5fa;
-          padding: 2em 0;
-          border-top: 1px solid #d1d5db;
+        .catalog-info p {
+          color: rgba(43, 43, 43, 0.7);
+          line-height: 26px;
         }
 
-        .footer-menu {
+        .stats-row {
           display: flex;
-          flex-direction: column;
-          gap: 0.5em;
+          gap: 16px;
+          margin-top: 24px;
+          font-size: 14px;
+          color: rgba(43, 43, 43, 0.6);
         }
 
-        .footer-menu a {
-          color: #334155;
-          text-decoration: none;
-          transition: color 0.2s;
+        .catalog-controls {
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 24px;
+          padding: 24px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
-        .footer-menu a:hover {
-          color: #046bd2;
+        .search-field input {
+          width: 100%;
+          min-height: 48px;
+          border-radius: 16px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          padding: 0 16px;
+          font-size: 15px;
+          background: linear-gradient(180deg, #fff, #fdf9f4);
         }
 
-        .adress {
+        .filters {
+          margin-top: 20px;
+          display: grid;
+          gap: 16px;
+        }
+
+        .chip-row {
           display: flex;
-          flex-direction: column;
-          gap: 0.5em;
+          gap: 8px;
+          flex-wrap: wrap;
         }
 
-        .adress-line {
+        .chip {
+          border-radius: 999px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          padding: 8px 14px;
+          background: #fff;
+          font-size: 13px;
+          cursor: pointer;
+          transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .chip.is-active {
+          background: rgba(180, 106, 60, 0.12);
+          border-color: rgba(180, 106, 60, 0.6);
+        }
+
+        .chip:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 14px rgba(180, 106, 60, 0.2);
+        }
+
+        .filter-actions {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .filter-actions select {
+          min-height: 40px;
+          border-radius: 999px;
+          border: 1px solid rgba(180, 106, 60, 0.25);
+          padding: 0 16px;
+          background: #fff;
+        }
+
+        .view-toggle {
+          display: flex;
+          gap: 8px;
+        }
+
+        .view-toggle button {
+          border-radius: 999px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          padding: 8px 14px;
+          background: #fff;
+        }
+
+        .view-toggle .is-active {
+          background: rgba(180, 106, 60, 0.15);
+          border-color: rgba(180, 106, 60, 0.6);
+        }
+
+        .mobile-filter-toggle {
+          display: none;
+          margin-top: 16px;
+          width: 100%;
+          border-radius: 999px;
+          border: 1px solid rgba(180, 106, 60, 0.3);
+          padding: 10px 16px;
+          background: #fff;
+        }
+
+        .museum-grid {
+          margin-top: 40px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 24px;
+        }
+
+        .museum-grid.list {
+          grid-template-columns: 1fr;
+        }
+
+        .museum-card {
+          background: #fff;
+          border-radius: 24px;
+          overflow: hidden;
+          border: 1px solid rgba(180, 106, 60, 0.15);
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .museum-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 32px rgba(64, 42, 18, 0.12);
+        }
+
+        .card-thumb {
+          position: relative;
+          aspect-ratio: 16 / 9;
+          background: linear-gradient(135deg, rgba(180, 106, 60, 0.2), rgba(255, 255, 255, 0.1));
+        }
+
+        .category-chip {
+          position: absolute;
+          top: 16px;
+          left: 16px;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 999px;
+          padding: 6px 12px;
+          font-size: 12px;
+        }
+
+        .card-body {
+          padding: 20px;
+          display: grid;
+          gap: 10px;
+        }
+
+        .location {
+          color: rgba(43, 43, 43, 0.6);
+          font-size: 14px;
+        }
+
+        .description {
+          color: rgba(43, 43, 43, 0.75);
+          font-size: 14px;
+          line-height: 22px;
+        }
+
+        .meta {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .card-actions {
           display: flex;
           align-items: center;
-          gap: 0.5em;
+          gap: 12px;
+          margin-top: 6px;
         }
 
-        .elementor-social-icons-wrapper {
-          display: flex;
-          gap: 1em;
-        }
-
-        .elementor-social-icon {
+        .favorite {
           width: 40px;
           height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #334155;
-          transition: color 0.2s;
+          border-radius: 50%;
+          border: 1px solid rgba(180, 106, 60, 0.25);
+          background: #fff;
+          font-size: 16px;
         }
 
-        .elementor-social-icon:hover {
-          color: #046bd2;
+        .skeleton-grid {
+          margin-top: 40px;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 24px;
         }
 
-        /* Burger Menu Styles */
-        .kz-burger-menu {
-          display: none;
-          flex-direction: column;
-          cursor: pointer;
-          gap: 4px;
-          z-index: 1001;
-          background: transparent;
-          border: none;
-          padding: 0;
+        .skeleton-card {
+          background: #fff;
+          border-radius: 24px;
+          padding: 20px;
+          display: grid;
+          gap: 12px;
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
-        .kz-burger-line {
-          width: 25px;
-          height: 3px;
-          background-color: #1e293b;
-          transition: all 0.3s;
+        .skeleton-thumb {
+          height: 160px;
+          border-radius: 16px;
+          background: linear-gradient(90deg, #f1e8dc, #f7f2ea, #f1e8dc);
+          background-size: 200% 100%;
+          animation: shimmer 1.2s infinite;
         }
 
-        .kz-burger-menu.active .kz-burger-line:nth-child(1) {
-          transform: rotate(45deg) translate(5px, 5px);
+        .skeleton-line {
+          height: 12px;
+          border-radius: 999px;
+          background: #f1e8dc;
         }
 
-        .kz-burger-menu.active .kz-burger-line:nth-child(2) {
-          opacity: 0;
+        .skeleton-line.short {
+          width: 70%;
         }
 
-        .kz-burger-menu.active .kz-burger-line:nth-child(3) {
-          transform: rotate(-45deg) translate(7px, -6px);
+        .empty-state {
+          margin-top: 40px;
+          padding: 32px;
+          border-radius: 24px;
+          background: #fff;
+          text-align: center;
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
-        .kz-fullscreen-menu {
-          display: none;
+        .design-system {
+          padding: 80px 0;
+        }
+
+        .design-system h2 {
+          font-size: 32px;
+          margin-bottom: 24px;
+        }
+
+        .design-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 24px;
+        }
+
+        .design-card {
+          background: #fff;
+          border-radius: 20px;
+          padding: 20px;
+          border: 1px solid rgba(180, 106, 60, 0.18);
+          box-shadow: 0 10px 20px rgba(64, 42, 18, 0.08);
+        }
+
+        .design-card ul {
+          margin: 12px 0 0;
+          padding-left: 18px;
+          color: rgba(43, 43, 43, 0.7);
+        }
+
+        .mobile-sheet {
           position: fixed;
-          top: 0;
-          left: 0;
+          inset: 0;
+          z-index: 200;
+          display: flex;
+          align-items: flex-end;
+        }
+
+        .sheet-backdrop {
+          position: absolute;
+          inset: 0;
+          background: rgba(17, 12, 6, 0.45);
+          border: none;
+        }
+
+        .sheet-panel {
+          position: relative;
+          background: #fff;
           width: 100%;
-          height: 100vh;
-          z-index: 1000;
-          background-color: rgba(0, 0, 0, 0.95);
+          border-radius: 24px 24px 0 0;
+          padding: 24px;
+          display: grid;
+          gap: 16px;
         }
 
-        .kz-fullscreen-menu.active {
+        .sheet-header {
           display: flex;
-        }
-
-        .kz-menu-left {
-          flex: 0 0 60%;
-          padding: 3em;
-          display: flex;
-          flex-direction: column;
           justify-content: space-between;
+          align-items: center;
         }
 
-        .kz-menu-nav {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5em;
+        .sheet-content {
+          display: grid;
+          gap: 16px;
         }
 
-        .kz-menu-link {
-          font-size: 2.5rem;
-          color: #ffffff;
-          text-decoration: none;
-          font-weight: 600;
-          transition: color 0.3s;
-          animation: slideIn 0.3s ease-out;
-          animation-delay: calc(var(--i) * 0.1s);
+        @keyframes shimmer {
+          0% {
+            background-position: 0% 50%;
+          }
+          100% {
+            background-position: 100% 50%;
+          }
         }
 
-        .kz-menu-link:hover {
-          color: #046bd2;
+        @media (max-width: 960px) {
+          .catalog-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .mobile-filter-toggle {
+            display: block;
+          }
+
+          .filters {
+            display: none;
+          }
         }
 
-        @keyframes slideIn {
-          from {
-          opacity: 0;
-          transform: translateX(-20px);
+        @media (max-width: 700px) {
+          .hero {
+            padding: 96px 0;
+          }
+
+          h1 {
+            font-size: 36px;
+            line-height: 44px;
+          }
         }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      .kz-menu-right {
-        flex: 0 0 40%;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-      }
-
-      .kz-menu-right-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
-
-      .kz-menu-right-content {
-        position: relative;
-        z-index: 1;
-        color: #ffffff;
-        padding: 3em;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .kz-menu-right-content h2 {
-        font-size: 2.5rem;
-        margin-bottom: 0.5em;
-      }
-
-      .kz-menu-close {
-        position: absolute;
-        top: 2em;
-        right: 2em;
-        width: 30px;
-        height: 30px;
-        cursor: pointer;
-        z-index: 1001;
-        background: transparent;
-        border: none;
-        padding: 0;
-      }
-
-      .kz-menu-close span {
-        display: block;
-        width: 100%;
-        height: 3px;
-        background-color: #ffffff;
-        position: absolute;
-        top: 50%;
-      }
-
-      .kz-menu-close span:first-child {
-        transform: rotate(45deg);
-      }
-
-      .kz-menu-close span:last-child {
-        transform: rotate(-45deg);
-      }
-
-      @media (max-width: 921px) {
-        .kz-burger-menu {
-          display: flex;
-        }
-
-        .kz-fullscreen-menu {
-          flex-direction: column;
-        }
-
-        .kz-menu-left {
-          flex: 1;
-          width: 100%;
-        }
-
-        .kz-menu-right {
-          display: none;
-        }
-      }
       `}</style>
-    </>
+    </div>
   );
 };
 
