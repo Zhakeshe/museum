@@ -81,6 +81,34 @@ const museums = [
   },
 ];
 
+const virtualTours = [
+  {
+    id: 1,
+    title: 'ҚР облыстық тарихи музейі — виртуалды тур',
+    url: 'https://qrgis.kz/tours/Virtualtour/',
+  },
+  {
+    id: 2,
+    title: 'Ақтау қаласының виртуалды туры',
+    url: 'https://qrgis.kz/tours/Virtual_Aqtau/',
+  },
+  {
+    id: 3,
+    title: 'Шаймардан мешіті — виртуалды тур',
+    url: 'https://torus360.kz/tours/shaimardan/',
+  },
+  {
+    id: 4,
+    title: 'Алматы қаласы — 360° тур',
+    url: 'https://torus.kz/almaty_tour/',
+  },
+  {
+    id: 5,
+    title: 'Ақтөбе музейі — 360° тур',
+    url: 'https://torus360.kz/tours/aqtobe-tour-new/index.html',
+  },
+];
+
 const HomePage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('Барлығы');
@@ -88,6 +116,7 @@ const HomePage: React.FC = () => {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [isLoading, setIsLoading] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [activeTour, setActiveTour] = useState(0);
 
   const filteredMuseums = useMemo(() => {
     const normalized = search.trim().toLowerCase();
@@ -118,6 +147,13 @@ const HomePage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [search, activeCategory, sort, view]);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveTour((prev) => (prev + 1) % virtualTours.length);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="page">
       <Head>
@@ -143,6 +179,51 @@ const HomePage: React.FC = () => {
             <div className="hero-actions">
               <button className="button button-primary">Зерттеу</button>
               <button className="button button-outline">Көбірек білу</button>
+            </div>
+          </div>
+        </section>
+
+        <section className="virtual-tours">
+          <div className="container">
+            <h2>Виртуалды турлар</h2>
+            <p className="subtitle">
+              5–9 секунд сайын келесі турға ауысып отырады. Қажетті турды басып, толық экранда ашуға
+              болады.
+            </p>
+            <div className="tour-slider">
+              {virtualTours.map((tour, index) => (
+                <div
+                  key={tour.id}
+                  className={`tour-slide ${index === activeTour ? 'is-active' : ''}`}
+                  aria-hidden={index !== activeTour}
+                >
+                  <div className="tour-frame">
+                    <iframe
+                      src={tour.url}
+                      title={tour.title}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </div>
+                  <div className="tour-meta">
+                    <h3>{tour.title}</h3>
+                    <a className="button button-primary" href={tour.url} target="_blank" rel="noreferrer">
+                      Турды ашу
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="tour-dots" role="tablist">
+              {virtualTours.map((tour, index) => (
+                <button
+                  key={tour.id}
+                  type="button"
+                  className={`dot ${index === activeTour ? 'is-active' : ''}`}
+                  onClick={() => setActiveTour(index)}
+                  aria-label={`${tour.title} турына ауысу`}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -448,6 +529,82 @@ const HomePage: React.FC = () => {
           display: flex;
           gap: 16px;
           flex-wrap: wrap;
+        }
+
+        .virtual-tours {
+          padding: 80px 0 40px;
+        }
+
+        .virtual-tours h2 {
+          font-size: 34px;
+          margin-bottom: 8px;
+          color: #7b2f2f;
+        }
+
+        .virtual-tours .subtitle {
+          color: rgba(43, 43, 43, 0.7);
+          margin-bottom: 24px;
+        }
+
+        .tour-slider {
+          position: relative;
+          background: #fff;
+          border-radius: 24px;
+          padding: 18px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 18px 32px rgba(64, 42, 18, 0.1);
+          overflow: hidden;
+        }
+
+        .tour-slide {
+          display: none;
+          align-items: center;
+          gap: 24px;
+        }
+
+        .tour-slide.is-active {
+          display: grid;
+          grid-template-columns: 1.3fr 1fr;
+          gap: 24px;
+        }
+
+        .tour-frame {
+          border-radius: 20px;
+          overflow: hidden;
+          border: 1px solid rgba(180, 106, 60, 0.15);
+          background: #f4efe7;
+          aspect-ratio: 16 / 9;
+        }
+
+        .tour-frame iframe {
+          width: 100%;
+          height: 100%;
+          border: none;
+        }
+
+        .tour-meta h3 {
+          margin-bottom: 16px;
+          font-size: 20px;
+        }
+
+        .tour-dots {
+          margin-top: 16px;
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(180, 106, 60, 0.3);
+          cursor: pointer;
+        }
+
+        .dot.is-active {
+          background: #b46a3c;
         }
 
         .button {
@@ -899,6 +1056,10 @@ const HomePage: React.FC = () => {
             grid-template-columns: 1fr;
           }
 
+          .tour-slide.is-active {
+            grid-template-columns: 1fr;
+          }
+
           .mobile-filter-toggle {
             display: block;
           }
@@ -911,6 +1072,10 @@ const HomePage: React.FC = () => {
         @media (max-width: 700px) {
           .hero {
             padding: 96px 0;
+          }
+
+          .tour-slider {
+            padding: 14px;
           }
 
           h1 {
