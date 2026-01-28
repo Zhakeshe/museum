@@ -11,7 +11,6 @@ const LoginPage: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
   const [status, setStatus] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const pageTitle =
     language === 'kk' ? 'Кіру — museonet' : language === 'ru' ? 'Вход — museonet' : 'Login — museonet';
@@ -50,33 +49,9 @@ const LoginPage: React.FC = () => {
         ? 'Произошла ошибка. Попробуйте еще раз.'
         : 'Something went wrong. Try again.';
 
-  const adminOtpLabel =
-    language === 'kk'
-      ? 'Google Authenticator коды'
-      : language === 'ru'
-        ? 'Код Google Authenticator'
-        : 'Google Authenticator code';
-  const adminOtpHint =
-    language === 'kk'
-      ? 'Админ аккаунты үшін 6 таңбалы код енгізіңіз.'
-      : language === 'ru'
-        ? 'Для админ аккаунта введите 6-значный код.'
-        : 'Enter the 6-digit code for admin accounts.';
-  const otpError =
-    language === 'kk'
-      ? 'OTP код 6 таңба болуы керек.'
-      : language === 'ru'
-        ? 'OTP код должен быть из 6 цифр.'
-        : 'OTP code must be 6 digits.';
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setStatus(null);
-    const isAdminLogin = mode === 'login' && email.toLowerCase().includes('@museonet.kz');
-    if (isAdminLogin && otp.trim().length !== 6) {
-      setStatus({ type: 'error', text: otpError });
-      return;
-    }
     if (mode === 'register') {
       try {
         const response = await fetch('/api/auth/register', {
@@ -92,12 +67,9 @@ const LoginPage: React.FC = () => {
         setStatus({ type: 'success', text: successMessage });
         setEmail('');
         setPassword('');
-        setOtp('');
         if (typeof window !== 'undefined') {
           window.localStorage.setItem('museonetUserName', email.split('@')[0] || 'Museonet');
           window.localStorage.setItem('museonetUserEmail', email);
-          window.localStorage.setItem('museonetUserRole', 'user');
-          window.localStorage.setItem('museonetAdminOtp', '');
         }
         router.push('/profile');
       } catch {
@@ -110,12 +82,9 @@ const LoginPage: React.FC = () => {
       const derivedName = email.split('@')[0] || 'Museonet';
       setStatus({ type: 'success', text: successMessage });
       setPassword('');
-      setOtp('');
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('museonetUserName', derivedName);
         window.localStorage.setItem('museonetUserEmail', email);
-        window.localStorage.setItem('museonetUserRole', isAdminLogin ? 'admin' : 'user');
-        window.localStorage.setItem('museonetAdminOtp', isAdminLogin ? otp.trim() : '');
       }
       router.push('/profile');
     }
@@ -193,22 +162,6 @@ const LoginPage: React.FC = () => {
                     required
                   />
                 </label>
-                {mode === 'login' && email.toLowerCase().includes('@museonet.kz') && (
-                  <label>
-                    {adminOtpLabel}
-                    <input
-                      className="input"
-                      type="text"
-                      placeholder="123456"
-                      value={otp}
-                      onChange={(event) => setOtp(event.target.value)}
-                      maxLength={6}
-                      inputMode="numeric"
-                      required
-                    />
-                    <span className="hint">{adminOtpHint}</span>
-                  </label>
-                )}
                 {status && <div className={`status ${status.type}`}>{status.text}</div>}
                 <button className="button button-primary" type="submit">
                   {heading}
@@ -304,10 +257,6 @@ const LoginPage: React.FC = () => {
           color: rgba(43, 43, 43, 0.7);
         }
 
-        .hint {
-          font-size: 12px;
-          color: rgba(43, 43, 43, 0.6);
-        }
 
         .login-links {
           display: flex;

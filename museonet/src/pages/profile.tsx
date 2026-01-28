@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -11,16 +10,13 @@ const ProfilePage: React.FC = () => {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState('user');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const storedName = window.localStorage.getItem('museonetUserName') ?? '';
     const storedEmail = window.localStorage.getItem('museonetUserEmail') ?? '';
-    const storedRole = window.localStorage.getItem('museonetUserRole') ?? 'user';
     setName(storedName);
     setEmail(storedEmail);
-    setRole(storedRole);
   }, []);
 
   const greeting = useMemo(() => {
@@ -58,8 +54,8 @@ const ProfilePage: React.FC = () => {
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem('museonetUserName');
       window.localStorage.removeItem('museonetUserEmail');
-      window.localStorage.removeItem('museonetUserRole');
-      window.localStorage.removeItem('museonetAdminOtp');
+      window.localStorage.removeItem('museonetAdminSecret');
+      window.localStorage.removeItem('museonetAdminVerified');
     }
     router.push('/');
   };
@@ -94,15 +90,8 @@ const ProfilePage: React.FC = () => {
                   <span>Email</span>
                   <strong>{email || '—'}</strong>
                 </div>
-                <div>
-                  <span>{language === 'kk' ? 'Рөл' : language === 'ru' ? 'Роль' : 'Role'}</span>
-                  <strong>{role}</strong>
-                </div>
               </div>
               <div className="profile-actions">
-                <Link href="/admin" className="button button-secondary">
-                  {language === 'kk' ? 'Админ панель' : language === 'ru' ? 'Админ панель' : 'Admin panel'}
-                </Link>
                 <button type="button" className="button button-outline" onClick={handleLogout}>
                   {language === 'kk' ? 'Шығу' : language === 'ru' ? 'Выйти' : 'Log out'}
                 </button>
