@@ -375,6 +375,24 @@ const GamesPage: React.FC = () => {
                   <h3>{activeGame.title} — симулятор</h3>
                   <p className="status">Статус: {simulationStatus}</p>
                   <p className="scenario">{activeGame.scenario}</p>
+                  <div className="scene-panel">
+                    <div className="scene-heading">
+                      <strong>{language === 'kk' ? '3D зертхана' : language === 'ru' ? '3D лаборатория' : '3D lab'}</strong>
+                      <span>{language === 'kk' ? 'Артефакт визуализациясы' : language === 'ru' ? 'Визуализация артефакта' : 'Artifact visualization'}</span>
+                    </div>
+                    <div className="scene">
+                      <div className="platform" />
+                      <div className="cube">
+                        <span className="face front">Au</span>
+                        <span className="face back">Cl</span>
+                        <span className="face right">Fe</span>
+                        <span className="face left">Cu</span>
+                        <span className="face top">Si</span>
+                        <span className="face bottom">O2</span>
+                      </div>
+                      <div className="scan-lines" />
+                    </div>
+                  </div>
                   <div className="task-list">
                     <strong>{language === 'kk' ? 'Тапсырмалар' : language === 'ru' ? 'Задачи' : 'Tasks'}</strong>
                     <ul>
@@ -535,6 +553,103 @@ const GamesPage: React.FC = () => {
           color: rgba(43, 43, 43, 0.7);
         }
 
+        .scene-panel {
+          margin-top: 18px;
+          padding: 16px;
+          border-radius: 18px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(247, 239, 229, 0.9));
+        }
+
+        .scene-heading {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 12px;
+          color: #7b4c2a;
+          font-size: 13px;
+        }
+
+        .scene {
+          position: relative;
+          height: 180px;
+          border-radius: 16px;
+          background: radial-gradient(circle at top, rgba(255, 255, 255, 0.9), rgba(226, 214, 197, 0.8));
+          display: grid;
+          place-items: center;
+          perspective: 800px;
+          overflow: hidden;
+        }
+
+        .platform {
+          position: absolute;
+          width: 140px;
+          height: 40px;
+          background: rgba(71, 43, 21, 0.2);
+          border-radius: 50%;
+          transform: translateY(60px);
+          filter: blur(2px);
+        }
+
+        .cube {
+          position: relative;
+          width: 90px;
+          height: 90px;
+          transform-style: preserve-3d;
+          animation: spin 8s linear infinite;
+        }
+
+        .face {
+          position: absolute;
+          width: 90px;
+          height: 90px;
+          display: grid;
+          place-items: center;
+          background: rgba(150, 90, 50, 0.85);
+          color: #fff;
+          font-weight: 600;
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          border-radius: 12px;
+        }
+
+        .front {
+          transform: translateZ(45px);
+        }
+
+        .back {
+          transform: rotateY(180deg) translateZ(45px);
+        }
+
+        .right {
+          transform: rotateY(90deg) translateZ(45px);
+        }
+
+        .left {
+          transform: rotateY(-90deg) translateZ(45px);
+        }
+
+        .top {
+          transform: rotateX(90deg) translateZ(45px);
+        }
+
+        .bottom {
+          transform: rotateX(-90deg) translateZ(45px);
+        }
+
+        .scan-lines {
+          position: absolute;
+          inset: 0;
+          background: repeating-linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.15),
+            rgba(255, 255, 255, 0.15) 2px,
+            transparent 2px,
+            transparent 6px
+          );
+          mix-blend-mode: soft-light;
+          opacity: 0.6;
+        }
+
         .task-list {
           margin-top: 16px;
         }
@@ -618,6 +733,15 @@ const GamesPage: React.FC = () => {
           display: grid;
           gap: 6px;
           color: rgba(43, 43, 43, 0.75);
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotateX(0deg) rotateY(0deg);
+          }
+          100% {
+            transform: rotateX(360deg) rotateY(360deg);
+          }
         }
 
         @media (max-width: 900px) {
