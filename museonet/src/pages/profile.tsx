@@ -10,13 +10,16 @@ const ProfilePage: React.FC = () => {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [points, setPoints] = useState(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const storedName = window.localStorage.getItem('museonetUserName') ?? '';
     const storedEmail = window.localStorage.getItem('museonetUserEmail') ?? '';
+    const storedPoints = Number(window.localStorage.getItem('museonetUserPoints') ?? 0);
     setName(storedName);
     setEmail(storedEmail);
+    setPoints(Number.isNaN(storedPoints) ? 0 : storedPoints);
   }, []);
 
   const greeting = useMemo(() => {
@@ -90,11 +93,66 @@ const ProfilePage: React.FC = () => {
                   <span>Email</span>
                   <strong>{email || '—'}</strong>
                 </div>
+                <div>
+                  <span>{language === 'kk' ? 'Жалпы ұпай' : language === 'ru' ? 'Всего очков' : 'Total points'}</span>
+                  <strong>{points}</strong>
+                </div>
               </div>
               <div className="profile-actions">
                 <button type="button" className="button button-outline" onClick={handleLogout}>
                   {language === 'kk' ? 'Шығу' : language === 'ru' ? 'Выйти' : 'Log out'}
                 </button>
+              </div>
+            </div>
+            <div className="profile-panels">
+              <div className="panel card">
+                <h2>{language === 'kk' ? 'Жетістіктер' : language === 'ru' ? 'Достижения' : 'Achievements'}</h2>
+                <ul>
+                  <li>{language === 'kk' ? 'Археолог (5 миссия)' : language === 'ru' ? 'Археолог (5 миссий)' : 'Archaeologist (5 missions)'}</li>
+                  <li>{language === 'kk' ? 'Пазл шебері' : language === 'ru' ? 'Мастер пазлов' : 'Puzzle master'}</li>
+                  <li>{language === 'kk' ? 'Зертхана аналитигі' : language === 'ru' ? 'Лабораторный аналитик' : 'Lab analyst'}</li>
+                </ul>
+              </div>
+              <div className="panel card">
+                <h2>{language === 'kk' ? 'Ойын белсенділігі' : language === 'ru' ? 'Активность' : 'Activity'}</h2>
+                <div className="activity-list">
+                  <div>
+                    <span>{language === 'kk' ? 'Бүгін' : language === 'ru' ? 'Сегодня' : 'Today'}</span>
+                    <strong>{language === 'kk' ? 'Пазл симуляторы' : language === 'ru' ? 'Пазл симулятор' : 'Puzzle simulator'}</strong>
+                    <em>+20</em>
+                  </div>
+                  <div>
+                    <span>{language === 'kk' ? 'Кеше' : language === 'ru' ? 'Вчера' : 'Yesterday'}</span>
+                    <strong>{language === 'kk' ? 'Қыш сынықтары' : language === 'ru' ? 'Осколки керамики' : 'Ceramic shards'}</strong>
+                    <em>+18</em>
+                  </div>
+                  <div>
+                    <span>{language === 'kk' ? 'Апта' : language === 'ru' ? 'Неделя' : 'Week'}</span>
+                    <strong>{language === 'kk' ? 'Талдау станциясы' : language === 'ru' ? 'Станция анализа' : 'Analysis station'}</strong>
+                    <em>+25</em>
+                  </div>
+                </div>
+              </div>
+              <div className="panel card">
+                <h2>{language === 'kk' ? 'Статистика' : language === 'ru' ? 'Статистика' : 'Stats'}</h2>
+                <div className="stats-grid">
+                  <div>
+                    <span>{language === 'kk' ? 'Сессиялар' : language === 'ru' ? 'Сессии' : 'Sessions'}</span>
+                    <strong>12</strong>
+                  </div>
+                  <div>
+                    <span>{language === 'kk' ? 'Уақыт' : language === 'ru' ? 'Время' : 'Time'}</span>
+                    <strong>4ч 20м</strong>
+                  </div>
+                  <div>
+                    <span>{language === 'kk' ? 'Деңгей' : language === 'ru' ? 'Уровень' : 'Level'}</span>
+                    <strong>5</strong>
+                  </div>
+                  <div>
+                    <span>{language === 'kk' ? 'Рейтинг' : language === 'ru' ? 'Рейтинг' : 'Rank'}</span>
+                    <strong>#28</strong>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -146,6 +204,76 @@ const ProfilePage: React.FC = () => {
           display: flex;
           gap: 12px;
           flex-wrap: wrap;
+        }
+
+        .profile-panels {
+          margin-top: 28px;
+          display: grid;
+          gap: 20px;
+        }
+
+        .panel h2 {
+          font-size: 20px;
+          margin-bottom: 12px;
+        }
+
+        .panel ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: grid;
+          gap: 8px;
+          color: rgba(43, 43, 43, 0.75);
+        }
+
+        .panel ul li {
+          padding: 10px 14px;
+          border-radius: 12px;
+          background: rgba(180, 106, 60, 0.08);
+        }
+
+        .activity-list {
+          display: grid;
+          gap: 12px;
+        }
+
+        .activity-list div {
+          display: grid;
+          gap: 4px;
+          padding: 12px 14px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.7);
+          border: 1px solid rgba(180, 106, 60, 0.12);
+        }
+
+        .activity-list span {
+          font-size: 12px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .activity-list em {
+          font-style: normal;
+          color: #7b4c2a;
+          font-weight: 600;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 12px;
+        }
+
+        .stats-grid div {
+          padding: 12px 14px;
+          border-radius: 12px;
+          background: rgba(180, 106, 60, 0.08);
+        }
+
+        .stats-grid span {
+          display: block;
+          font-size: 12px;
+          color: rgba(43, 43, 43, 0.6);
+          margin-bottom: 6px;
         }
 
         .button {
