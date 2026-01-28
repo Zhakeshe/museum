@@ -3,9 +3,6 @@ import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-const categoryFilters = ['Үй-музей', 'Археология', 'Өнер', 'Қорық-музей'];
-const sortOptions = ['Танымал', 'Жаңа', 'A–Я'];
-
 const museums = [
   {
     id: 1,
@@ -110,42 +107,8 @@ const virtualTours = [
 ];
 
 const HomePage: React.FC = () => {
-  const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Барлығы');
-  const [sort, setSort] = useState('Танымал');
-  const [view, setView] = useState<'grid' | 'list'>('grid');
-  const [isLoading, setIsLoading] = useState(false);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [activeTour, setActiveTour] = useState(0);
-
-  const filteredMuseums = useMemo(() => {
-    const normalized = search.trim().toLowerCase();
-    let items = museums.filter((museum) => {
-      const matchesSearch =
-        museum.name.toLowerCase().includes(normalized) ||
-        museum.location.toLowerCase().includes(normalized);
-      const matchesCategory = activeCategory === 'Барлығы' || museum.category === activeCategory;
-      return matchesSearch && matchesCategory;
-    });
-
-    if (sort === 'Жаңа') {
-      items = [...items].reverse();
-    }
-    if (sort === 'A–Я') {
-      items = [...items].sort((a, b) => a.name.localeCompare(b.name));
-    }
-    if (sort === 'Танымал') {
-      items = [...items].sort((a, b) => b.rating - a.rating);
-    }
-
-    return items;
-  }, [search, activeCategory, sort]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, [search, activeCategory, sort, view]);
+  const featuredMuseums = useMemo(() => museums.slice(0, 5), []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -183,14 +146,45 @@ const HomePage: React.FC = () => {
           </div>
         </section>
 
+        <section className="featured-museums">
+          <div className="container">
+            <div className="section-heading">
+              <h2>Музейлер тізімі</h2>
+              <p>Ең танымал 5 музей.</p>
+            </div>
+            <div className="museum-grid">
+              {featuredMuseums.map((museum) => (
+                <article className="museum-card" key={museum.id}>
+                  <div className="card-thumb">
+                    <span className="category-chip">{museum.category}</span>
+                  </div>
+                  <div className="card-body">
+                    <h3>{museum.name}</h3>
+                    <p className="location">{museum.location}</p>
+                    <p className="description">{museum.description}</p>
+                    <div className="meta">
+                      <span>{museum.hours}</span>
+                      <span>⭐ {museum.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="virtual-tours">
           <div className="container">
             <h2>Виртуалды турлар</h2>
-            <p className="subtitle">
-              5–9 секунд сайын келесі турға ауысып отырады. Қажетті турды басып, толық экранда ашуға
-              болады.
-            </p>
+            <p className="subtitle">Келесі турға қолмен ауыстыра аласыз.</p>
             <div className="tour-slider">
+              <button
+                className="slider-nav prev"
+                type="button"
+                onClick={() => setActiveTour((prev) => (prev - 1 + virtualTours.length) % virtualTours.length)}
+              >
+                ‹
+              </button>
               {virtualTours.map((tour, index) => (
                 <div
                   key={tour.id}
@@ -213,268 +207,78 @@ const HomePage: React.FC = () => {
                   </div>
                 </div>
               ))}
+              <button
+                className="slider-nav next"
+                type="button"
+                onClick={() => setActiveTour((prev) => (prev + 1) % virtualTours.length)}
+              >
+                ›
+              </button>
             </div>
-            <div className="tour-dots" role="tablist">
-              {virtualTours.map((tour, index) => (
-                <button
-                  key={tour.id}
-                  type="button"
-                  className={`dot ${index === activeTour ? 'is-active' : ''}`}
-                  onClick={() => setActiveTour(index)}
-                  aria-label={`${tour.title} турына ауысу`}
-                />
+          </div>
+        </section>
+
+        <section className="model-showcase">
+          <div className="container">
+            <div className="model-grid">
+              <div className="model-info">
+                <h2>3D моделдер</h2>
+                <p className="model-title">Подвеска, бронза. XIX ғ.</p>
+              </div>
+              <div className="model-image">
+                <div className="model-placeholder">3D</div>
+              </div>
+              <div className="model-meta">
+                <p>Сақталатын орын:</p>
+                <strong>Шым қала тарихи-мәдени кешені</strong>
+              </div>
+            </div>
+            <div className="model-thumbs">
+              {['1', '2', '3', '4', '5', '6'].map((item) => (
+                <div className="thumb" key={item}>
+                  {item}
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="catalog">
-          <div className="container catalog-grid">
-            <div className="catalog-info">
-              <h2>Музейлер тізімі</h2>
-              <p>
-                Қазақстан бойынша музейлерді тақырып, өңір және танымалдығы бойынша іздеңіз. Әр музей
-                карточкасында негізгі мәліметтер мен байланыс деректері көрсетіледі.
-              </p>
-              <div className="stats-row">
-                <span>285 музей</span>
-                <span>17 өңір</span>
-                <span>12 категория</span>
+        <section className="artifact-section">
+          <div className="container">
+            <div className="artifact-header">
+              <h2>Музейные предметы</h2>
+              <div className="artifact-nav">
+                <button type="button">‹</button>
+                <button type="button">›</button>
               </div>
             </div>
-            <div className="catalog-controls">
-              <div className="search-field">
-                <input
-                  type="search"
-                  placeholder="Музей атауын немесе қаланы іздеу..."
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-              </div>
-              <div className="filters">
-                <div className="chip-row">
-                  {['Барлығы', ...categoryFilters].map((item) => (
-                    <button
-                      key={item}
-                      className={`chip ${activeCategory === item ? 'is-active' : ''}`}
-                      type="button"
-                      onClick={() => setActiveCategory(item)}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-                <div className="filter-actions">
-                  <select value={sort} onChange={(event) => setSort(event.target.value)}>
-                    {sortOptions.map((option) => (
-                      <option key={option} value={option}>
-                        Сұрыптау: {option}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="view-toggle">
-                    {['grid', 'list'].map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        className={view === item ? 'is-active' : ''}
-                        onClick={() => setView(item as 'grid' | 'list')}
-                      >
-                        {item === 'grid' ? 'Тор' : 'Тізім'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <button className="mobile-filter-toggle" type="button" onClick={() => setMobileFiltersOpen(true)}>
-                Фильтрлерді ашу
-              </button>
-            </div>
-          </div>
-
-          {isLoading ? (
-            <div className="container skeleton-grid">
-              {[1, 2, 3].map((item) => (
-                <div className="skeleton-card" key={item}>
-                  <div className="skeleton-thumb"></div>
-                  <div className="skeleton-line"></div>
-                  <div className="skeleton-line short"></div>
-                  <div className="skeleton-line"></div>
-                </div>
-              ))}
-            </div>
-          ) : filteredMuseums.length === 0 ? (
-            <div className="container empty-state">
-              <h3>Нәтиже табылмады</h3>
-              <p>Іздеу шарттарын өзгертіп көріңіз немесе басқа категория таңдаңыз.</p>
-            </div>
-          ) : (
-            <div className={`container museum-grid ${view}`}>
-              {filteredMuseums.map((museum) => (
-                <article className="museum-card" key={museum.id}>
-                  <div className="card-thumb">
-                    <span className="category-chip">{museum.category}</span>
-                  </div>
-                  <div className="card-body">
-                    <h3>{museum.name}</h3>
-                    <p className="location">{museum.location}</p>
-                    <p className="description">{museum.description}</p>
-                    <div className="meta">
-                      <span>{museum.hours}</span>
-                      <span>⭐ {museum.rating.toFixed(1)}</span>
-                    </div>
-                    <div className="card-actions">
-                      <button className="button button-primary">Толық ақпарат</button>
-                      <button className="favorite" type="button" aria-label="Таңдаулыға қосу">
-                        ♡
-                      </button>
-                    </div>
-                  </div>
+            <div className="artifact-grid">
+              {['Молитвенный коврик', 'Молитвенный коврик', 'Медаль', 'Пиджак'].map((title, index) => (
+                <article className="artifact-card" key={`${title}-${index}`}>
+                  <div className="artifact-image"></div>
+                  <h3>{title}</h3>
+                  <p>Ұлттық музей коллекциясы</p>
                 </article>
               ))}
             </div>
-          )}
-        </section>
-
-        <section className="digital-experience">
-          <div className="container">
-            <div className="digital-header">
-              <h2>Цифрлық мұра кеңістігі</h2>
-              <p>
-                3D модельдер, музейные предметы және виртуалные туры — бәрі бір платформада. Контент
-                архивтері мен экспедициялық материалдар цифрландырылып, зерттеуге дайын тұрады.
-              </p>
-            </div>
-            <div className="digital-grid">
-              <article className="digital-card">
-                <h3>3D моделдер</h3>
-                <p>Артефактілердің 360° модельдері, масштабтауға және зерттеуге ыңғайлы формат.</p>
-              </article>
-              <article className="digital-card">
-                <h3>Музейные предметы</h3>
-                <p>Қордағы негізгі экспонаттар мен тарихи жәдігерлердің цифрлық паспорттары.</p>
-              </article>
-              <article className="digital-card">
-                <h3>Виртуалные туры</h3>
-                <p>Иммерсивті турлар арқылы музей залдарын онлайн аралап шығыңыз.</p>
-              </article>
-            </div>
-            <div className="digital-stats">
-              <div className="stat-card">
-                <span className="stat-value">285</span>
-                <span className="stat-label">Музейных экспонатов</span>
-              </div>
-              <div className="stat-card">
-                <span className="stat-value">66,000</span>
-                <span className="stat-label">3D моделей</span>
-              </div>
-              <div className="stat-card">
-                <span className="stat-value">750</span>
-                <span className="stat-label">Виртуальных туров</span>
-              </div>
-              <div className="stat-card">
-                <span className="stat-value">15</span>
-                <span className="stat-label">Экспедиций</span>
-              </div>
-            </div>
           </div>
         </section>
 
-        <section className="design-system">
-          <div className="container">
-            <h2>Дизайн нұсқаулығы</h2>
-            <div className="design-grid">
-              <div className="design-card">
-                <h3>Типография</h3>
-                <ul>
-                  <li>H1 — 48px / 56px</li>
-                  <li>H2 — 32px / 40px</li>
-                  <li>H3 — 20px / 28px</li>
-                  <li>Body — 16px / 26px</li>
-                  <li>Caption — 13px / 20px</li>
-                </ul>
+        <section className="stats-strip">
+          <div className="container stats-grid">
+            {[
+              { value: '285', label: 'Музейных экспонатов' },
+              { value: '66,000', label: '3D моделей' },
+              { value: '750', label: 'Виртуальных туров' },
+              { value: '15', label: 'Экспедиций' },
+            ].map((stat) => (
+              <div className="stat-card" key={stat.label}>
+                <span className="stat-value">{stat.value}</span>
+                <span className="stat-label">{stat.label}</span>
               </div>
-              <div className="design-card">
-                <h3>Кеңістік</h3>
-                <ul>
-                  <li>8px модульдік тор</li>
-                  <li>Section padding: 96px (desktop) / 64px (mobile)</li>
-                  <li>Card gap: 24px</li>
-                  <li>Radius: 16–28px</li>
-                </ul>
-              </div>
-              <div className="design-card">
-                <h3>Түс палитрасы</h3>
-                <ul>
-                  <li>Негізгі фон: #F6F1E9</li>
-                  <li>Беткей: #FFFFFF</li>
-                  <li>Акцент: #B46A3C</li>
-                  <li>Мәтін: #2B2B2B</li>
-                  <li>Жиек: rgba(180, 106, 60, 0.2)</li>
-                </ul>
-              </div>
-              <div className="design-card">
-                <h3>Компоненттер</h3>
-                <ul>
-                  <li>CTA: толық және контурлы стиль</li>
-                  <li>Чиптер: rounded-pill, hover көлеңке</li>
-                  <li>Карточка: 16:9 бейне, lift hover</li>
-                  <li>Мобильді фильтр: төменгі sheet</li>
-                </ul>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
-
-        {mobileFiltersOpen && (
-          <div className="mobile-sheet">
-            <button className="sheet-backdrop" type="button" onClick={() => setMobileFiltersOpen(false)} />
-            <div className="sheet-panel">
-              <div className="sheet-header">
-                <h3>Фильтрлер</h3>
-                <button type="button" onClick={() => setMobileFiltersOpen(false)}>
-                  Жабу
-                </button>
-              </div>
-              <div className="sheet-content">
-                <div className="chip-row">
-                  {['Барлығы', ...categoryFilters].map((item) => (
-                    <button
-                      key={item}
-                      className={`chip ${activeCategory === item ? 'is-active' : ''}`}
-                      type="button"
-                      onClick={() => setActiveCategory(item)}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-                <select value={sort} onChange={(event) => setSort(event.target.value)}>
-                  {sortOptions.map((option) => (
-                    <option key={option} value={option}>
-                      Сұрыптау: {option}
-                    </option>
-                  ))}
-                </select>
-                <div className="view-toggle">
-                  {['grid', 'list'].map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      className={view === item ? 'is-active' : ''}
-                      onClick={() => setView(item as 'grid' | 'list')}
-                    >
-                      {item === 'grid' ? 'Тор' : 'Тізім'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <button className="button button-primary" onClick={() => setMobileFiltersOpen(false)}>
-                Қолдану
-              </button>
-            </div>
-          </div>
-        )}
       </main>
 
       <Footer />
@@ -531,8 +335,22 @@ const HomePage: React.FC = () => {
           flex-wrap: wrap;
         }
 
+        .featured-museums {
+          padding: 64px 0 20px;
+        }
+
+        .section-heading h2 {
+          font-size: 32px;
+          margin-bottom: 8px;
+        }
+
+        .section-heading p {
+          color: rgba(43, 43, 43, 0.7);
+          margin-bottom: 24px;
+        }
+
         .virtual-tours {
-          padding: 80px 0 40px;
+          padding: 40px 0 64px;
         }
 
         .virtual-tours h2 {
@@ -554,6 +372,29 @@ const HomePage: React.FC = () => {
           border: 1px solid rgba(180, 106, 60, 0.2);
           box-shadow: 0 18px 32px rgba(64, 42, 18, 0.1);
           overflow: hidden;
+        }
+
+        .slider-nav {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid rgba(180, 106, 60, 0.3);
+          background: #fff;
+          color: #7b4c2a;
+          font-size: 24px;
+          cursor: pointer;
+          z-index: 2;
+        }
+
+        .slider-nav.prev {
+          left: 12px;
+        }
+
+        .slider-nav.next {
+          right: 12px;
         }
 
         .tour-slide {
@@ -592,6 +433,139 @@ const HomePage: React.FC = () => {
           display: flex;
           justify-content: center;
           gap: 8px;
+        }
+
+        .model-showcase {
+          padding: 60px 0;
+          background: #fff;
+        }
+
+        .model-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.2fr 1fr;
+          align-items: center;
+          gap: 24px;
+        }
+
+        .model-info h2 {
+          font-size: 32px;
+          color: #7b2f2f;
+          margin-bottom: 16px;
+        }
+
+        .model-title {
+          font-size: 20px;
+          color: rgba(43, 43, 43, 0.7);
+        }
+
+        .model-image {
+          display: flex;
+          justify-content: center;
+        }
+
+        .model-placeholder {
+          width: 320px;
+          height: 220px;
+          border-radius: 24px;
+          background: #f2ebe1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 36px;
+          color: rgba(180, 106, 60, 0.6);
+        }
+
+        .model-meta {
+          color: rgba(43, 43, 43, 0.7);
+        }
+
+        .model-thumbs {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 24px;
+          flex-wrap: wrap;
+        }
+
+        .thumb {
+          width: 54px;
+          height: 54px;
+          border-radius: 12px;
+          background: #f7f2ea;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .artifact-section {
+          padding: 64px 0;
+        }
+
+        .artifact-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+
+        .artifact-header h2 {
+          font-size: 32px;
+          color: #7b2f2f;
+        }
+
+        .artifact-nav button {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: 1px solid rgba(180, 106, 60, 0.3);
+          background: transparent;
+          color: #7b2f2f;
+          font-size: 20px;
+          margin-left: 8px;
+        }
+
+        .artifact-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 24px;
+        }
+
+        .artifact-card {
+          background: #fff;
+          border-radius: 24px;
+          padding: 18px;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          display: grid;
+          gap: 10px;
+        }
+
+        .artifact-image {
+          height: 220px;
+          border-radius: 20px;
+          background: #f3ece3;
+        }
+
+        .artifact-card h3 {
+          font-size: 18px;
+          color: #8b6a4b;
+        }
+
+        .artifact-card p {
+          color: rgba(43, 43, 43, 0.6);
+          font-size: 14px;
+        }
+
+        .stats-strip {
+          padding: 40px 0 80px;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
         }
 
         .dot {
@@ -1060,6 +1034,11 @@ const HomePage: React.FC = () => {
             grid-template-columns: 1fr;
           }
 
+          .model-grid {
+            grid-template-columns: 1fr;
+            text-align: center;
+          }
+
           .mobile-filter-toggle {
             display: block;
           }
@@ -1083,8 +1062,9 @@ const HomePage: React.FC = () => {
             line-height: 44px;
           }
 
-          .digital-experience {
-            padding: 64px 0;
+          .model-placeholder {
+            width: 240px;
+            height: 180px;
           }
         }
       `}</style>
