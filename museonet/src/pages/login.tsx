@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -10,7 +11,9 @@ const LoginPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [status, setStatus] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [hydrated, setHydrated] = useState(false);
   const pageTitle =
     language === 'kk' ? 'Кіру — museonet' : language === 'ru' ? 'Вход — museonet' : 'Login — museonet';
   const heading =
@@ -49,9 +52,37 @@ const LoginPage: React.FC = () => {
         ? 'Произошла ошибка. Попробуйте еще раз.'
         : 'Something went wrong. Try again.';
 
+  const adminOtpLabel =
+    language === 'kk'
+      ? 'Google Authenticator коды'
+      : language === 'ru'
+        ? 'Код Google Authenticator'
+        : 'Google Authenticator code';
+  const adminOtpHint =
+    language === 'kk'
+      ? 'Админ аккаунты үшін 6 таңбалы код енгізіңіз.'
+      : language === 'ru'
+        ? 'Для админ аккаунта введите 6-значный код.'
+        : 'Enter the 6-digit code for admin accounts.';
+  const otpError =
+    language === 'kk'
+      ? 'OTP код 6 таңба болуы керек.'
+      : language === 'ru'
+        ? 'OTP код должен быть из 6 цифр.'
+        : 'OTP code must be 6 digits.';
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setStatus(null);
+    const isAdminLogin = mode === 'login' && email.toLowerCase().includes('@museonet.kz');
+    if (isAdminLogin && otp.trim().length !== 6) {
+      setStatus({ type: 'error', text: otpError });
+      return;
+    }
     if (mode === 'register') {
       try {
         const response = await fetch('/api/auth/register', {
@@ -68,8 +99,25 @@ const LoginPage: React.FC = () => {
         setName('');
         setEmail('');
         setPassword('');
+        setOtp('');
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem('museonetUserName', name);
+          window.localStorage.setItem('museonetUserEmail', email);
+        }
       } catch {
         setStatus({ type: 'error', text: errorMessage });
+      }
+      return;
+    }
+
+    if (mode === 'login') {
+      const derivedName = name || email.split('@')[0] || 'Museonet';
+      setStatus({ type: 'success', text: successMessage });
+      setPassword('');
+      setOtp('');
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('museonetUserName', derivedName);
+        window.localStorage.setItem('museonetUserEmail', email);
       }
     }
   };
@@ -124,6 +172,18 @@ const LoginPage: React.FC = () => {
                 </button>
               </div>
               <form className="login-form" onSubmit={handleSubmit}>
+                {mode === 'login' && (
+                  <label>
+                    {nameLabel}
+                    <input
+                      className="input"
+                      type="text"
+                      placeholder={language === 'kk' ? 'Атыңыз' : language === 'ru' ? 'Ваше имя' : 'Your name'}
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                    />
+                  </label>
+                )}
                 {mode === 'register' && (
                   <label>
                     {nameLabel}
@@ -159,6 +219,22 @@ const LoginPage: React.FC = () => {
                     required={mode === 'login'}
                   />
                 </label>
+                {mode === 'login' && email.toLowerCase().includes('@museonet.kz') && (
+                  <label>
+                    {adminOtpLabel}
+                    <input
+                      className="input"
+                      type="text"
+                      placeholder="123456"
+                      value={otp}
+                      onChange={(event) => setOtp(event.target.value)}
+                      maxLength={6}
+                      inputMode="numeric"
+                      required
+                    />
+                    <span className="hint">{adminOtpHint}</span>
+                  </label>
+                )}
                 {status && <div className={`status ${status.type}`}>{status.text}</div>}
                 <button className="button button-primary" type="submit">
                   {heading}
@@ -186,6 +262,17 @@ const LoginPage: React.FC = () => {
                   </button>
                 </div>
               </form>
+              {hydrated && (
+                <div className="profile-link">
+                  <Link href="/profile">
+                    {language === 'kk'
+                      ? 'Профильге өту'
+                      : language === 'ru'
+                        ? 'Перейти в профиль'
+                        : 'Go to profile'}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -254,6 +341,11 @@ const LoginPage: React.FC = () => {
           color: rgba(43, 43, 43, 0.7);
         }
 
+        .hint {
+          font-size: 12px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
         .login-links {
           display: flex;
           justify-content: space-between;
@@ -289,6 +381,16 @@ const LoginPage: React.FC = () => {
         .status.error {
           background: rgba(206, 78, 54, 0.12);
           color: #a0351f;
+        }
+
+        .profile-link {
+          text-align: center;
+          font-size: 14px;
+        }
+
+        .profile-link :global(a) {
+          color: var(--accent);
+          font-weight: 600;
         }
       `}</style>
     </div>

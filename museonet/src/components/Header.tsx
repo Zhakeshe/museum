@@ -15,6 +15,7 @@ const Header: React.FC = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { language, setLanguage } = useLanguage();
+  const [userName, setUserName] = useState('');
   const labels = useMemo(
     () => ({
       kk: {
@@ -24,6 +25,7 @@ const Header: React.FC = () => {
         museums: 'Музейлер',
         admin: 'Админ',
         login: 'Кіру',
+        profile: 'Профиль',
         aria: 'Негізгі навигация',
       },
       ru: {
@@ -33,6 +35,7 @@ const Header: React.FC = () => {
         museums: 'Музеи',
         admin: 'Админ',
         login: 'Войти',
+        profile: 'Профиль',
         aria: 'Главная навигация',
       },
       en: {
@@ -42,11 +45,22 @@ const Header: React.FC = () => {
         museums: 'Museums',
         admin: 'Admin',
         login: 'Login',
+        profile: 'Profile',
         aria: 'Main navigation',
       },
     }),
     [],
   );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const updateUser = () => {
+      setUserName(window.localStorage.getItem('museonetUserName') ?? '');
+    };
+    updateUser();
+    window.addEventListener('storage', updateUser);
+    return () => window.removeEventListener('storage', updateUser);
+  }, []);
 
   useEffect(() => {
     const handleRouteChange = () => setIsOpen(false);
@@ -89,8 +103,8 @@ const Header: React.FC = () => {
               );
             })}
             <li>
-              <Link href="/login" className="nav-button">
-                {labels[language].login}
+              <Link href={userName ? '/profile' : '/login'} className="nav-button">
+                {userName ? userName : labels[language].login}
               </Link>
             </li>
             <li>
