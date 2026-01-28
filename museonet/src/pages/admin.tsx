@@ -59,6 +59,12 @@ const AdminPage: React.FC = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      const role = typeof window !== 'undefined' ? window.localStorage.getItem('museonetUserRole') : null;
+      const otp = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminOtp') : null;
+      if (role !== 'admin' || !otp) {
+        window.location.href = '/login';
+        return;
+      }
       const [museumsResponse, usersResponse] = await Promise.all([
         fetch('/api/museums'),
         fetch('/api/users'),

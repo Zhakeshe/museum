@@ -11,11 +11,16 @@ const ProfilePage: React.FC = () => {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState('user');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    setName(window.localStorage.getItem('museonetUserName') ?? '');
-    setEmail(window.localStorage.getItem('museonetUserEmail') ?? '');
+    const storedName = window.localStorage.getItem('museonetUserName') ?? '';
+    const storedEmail = window.localStorage.getItem('museonetUserEmail') ?? '';
+    const storedRole = window.localStorage.getItem('museonetUserRole') ?? 'user';
+    setName(storedName);
+    setEmail(storedEmail);
+    setRole(storedRole);
   }, []);
 
   const greeting = useMemo(() => {
@@ -53,6 +58,8 @@ const ProfilePage: React.FC = () => {
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem('museonetUserName');
       window.localStorage.removeItem('museonetUserEmail');
+      window.localStorage.removeItem('museonetUserRole');
+      window.localStorage.removeItem('museonetAdminOtp');
     }
     router.push('/');
   };
@@ -86,6 +93,10 @@ const ProfilePage: React.FC = () => {
                 <div>
                   <span>Email</span>
                   <strong>{email || '—'}</strong>
+                </div>
+                <div>
+                  <span>{language === 'kk' ? 'Рөл' : language === 'ru' ? 'Роль' : 'Role'}</span>
+                  <strong>{role}</strong>
                 </div>
               </div>
               <div className="profile-actions">

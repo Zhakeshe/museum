@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const LoginPage: React.FC = () => {
   const { language } = useLanguage();
+  const router = useRouter();
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [status, setStatus] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [hydrated, setHydrated] = useState(false);
   const pageTitle =
     language === 'kk' ? 'Кіру — museonet' : language === 'ru' ? 'Вход — museonet' : 'Login — museonet';
   const heading =
@@ -38,13 +37,12 @@ const LoginPage: React.FC = () => {
     language === 'kk' ? 'Тіркелу' : language === 'ru' ? 'Регистрация' : 'Sign up';
   const googleLabel =
     language === 'kk' ? 'Google арқылы кіру' : language === 'ru' ? 'Войти через Google' : 'Sign in with Google';
-  const nameLabel = language === 'kk' ? 'Аты-жөні' : language === 'ru' ? 'Имя' : 'Name';
   const successMessage =
     language === 'kk'
-      ? 'Тіркелу сәтті аяқталды!'
+      ? 'Сәтті орындалды!'
       : language === 'ru'
-        ? 'Регистрация прошла успешно!'
-        : 'Registration successful!';
+        ? 'Успешно!'
+        : 'Success!';
   const errorMessage =
     language === 'kk'
       ? 'Қате пайда болды. Қайта көріңіз.'
@@ -71,10 +69,6 @@ const LoginPage: React.FC = () => {
         ? 'OTP код должен быть из 6 цифр.'
         : 'OTP code must be 6 digits.';
 
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setStatus(null);
@@ -88,7 +82,7 @@ const LoginPage: React.FC = () => {
         const response = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email }),
+          body: JSON.stringify({ name: email.split('@')[0] || 'Museonet', email }),
         });
         if (!response.ok) {
           const data = await response.json();
@@ -96,14 +90,16 @@ const LoginPage: React.FC = () => {
           return;
         }
         setStatus({ type: 'success', text: successMessage });
-        setName('');
         setEmail('');
         setPassword('');
         setOtp('');
         if (typeof window !== 'undefined') {
-          window.localStorage.setItem('museonetUserName', name);
+          window.localStorage.setItem('museonetUserName', email.split('@')[0] || 'Museonet');
           window.localStorage.setItem('museonetUserEmail', email);
+          window.localStorage.setItem('museonetUserRole', 'user');
+          window.localStorage.setItem('museonetAdminOtp', '');
         }
+        router.push('/profile');
       } catch {
         setStatus({ type: 'error', text: errorMessage });
       }
@@ -111,14 +107,17 @@ const LoginPage: React.FC = () => {
     }
 
     if (mode === 'login') {
-      const derivedName = name || email.split('@')[0] || 'Museonet';
+      const derivedName = email.split('@')[0] || 'Museonet';
       setStatus({ type: 'success', text: successMessage });
       setPassword('');
       setOtp('');
       if (typeof window !== 'undefined') {
         window.localStorage.setItem('museonetUserName', derivedName);
         window.localStorage.setItem('museonetUserEmail', email);
+        window.localStorage.setItem('museonetUserRole', isAdminLogin ? 'admin' : 'user');
+        window.localStorage.setItem('museonetAdminOtp', isAdminLogin ? otp.trim() : '');
       }
+      router.push('/profile');
     }
   };
 
@@ -172,31 +171,6 @@ const LoginPage: React.FC = () => {
                 </button>
               </div>
               <form className="login-form" onSubmit={handleSubmit}>
-                {mode === 'login' && (
-                  <label>
-                    {nameLabel}
-                    <input
-                      className="input"
-                      type="text"
-                      placeholder={language === 'kk' ? 'Атыңыз' : language === 'ru' ? 'Ваше имя' : 'Your name'}
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
-                    />
-                  </label>
-                )}
-                {mode === 'register' && (
-                  <label>
-                    {nameLabel}
-                    <input
-                      className="input"
-                      type="text"
-                      placeholder={language === 'kk' ? 'Есіміңіз' : language === 'ru' ? 'Ваше имя' : 'Your name'}
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
-                      required
-                    />
-                  </label>
-                )}
                 <label>
                   {language === 'kk' ? 'Email' : language === 'ru' ? 'Email' : 'Email'}
                   <input
@@ -216,7 +190,7 @@ const LoginPage: React.FC = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    required={mode === 'login'}
+                    required
                   />
                 </label>
                 {mode === 'login' && email.toLowerCase().includes('@museonet.kz') && (
@@ -262,17 +236,6 @@ const LoginPage: React.FC = () => {
                   </button>
                 </div>
               </form>
-              {hydrated && (
-                <div className="profile-link">
-                  <Link href="/profile">
-                    {language === 'kk'
-                      ? 'Профильге өту'
-                      : language === 'ru'
-                        ? 'Перейти в профиль'
-                        : 'Go to profile'}
-                  </Link>
-                </div>
-              )}
             </div>
           </div>
         </section>
@@ -383,15 +346,6 @@ const LoginPage: React.FC = () => {
           color: #a0351f;
         }
 
-        .profile-link {
-          text-align: center;
-          font-size: 14px;
-        }
-
-        .profile-link :global(a) {
-          color: var(--accent);
-          font-weight: 600;
-        }
       `}</style>
     </div>
   );
