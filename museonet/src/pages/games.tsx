@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Head from 'next/head';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -193,9 +193,9 @@ const games = [
     points: 20,
     scenario: 'Пазлды 2 минут ішінде жинап, әр сурет үшін 20 ұпай алыңыз.',
     puzzleLevels: [
-      { title: 'Қыш құмыра', grid: 2, pieces: 4, points: 20 },
-      { title: 'Алтын әшекей', grid: 3, pieces: 9, points: 20 },
-      { title: 'Күміс табақ', grid: 4, pieces: 16, points: 20 },
+      { title: 'Қыш құмыра', pieces: 10, points: 20 },
+      { title: 'Алтын әшекей', pieces: 12, points: 20 },
+      { title: 'Күміс табақ', pieces: 15, points: 20 },
     ],
     steps: [
       {
@@ -224,6 +224,7 @@ const GamesPage: React.FC = () => {
   const [puzzlePlaced, setPuzzlePlaced] = useState<number[]>([]);
   const [puzzleTimer, setPuzzleTimer] = useState(120);
   const [puzzleStatus, setPuzzleStatus] = useState<'ready' | 'running' | 'failed' | 'level-complete' | 'finished'>('ready');
+  const puzzleStageRef = useRef<HTMLDivElement | null>(null);
   const pageTitle =
     language === 'kk' ? 'Ойындар — museonet' : language === 'ru' ? 'Игры — museonet' : 'Games — museonet';
   const heading =
@@ -351,6 +352,11 @@ const GamesPage: React.FC = () => {
     return () => window.clearInterval(interval);
   }, [puzzleActive, puzzleStatus]);
 
+  useEffect(() => {
+    if (!puzzleActive) return;
+    puzzleStageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [puzzleActive, puzzleLevelIndex]);
+
   const handlePuzzlePick = (piece: number) => {
     if (!activeGame || !('puzzleLevels' in activeGame)) return;
     if (puzzleStatus !== 'running') return;
@@ -393,6 +399,7 @@ const GamesPage: React.FC = () => {
 
   const currentPuzzleLevel =
     activeGame && 'puzzleLevels' in activeGame ? activeGame.puzzleLevels[puzzleLevelIndex] : null;
+  const puzzleColumns = currentPuzzleLevel ? Math.ceil(Math.sqrt(currentPuzzleLevel.pieces)) : 0;
 
   return (
     <div className="page">
@@ -423,27 +430,29 @@ const GamesPage: React.FC = () => {
               <p>{subtext}</p>
             </div>
 
-            <div className="filters">
-              {(['All', 'Beginner', 'Advanced'] as const).map((level) => (
-                <button
-                  key={level}
-                  className={`chip ${activeLevel === level ? 'is-active' : ''}`}
-                  type="button"
-                  onClick={() => setActiveLevel(level)}
-                >
-                  {level}
-                </button>
-              ))}
-              {canPlay ? (
-                <span className="points-pill">
-                  {language === 'kk' ? 'Ұпай' : language === 'ru' ? 'Очки' : 'Points'}: {userPoints}
-                </span>
-              ) : (
-                <span className="points-pill">{loginHint}</span>
-              )}
-            </div>
+            {!puzzleActive && (
+              <div className="filters">
+                {(['All', 'Beginner', 'Advanced'] as const).map((level) => (
+                  <button
+                    key={level}
+                    className={`chip ${activeLevel === level ? 'is-active' : ''}`}
+                    type="button"
+                    onClick={() => setActiveLevel(level)}
+                  >
+                    {level}
+                  </button>
+                ))}
+                {canPlay ? (
+                  <span className="points-pill">
+                    {language === 'kk' ? 'Ұпай' : language === 'ru' ? 'Очки' : 'Points'}: {userPoints}
+                  </span>
+                ) : (
+                  <span className="points-pill">{loginHint}</span>
+                )}
+              </div>
+            )}
 
-            {!canPlay && (
+            {!canPlay && !puzzleActive && (
               <div className="login-panel">
                 <div>
                   <h3>{language === 'kk' ? 'Ойыншы профилі' : language === 'ru' ? 'Профиль игрока' : 'Player profile'}</h3>
@@ -469,31 +478,111 @@ const GamesPage: React.FC = () => {
               </div>
             )}
 
-            <div className="games-grid">
-              {filteredGames.map((game) => (
-                <div className="card" key={game.title}>
-                  <div className="game-header">
-                    <h3>{game.title}</h3>
-                    <span className="chip">{game.level}</span>
+            {puzzleActive && currentPuzzleLevel ? (
+              <div className="puzzle-stage" ref={puzzleStageRef}>
+                <div className="puzzle-stage-info">
+                  <span className="eyebrow">{language === 'kk' ? 'Пазл симуляторы' : language === 'ru' ? 'Симулятор пазла' : 'Puzzle simulator'}</span>
+                  <h2>{currentPuzzleLevel.title}</h2>
+                  <p className="puzzle-stage-status">
+                    {puzzleStatus === 'failed'
+                      ? 'Уақыт бітті. Қайта бастау керек.'
+                      : puzzleStatus === 'level-complete'
+                        ? 'Деңгей аяқталды! Келесі деңгейге өт.'
+                        : puzzleStatus === 'finished'
+                          ? 'Барлық деңгей аяқталды!'
+                          : 'Суретті дұрыс жина.'}
+                  </p>
+                  <div className="puzzle-stage-meta">
+                    <div>
+                      <strong>⏱️ 02:00</strong>
+                      <span>{language === 'kk' ? 'Уақыт лимиті' : language === 'ru' ? 'Лимит времени' : 'Time limit'}</span>
+                    </div>
+                    <div>
+                      <strong>🧩 {currentPuzzleLevel.pieces} {language === 'kk' ? 'бөлік' : 'pieces'}</strong>
+                      <span>{language === 'kk' ? 'Қиындық деңгейі' : language === 'ru' ? 'Сложность' : 'Difficulty'}</span>
+                    </div>
+                    <div>
+                      <strong>⭐ +{currentPuzzleLevel.points}</strong>
+                      <span>{language === 'kk' ? 'Ұпай' : language === 'ru' ? 'Очки' : 'Points'}</span>
+                    </div>
                   </div>
-                  <p>{game.text}</p>
-                  <div className="game-meta">
-                    <span>{language === 'kk' ? 'Сценарий' : language === 'ru' ? 'Сценарий' : 'Scenario'}</span>
-                    <strong>{game.scenario}</strong>
+                  <div className="puzzle-stage-timer">
+                    <span>{language === 'kk' ? 'Қалған уақыт' : language === 'ru' ? 'Осталось' : 'Remaining'}</span>
+                    <strong>{Math.floor(puzzleTimer / 60)}:{String(puzzleTimer % 60).padStart(2, '0')}</strong>
                   </div>
-                  <button
-                    className="button button-secondary"
-                    type="button"
-                    onClick={() => startSimulation(game)}
-                    disabled={!canPlay}
-                  >
-                    {canPlay ? 'Симуляцияны бастау' : 'Кіру керек'}
-                  </button>
+                  <div className="puzzle-stage-actions">
+                    {puzzleStatus === 'level-complete' && (
+                      <button className="button button-primary" type="button" onClick={handlePuzzleNextLevel}>
+                        {language === 'kk' ? 'Келесі деңгей' : language === 'ru' ? 'Следующий уровень' : 'Next level'}
+                      </button>
+                    )}
+                    {puzzleStatus === 'failed' && (
+                      <button className="button button-primary" type="button" onClick={handlePuzzleRestart}>
+                        {language === 'kk' ? 'Қайта бастау' : language === 'ru' ? 'Перезапуск' : 'Restart'}
+                      </button>
+                    )}
+                    <button
+                      className="button button-secondary"
+                      type="button"
+                      onClick={() => {
+                        setPuzzleActive(false);
+                        setActiveGame(null);
+                      }}
+                    >
+                      {language === 'kk' ? 'Ойындар тізімі' : language === 'ru' ? 'К списку игр' : 'Back to games'}
+                    </button>
+                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="puzzle-stage-board">
+                  <div className="puzzle-board-lg" style={{ gridTemplateColumns: `repeat(${puzzleColumns}, 1fr)` }}>
+                    {Array.from({ length: currentPuzzleLevel.pieces }).map((_, index) => (
+                      <div className={`puzzle-slot-lg ${puzzlePlaced[index] ? 'is-filled' : ''}`} key={`stage-slot-${index}`}>
+                        {puzzlePlaced[index] ? puzzlePlaced[index] : ''}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="puzzle-pieces-lg">
+                    {puzzlePieces.map((piece) => (
+                      <button
+                        key={piece}
+                        className="puzzle-piece-lg"
+                        type="button"
+                        onClick={() => handlePuzzlePick(piece)}
+                        disabled={puzzleStatus !== 'running'}
+                      >
+                        {piece}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="games-grid">
+                {filteredGames.map((game) => (
+                  <div className="card" key={game.title}>
+                    <div className="game-header">
+                      <h3>{game.title}</h3>
+                      <span className="chip">{game.level}</span>
+                    </div>
+                    <p>{game.text}</p>
+                    <div className="game-meta">
+                      <span>{language === 'kk' ? 'Сценарий' : language === 'ru' ? 'Сценарий' : 'Scenario'}</span>
+                      <strong>{game.scenario}</strong>
+                    </div>
+                    <button
+                      className="button button-secondary"
+                      type="button"
+                      onClick={() => startSimulation(game)}
+                      disabled={!canPlay}
+                    >
+                      {canPlay ? 'Симуляцияны бастау' : 'Кіру керек'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
-            {activeGame && (
+            {activeGame && !puzzleActive && (
               <div className="simulation-panel">
                 <div>
                   <h3>{activeGame.title} — симулятор</h3>
@@ -520,7 +609,7 @@ const GamesPage: React.FC = () => {
                   <div className="task-list">
                     <strong>{language === 'kk' ? 'Тапсырмалар' : language === 'ru' ? 'Задачи' : 'Tasks'}</strong>
                     <ul>
-                      {('puzzleLevels' in activeGame ? activeGame.puzzleLevels : activeGame.steps).map((step, index) => (
+                      {activeGame.steps.map((step, index) => (
                         <li key={step.title} className={index <= simulationStep ? 'done' : ''}>
                           {step.title}
                         </li>
@@ -529,91 +618,33 @@ const GamesPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="console">
-                  {currentPuzzleLevel ? (
-                    <>
-                      <div className="console-line">⏱️ Таймер: {puzzleTimer}s / 120s</div>
-                      <div className="console-line">
-                        🧩 Деңгей: {puzzleLevelIndex + 1} / {activeGame.puzzleLevels.length}
-                      </div>
-                      <div className="console-line">
-                        🎯 Мақсат: {currentPuzzleLevel.title} ({currentPuzzleLevel.grid}x{currentPuzzleLevel.grid})
-                      </div>
-                      <div className="console-line">✅ Ұпай: +{currentPuzzleLevel.points}</div>
-                      <div className="puzzle-panel">
-                        <p className="puzzle-status">
-                          {puzzleStatus === 'failed'
-                            ? 'Уақыт бітті. Қайта бастау керек.'
-                            : puzzleStatus === 'level-complete'
-                              ? 'Деңгей аяқталды! Келесі деңгейге өт.'
-                              : puzzleStatus === 'finished'
-                                ? 'Барлық деңгей аяқталды!'
-                                : 'Суретті дұрыс жина.'}
-                        </p>
-                        <div className="puzzle-board" style={{ gridTemplateColumns: `repeat(${currentPuzzleLevel.grid}, 1fr)` }}>
-                          {Array.from({ length: currentPuzzleLevel.pieces }).map((_, index) => (
-                            <div className={`puzzle-slot ${puzzlePlaced[index] ? 'is-filled' : ''}`} key={`slot-${index}`}>
-                              {puzzlePlaced[index] ? puzzlePlaced[index] : ''}
-                            </div>
-                          ))}
-                        </div>
-                        <div className="puzzle-pieces">
-                          {puzzlePieces.map((piece) => (
-                            <button
-                              key={piece}
-                              className="puzzle-piece"
-                              type="button"
-                              onClick={() => handlePuzzlePick(piece)}
-                              disabled={puzzleStatus !== 'running'}
-                            >
-                              {piece}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="puzzle-actions">
-                          {puzzleStatus === 'level-complete' && puzzleLevelIndex < activeGame.puzzleLevels.length - 1 && (
-                            <button className="button button-primary" type="button" onClick={handlePuzzleNextLevel}>
-                              {language === 'kk' ? 'Келесі деңгей' : language === 'ru' ? 'Следующий уровень' : 'Next level'}
-                            </button>
-                          )}
-                          {puzzleStatus === 'failed' && (
-                            <button className="button button-primary" type="button" onClick={handlePuzzleRestart}>
-                              {language === 'kk' ? 'Қайта бастау' : language === 'ru' ? 'Перезапуск' : 'Restart'}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="console-line">
-                        ⏱️ Таймер: {Math.min(simulationStep + 1, activeGame.steps.length)} / {activeGame.steps.length}
-                      </div>
-                      <div className="console-line">🔬 Этап: {activeGame.steps[Math.min(simulationStep, activeGame.steps.length - 1)].title}</div>
-                      <div className="console-line">📍 Координат: X{simulationStep * 4 + 12} Y{simulationStep * 3 + 6}</div>
-                      <div className="console-line">✅ Дерек сақталды</div>
-                      <div className="step-panel">
-                        <p>{activeGame.steps[Math.min(simulationStep, activeGame.steps.length - 1)].prompt}</p>
-                        <div className="choices">
-                          {activeGame.steps[Math.min(simulationStep, activeGame.steps.length - 1)].choices.map((choice) => (
-                            <button
-                              key={choice}
-                              className={`choice ${activeChoice === choice ? 'is-active' : ''}`}
-                              type="button"
-                              onClick={() => advanceSimulation(choice)}
-                              disabled={simulationStep >= activeGame.steps.length}
-                            >
-                              {choice}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  <div className="console-line">
+                    ⏱️ Таймер: {Math.min(simulationStep + 1, activeGame.steps.length)} / {activeGame.steps.length}
+                  </div>
+                  <div className="console-line">🔬 Этап: {activeGame.steps[Math.min(simulationStep, activeGame.steps.length - 1)].title}</div>
+                  <div className="console-line">📍 Координат: X{simulationStep * 4 + 12} Y{simulationStep * 3 + 6}</div>
+                  <div className="console-line">✅ Дерек сақталды</div>
+                  <div className="step-panel">
+                    <p>{activeGame.steps[Math.min(simulationStep, activeGame.steps.length - 1)].prompt}</p>
+                    <div className="choices">
+                      {activeGame.steps[Math.min(simulationStep, activeGame.steps.length - 1)].choices.map((choice) => (
+                        <button
+                          key={choice}
+                          className={`choice ${activeChoice === choice ? 'is-active' : ''}`}
+                          type="button"
+                          onClick={() => advanceSimulation(choice)}
+                          disabled={simulationStep >= activeGame.steps.length}
+                        >
+                          {choice}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            {fieldLog.length > 0 && (
+            {fieldLog.length > 0 && !puzzleActive && (
               <div className="field-log">
                 <h3>{language === 'kk' ? 'Дала журналы' : language === 'ru' ? 'Полевой журнал' : 'Field log'}</h3>
                 <ul>
@@ -735,6 +766,116 @@ const GamesPage: React.FC = () => {
 
         .scenario {
           color: rgba(43, 43, 43, 0.7);
+        }
+
+        .puzzle-stage {
+          margin-top: 32px;
+          display: grid;
+          grid-template-columns: minmax(260px, 0.4fr) 1fr;
+          gap: 24px;
+          padding: 32px;
+          border-radius: 28px;
+          background: #fff;
+          border: 1px solid rgba(180, 106, 60, 0.2);
+          box-shadow: 0 20px 40px rgba(64, 42, 18, 0.1);
+        }
+
+        .puzzle-stage-info {
+          display: grid;
+          gap: 16px;
+        }
+
+        .puzzle-stage-info h2 {
+          font-size: 28px;
+        }
+
+        .puzzle-stage-status {
+          color: rgba(43, 43, 43, 0.7);
+          font-size: 16px;
+        }
+
+        .puzzle-stage-meta {
+          display: grid;
+          gap: 12px;
+        }
+
+        .puzzle-stage-meta div {
+          display: grid;
+          gap: 4px;
+          padding: 12px 14px;
+          border-radius: 16px;
+          background: rgba(180, 106, 60, 0.08);
+        }
+
+        .puzzle-stage-meta span {
+          font-size: 13px;
+          color: rgba(43, 43, 43, 0.6);
+        }
+
+        .puzzle-stage-timer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 16px;
+          border-radius: 16px;
+          background: #111;
+          color: #fff;
+        }
+
+        .puzzle-stage-timer strong {
+          font-size: 20px;
+          letter-spacing: 1px;
+        }
+
+        .puzzle-stage-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .puzzle-stage-board {
+          display: grid;
+          gap: 20px;
+        }
+
+        .puzzle-board-lg {
+          display: grid;
+          gap: 10px;
+          padding: 20px;
+          border-radius: 24px;
+          background: rgba(17, 17, 17, 0.92);
+          min-height: 380px;
+        }
+
+        .puzzle-slot-lg {
+          border-radius: 14px;
+          border: 2px dashed rgba(255, 255, 255, 0.2);
+          display: grid;
+          place-items: center;
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 18px;
+          height: 84px;
+        }
+
+        .puzzle-slot-lg.is-filled {
+          background: rgba(180, 106, 60, 0.6);
+          border-color: rgba(255, 255, 255, 0.5);
+          font-weight: 600;
+        }
+
+        .puzzle-pieces-lg {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .puzzle-piece-lg {
+          padding: 12px 16px;
+          border-radius: 12px;
+          background: rgba(17, 17, 17, 0.85);
+          color: #fff;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          font-size: 14px;
         }
 
         .scene-panel {
@@ -889,61 +1030,6 @@ const GamesPage: React.FC = () => {
           gap: 8px;
         }
 
-        .puzzle-panel {
-          margin-top: 12px;
-          display: grid;
-          gap: 12px;
-        }
-
-        .puzzle-status {
-          font-size: 13px;
-          color: rgba(230, 225, 216, 0.85);
-        }
-
-        .puzzle-board {
-          display: grid;
-          gap: 6px;
-          background: rgba(255, 255, 255, 0.05);
-          padding: 10px;
-          border-radius: 12px;
-        }
-
-        .puzzle-slot {
-          height: 46px;
-          border-radius: 8px;
-          border: 1px dashed rgba(255, 255, 255, 0.2);
-          display: grid;
-          place-items: center;
-          color: rgba(255, 255, 255, 0.7);
-          font-size: 12px;
-        }
-
-        .puzzle-slot.is-filled {
-          background: rgba(180, 106, 60, 0.5);
-          border-color: rgba(255, 255, 255, 0.4);
-          font-weight: 600;
-        }
-
-        .puzzle-pieces {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .puzzle-piece {
-          padding: 8px 12px;
-          border-radius: 10px;
-          background: rgba(255, 255, 255, 0.12);
-          color: #fff;
-          border: 1px solid rgba(255, 255, 255, 0.25);
-          font-size: 12px;
-        }
-
-        .puzzle-actions {
-          display: flex;
-          gap: 10px;
-        }
-
         .choice {
           padding: 8px 12px;
           border-radius: 12px;
@@ -986,6 +1072,15 @@ const GamesPage: React.FC = () => {
         @media (max-width: 900px) {
           .simulation-panel {
             grid-template-columns: 1fr;
+          }
+
+          .puzzle-stage {
+            grid-template-columns: 1fr;
+            padding: 20px;
+          }
+
+          .puzzle-board-lg {
+            min-height: 280px;
           }
 
           .login-panel {
