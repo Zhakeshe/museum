@@ -208,7 +208,9 @@ const AdminPage: React.FC = () => {
 
   useEffect(() => {
     if (!otpSecret) return;
-    const uri = `otpauth://totp/museonet:Admin?secret=${otpSecret}&issuer=museonet&algorithm=SHA1&digits=6&period=30`;
+    const label = encodeURIComponent('museonet Admin');
+    const issuer = encodeURIComponent('museonet');
+    const uri = `otpauth://totp/${label}?secret=${otpSecret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
     setOtpQr(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(uri)}`);
   }, [otpSecret]);
 
@@ -323,7 +325,10 @@ const AdminPage: React.FC = () => {
               </div>
               <div className="otp-card">
                 {otpQr && <img src={otpQr} alt="Admin QR code" />}
-                <p className="otp-hint">Google Authenticator-ға QR кодты қосып, бір реттік код енгізіңіз.</p>
+                <p className="otp-hint">
+                  Google Authenticator-ға QR кодты қосып, бір реттік код енгізіңіз. Егер QR ашылмаса, төмендегі
+                  secret-ті қолмен енгізіңіз.
+                </p>
                 <div className="otp-secret">
                   <span>Secret:</span>
                   <strong>{otpSecret}</strong>
