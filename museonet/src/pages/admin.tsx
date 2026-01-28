@@ -156,6 +156,9 @@ const generateTotp = (secret: string, offset = 0) => {
   return String(code % 1_000_000).padStart(6, '0');
 };
 
+const createAdminSecret = () =>
+  Array.from({ length: 20 }, () => base32Alphabet[Math.floor(Math.random() * base32Alphabet.length)]).join('');
+
 const AdminPage: React.FC = () => {
   const [museums, setMuseums] = useState<Museum[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -196,14 +199,31 @@ const AdminPage: React.FC = () => {
   useEffect(() => {
     const verified = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminVerified') : null;
     const storedSecret = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminSecret') : null;
-    const secret =
-      storedSecret ??
-      Array.from({ length: 20 }, () => base32Alphabet[Math.floor(Math.random() * base32Alphabet.length)]).join('');
+    const secret = storedSecret ?? createAdminSecret();
     if (!storedSecret && typeof window !== 'undefined') {
       window.localStorage.setItem('museonetAdminSecret', secret);
     }
     setOtpSecret(secret);
     setOtpVerified(verified === 'true');
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const interval = window.setInterval(() => {
+      const secret = createAdminSecret();
+      window.localStorage.removeItem('museonetAdminVerified');
+      window.localStorage.setItem('museonetAdminSecret', secret);
+      setOtpVerified(false);
+      setOtpInput('');
+      setOtpError('');
+      setOtpSecret(secret);
+      setOtpQr('');
+      setMuseums([]);
+      setUsers([]);
+      setLoading(true);
+      setMessage('');
+    }, 120000);
+    return () => window.clearInterval(interval);
   }, []);
 
   useEffect(() => {
