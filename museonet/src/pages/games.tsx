@@ -224,6 +224,8 @@ const GamesPage: React.FC = () => {
   const [puzzlePlaced, setPuzzlePlaced] = useState<number[]>([]);
   const [puzzleTimer, setPuzzleTimer] = useState(120);
   const [puzzleStatus, setPuzzleStatus] = useState<'ready' | 'running' | 'failed' | 'level-complete' | 'finished'>('ready');
+  const [puzzlePhase, setPuzzlePhase] = useState<'preview' | 'scatter' | 'play'>('preview');
+  const [draggingPiece, setDraggingPiece] = useState<number | null>(null);
   const puzzleStageRef = useRef<HTMLDivElement | null>(null);
   const pageTitle =
     language === 'kk' ? 'Ойындар — museonet' : language === 'ru' ? 'Игры — museonet' : 'Games — museonet';
@@ -267,6 +269,11 @@ const GamesPage: React.FC = () => {
     return copy;
   };
 
+  const isPuzzleGame = (
+    game: (typeof games)[number],
+  ): game is (typeof games)[number] & { puzzleLevels: { title: string; pieces: number; points: number }[] } =>
+    'puzzleLevels' in game && Array.isArray(game.puzzleLevels);
+
   const updatePoints = (amount: number) => {
     const nextPoints = userPoints + amount;
     setUserPoints(nextPoints);
@@ -279,10 +286,12 @@ const GamesPage: React.FC = () => {
     setPuzzleLevelIndex(levelIndex);
     setSimulationStep(levelIndex);
     setPuzzlePieces(shuffle(Array.from({ length: totalPieces }, (_, i) => i + 1)));
-    setPuzzlePlaced([]);
+    setPuzzlePlaced(Array.from({ length: totalPieces }, () => 0));
     setPuzzleTimer(120);
     setPuzzleStatus('running');
     setSimulationStatus('Симуляция жүріп жатыр');
+    setPuzzlePhase('preview');
+    setDraggingPiece(null);
   };
 
   const handleNameSave = () => {
@@ -304,15 +313,17 @@ const GamesPage: React.FC = () => {
       'Журнал ашылды. Қауіпсіздік тексерілді.',
       'Команда байланыста, құралдар дайын.',
     ]);
-    if ('puzzleLevels' in game) {
+    if (isPuzzleGame(game)) {
       setPuzzleActive(true);
       setPuzzleStatus('ready');
       setPuzzleTimer(120);
       setPuzzlePieces([]);
       setPuzzlePlaced([]);
       setPuzzleLevelIndex(0);
-      const firstLevel = game.puzzleLevels[0];
-      setupPuzzleLevel(0, firstLevel.pieces);
+      if (game.puzzleLevels.length > 0) {
+        const firstLevel = game.puzzleLevels[0];
+        setupPuzzleLevel(0, firstLevel.pieces);
+      }
     } else {
       setPuzzleActive(false);
       setPuzzleStatus('ready');
@@ -321,7 +332,7 @@ const GamesPage: React.FC = () => {
 
   const advanceSimulation = (choice: string) => {
     if (!activeGame) return;
-    if ('puzzleLevels' in activeGame) return;
+    if (isPuzzleGame(activeGame)) return;
     const nextStep = simulationStep + 1;
     setActiveChoice(choice);
     setSimulationStep(nextStep);
@@ -353,18 +364,38 @@ const GamesPage: React.FC = () => {
   }, [puzzleActive, puzzleStatus]);
 
   useEffect(() => {
+    if (!puzzleActive || puzzleStatus !== 'running') return;
+    setPuzzlePhase('preview');
+    const previewTimer = window.setTimeout(() => {
+      setPuzzlePhase('scatter');
+      const scatterTimer = window.setTimeout(() => {
+        setPuzzlePhase('play');
+      }, 700);
+      return () => window.clearTimeout(scatterTimer);
+    }, 2500);
+    return () => window.clearTimeout(previewTimer);
+  }, [puzzleActive, puzzleStatus, puzzleLevelIndex]);
+
+  useEffect(() => {
     if (!puzzleActive) return;
     puzzleStageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [puzzleActive, puzzleLevelIndex]);
 
   const handlePuzzlePick = (piece: number) => {
-    if (!activeGame || !('puzzleLevels' in activeGame)) return;
-    if (puzzleStatus !== 'running') return;
-    const level = activeGame.puzzleLevels[puzzleLevelIndex];
-    setPuzzlePieces((prev) => prev.filter((item) => item !== piece));
+    return;
+  };
+
+  const handlePuzzleDrop = (slotIndex: number) => {
+    if (!activeGame || !isPuzzleGame(activeGame)) return;
+    if (puzzleStatus !== 'running' || puzzlePhase !== 'play') return;
+    if (draggingPiece === null) return;
     setPuzzlePlaced((prev) => {
-      const next = [...prev, piece];
-      if (next.length >= level.pieces) {
+      if (prev[slotIndex]) return prev;
+      const next = [...prev];
+      next[slotIndex] = draggingPiece;
+      const remaining = next.filter((piece) => piece === 0).length;
+      if (remaining === 0) {
+        const level = activeGame.puzzleLevels[puzzleLevelIndex];
         const isLast = puzzleLevelIndex >= activeGame.puzzleLevels.length - 1;
         setPuzzleStatus(isLast ? 'finished' : 'level-complete');
         setSimulationStatus(isLast ? 'Симуляция аяқталды' : 'Деңгей аяқталды');
@@ -377,10 +408,12 @@ const GamesPage: React.FC = () => {
       }
       return next;
     });
+    setPuzzlePieces((prev) => prev.filter((piece) => piece !== draggingPiece));
+    setDraggingPiece(null);
   };
 
   const handlePuzzleNextLevel = () => {
-    if (!activeGame || !('puzzleLevels' in activeGame)) return;
+    if (!activeGame || !isPuzzleGame(activeGame)) return;
     const nextIndex = puzzleLevelIndex + 1;
     if (nextIndex >= activeGame.puzzleLevels.length) {
       setPuzzleStatus('finished');
@@ -391,14 +424,14 @@ const GamesPage: React.FC = () => {
   };
 
   const handlePuzzleRestart = () => {
-    if (!activeGame || !('puzzleLevels' in activeGame)) return;
+    if (!activeGame || !isPuzzleGame(activeGame)) return;
     const level = activeGame.puzzleLevels[puzzleLevelIndex];
     setupPuzzleLevel(puzzleLevelIndex, level.pieces);
     setFieldLog((log) => [...log, `Қайта бастау: ${level.title}.`]);
   };
 
   const currentPuzzleLevel =
-    activeGame && 'puzzleLevels' in activeGame ? activeGame.puzzleLevels[puzzleLevelIndex] : null;
+    activeGame && isPuzzleGame(activeGame) ? activeGame.puzzleLevels[puzzleLevelIndex] : null;
   const puzzleColumns = currentPuzzleLevel ? Math.ceil(Math.sqrt(currentPuzzleLevel.pieces)) : 0;
 
   return (
@@ -534,9 +567,24 @@ const GamesPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="puzzle-stage-board">
-                  <div className="puzzle-board-lg" style={{ gridTemplateColumns: `repeat(${puzzleColumns}, 1fr)` }}>
+                  <div
+                    className={`puzzle-board-lg ${puzzlePhase === 'scatter' ? 'is-scattering' : ''}`}
+                    style={{ gridTemplateColumns: `repeat(${puzzleColumns}, 1fr)` }}
+                  >
+                    {puzzlePhase === 'preview' && (
+                      <div className="puzzle-preview">
+                        <div className="puzzle-preview-image">
+                          {currentPuzzleLevel.title}
+                        </div>
+                      </div>
+                    )}
                     {Array.from({ length: currentPuzzleLevel.pieces }).map((_, index) => (
-                      <div className={`puzzle-slot-lg ${puzzlePlaced[index] ? 'is-filled' : ''}`} key={`stage-slot-${index}`}>
+                      <div
+                        className={`puzzle-slot-lg ${puzzlePlaced[index] ? 'is-filled' : ''}`}
+                        key={`stage-slot-${index}`}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => handlePuzzleDrop(index)}
+                      >
                         {puzzlePlaced[index] ? puzzlePlaced[index] : ''}
                       </div>
                     ))}
@@ -545,10 +593,12 @@ const GamesPage: React.FC = () => {
                     {puzzlePieces.map((piece) => (
                       <button
                         key={piece}
-                        className="puzzle-piece-lg"
+                        className={`puzzle-piece-lg ${puzzlePhase !== 'play' ? 'is-locked' : ''}`}
                         type="button"
+                        draggable={puzzlePhase === 'play' && puzzleStatus === 'running'}
+                        onDragStart={() => setDraggingPiece(piece)}
                         onClick={() => handlePuzzlePick(piece)}
-                        disabled={puzzleStatus !== 'running'}
+                        disabled={puzzleStatus !== 'running' || puzzlePhase !== 'play'}
                       >
                         {piece}
                       </button>
@@ -845,6 +895,13 @@ const GamesPage: React.FC = () => {
           border-radius: 24px;
           background: rgba(17, 17, 17, 0.92);
           min-height: 380px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .puzzle-board-lg.is-scattering .puzzle-slot-lg {
+          transform: translateY(20px) rotate(6deg);
+          opacity: 0.4;
         }
 
         .puzzle-slot-lg {
@@ -855,12 +912,35 @@ const GamesPage: React.FC = () => {
           color: rgba(255, 255, 255, 0.7);
           font-size: 18px;
           height: 84px;
+          transition: transform 0.4s ease, opacity 0.4s ease;
         }
 
         .puzzle-slot-lg.is-filled {
           background: rgba(180, 106, 60, 0.6);
           border-color: rgba(255, 255, 255, 0.5);
           font-weight: 600;
+        }
+
+        .puzzle-preview {
+          position: absolute;
+          inset: 0;
+          display: grid;
+          place-items: center;
+          background: rgba(17, 17, 17, 0.85);
+          z-index: 2;
+        }
+
+        .puzzle-preview-image {
+          width: 80%;
+          height: 70%;
+          border-radius: 24px;
+          display: grid;
+          place-items: center;
+          font-size: 24px;
+          font-weight: 600;
+          color: #fff;
+          background: linear-gradient(140deg, #9b5d2f, #d7b08a);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .puzzle-pieces-lg {
@@ -876,6 +956,11 @@ const GamesPage: React.FC = () => {
           color: #fff;
           border: 1px solid rgba(255, 255, 255, 0.2);
           font-size: 14px;
+        }
+
+        .puzzle-piece-lg.is-locked {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
 
         .scene-panel {
