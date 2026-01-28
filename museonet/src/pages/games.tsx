@@ -433,6 +433,32 @@ const GamesPage: React.FC = () => {
   const currentPuzzleLevel =
     activeGame && isPuzzleGame(activeGame) ? activeGame.puzzleLevels[puzzleLevelIndex] : null;
   const puzzleColumns = currentPuzzleLevel ? Math.ceil(Math.sqrt(currentPuzzleLevel.pieces)) : 0;
+  const puzzleRows = currentPuzzleLevel && puzzleColumns ? Math.ceil(currentPuzzleLevel.pieces / puzzleColumns) : 0;
+  const puzzleImage = useMemo(() => {
+    const svg = `
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'>
+        <defs>
+          <linearGradient id='bg' x1='0' y1='0' x2='1' y2='1'>
+            <stop offset='0%' stop-color='#d5a272'/>
+            <stop offset='100%' stop-color='#8a4d2b'/>
+          </linearGradient>
+          <linearGradient id='shine' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stop-color='rgba(255,255,255,0.6)'/>
+            <stop offset='100%' stop-color='rgba(255,255,255,0)'/>
+          </linearGradient>
+        </defs>
+        <rect width='800' height='600' fill='url(#bg)'/>
+        <ellipse cx='400' cy='420' rx='220' ry='60' fill='rgba(0,0,0,0.15)'/>
+        <path d='M240 410c0-120 80-210 160-210s160 90 160 210c0 70-60 120-160 120s-160-50-160-120z' fill='#f2d1a1'/>
+        <path d='M280 420c0-90 60-160 120-160s120 70 120 160c0 50-50 90-120 90s-120-40-120-90z' fill='#c48a56'/>
+        <path d='M280 320c30-40 70-60 120-60s90 20 120 60' stroke='#8a4d2b' stroke-width='18' stroke-linecap='round' fill='none'/>
+        <rect x='200' y='150' width='400' height='80' rx='40' fill='rgba(0,0,0,0.2)'/>
+        <rect x='230' y='160' width='340' height='60' rx='30' fill='url(#shine)'/>
+        <text x='400' y='205' text-anchor='middle' font-size='40' font-family='Arial' fill='#fff'>museonet</text>
+      </svg>
+    `;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }, []);
 
   return (
     <div className="page">
@@ -573,20 +599,41 @@ const GamesPage: React.FC = () => {
                   >
                     {puzzlePhase === 'preview' && (
                       <div className="puzzle-preview">
-                        <div className="puzzle-preview-image">
+                        <div className="puzzle-preview-image" style={{ backgroundImage: `url(${puzzleImage})` }}>
                           {currentPuzzleLevel.title}
                         </div>
                       </div>
                     )}
                     {Array.from({ length: currentPuzzleLevel.pieces }).map((_, index) => (
+                      (() => {
+                        const row = puzzleColumns ? Math.floor(index / puzzleColumns) : 0;
+                        const col = puzzleColumns ? index % puzzleColumns : 0;
+                        const backgroundPosition = puzzleColumns && puzzleRows
+                          ? `${(col / Math.max(1, puzzleColumns - 1)) * 100}% ${(row / Math.max(1, puzzleRows - 1)) * 100}%`
+                          : '50% 50%';
+                        const backgroundSize = puzzleColumns && puzzleRows
+                          ? `${puzzleColumns * 100}% ${puzzleRows * 100}%`
+                          : 'cover';
+                        return (
                       <div
                         className={`puzzle-slot-lg ${puzzlePlaced[index] ? 'is-filled' : ''}`}
                         key={`stage-slot-${index}`}
                         onDragOver={(event) => event.preventDefault()}
                         onDrop={() => handlePuzzleDrop(index)}
+                        style={
+                          puzzlePlaced[index]
+                            ? {
+                                backgroundImage: `url(${puzzleImage})`,
+                                backgroundSize,
+                                backgroundPosition,
+                              }
+                            : undefined
+                        }
                       >
                         {puzzlePlaced[index] ? puzzlePlaced[index] : ''}
                       </div>
+                        );
+                      })()
                     ))}
                   </div>
                   <div className="puzzle-pieces-lg">
@@ -916,7 +963,7 @@ const GamesPage: React.FC = () => {
         }
 
         .puzzle-slot-lg.is-filled {
-          background: rgba(180, 106, 60, 0.6);
+          background-color: rgba(180, 106, 60, 0.1);
           border-color: rgba(255, 255, 255, 0.5);
           font-weight: 600;
         }
@@ -939,7 +986,10 @@ const GamesPage: React.FC = () => {
           font-size: 24px;
           font-weight: 600;
           color: #fff;
-          background: linear-gradient(140deg, #9b5d2f, #d7b08a);
+          background-size: cover;
+          background-position: center;
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
