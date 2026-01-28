@@ -25,6 +25,137 @@ type User = {
   lastActive: string;
 };
 
+const base32Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+const decodeBase32 = (input: string) => {
+  let bits = 0;
+  let value = 0;
+  const output: number[] = [];
+  for (const char of input.toUpperCase().replace(/=+$/, '')) {
+    const index = base32Alphabet.indexOf(char);
+    if (index === -1) continue;
+    value = (value << 5) | index;
+    bits += 5;
+    if (bits >= 8) {
+      output.push((value >>> (bits - 8)) & 255);
+      bits -= 8;
+    }
+  }
+  return new Uint8Array(output);
+};
+
+const sha1 = (message: Uint8Array) => {
+  const words: number[] = [];
+  const length = message.length * 8;
+  for (let i = 0; i < message.length; i++) {
+    words[i >> 2] |= message[i] << (24 - (i % 4) * 8);
+  }
+  words[length >> 5] |= 0x80 << (24 - (length % 32));
+  words[(((length + 64) >> 9) << 4) + 15] = length;
+
+  let h0 = 0x67452301;
+  let h1 = 0xefcdab89;
+  let h2 = 0x98badcfe;
+  let h3 = 0x10325476;
+  let h4 = 0xc3d2e1f0;
+
+  for (let i = 0; i < words.length; i += 16) {
+    const w = new Array(80);
+    for (let j = 0; j < 16; j++) {
+      w[j] = words[i + j] | 0;
+    }
+    for (let j = 16; j < 80; j++) {
+      w[j] = ((w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16]) << 1) | ((w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16]) >>> 31);
+    }
+
+    let a = h0;
+    let b = h1;
+    let c = h2;
+    let d = h3;
+    let e = h4;
+
+    for (let j = 0; j < 80; j++) {
+      let f = 0;
+      let k = 0;
+      if (j < 20) {
+        f = (b & c) | (~b & d);
+        k = 0x5a827999;
+      } else if (j < 40) {
+        f = b ^ c ^ d;
+        k = 0x6ed9eba1;
+      } else if (j < 60) {
+        f = (b & c) | (b & d) | (c & d);
+        k = 0x8f1bbcdc;
+      } else {
+        f = b ^ c ^ d;
+        k = 0xca62c1d6;
+      }
+      const temp = (((a << 5) | (a >>> 27)) + f + e + k + w[j]) | 0;
+      e = d;
+      d = c;
+      c = (b << 30) | (b >>> 2);
+      b = a;
+      a = temp;
+    }
+
+    h0 = (h0 + a) | 0;
+    h1 = (h1 + b) | 0;
+    h2 = (h2 + c) | 0;
+    h3 = (h3 + d) | 0;
+    h4 = (h4 + e) | 0;
+  }
+
+  const hash = new Uint8Array(20);
+  const h = [h0, h1, h2, h3, h4];
+  for (let i = 0; i < h.length; i++) {
+    hash[i * 4] = (h[i] >>> 24) & 0xff;
+    hash[i * 4 + 1] = (h[i] >>> 16) & 0xff;
+    hash[i * 4 + 2] = (h[i] >>> 8) & 0xff;
+    hash[i * 4 + 3] = h[i] & 0xff;
+  }
+  return hash;
+};
+
+const hmacSha1 = (key: Uint8Array, message: Uint8Array) => {
+  const blockSize = 64;
+  let keyBytes = key;
+  if (keyBytes.length > blockSize) {
+    keyBytes = sha1(keyBytes);
+  }
+  const oKeyPad = new Uint8Array(blockSize);
+  const iKeyPad = new Uint8Array(blockSize);
+  oKeyPad.fill(0x5c);
+  iKeyPad.fill(0x36);
+  for (let i = 0; i < keyBytes.length; i++) {
+    oKeyPad[i] ^= keyBytes[i];
+    iKeyPad[i] ^= keyBytes[i];
+  }
+  const inner = new Uint8Array(iKeyPad.length + message.length);
+  inner.set(iKeyPad);
+  inner.set(message, iKeyPad.length);
+  const innerHash = sha1(inner);
+  const outer = new Uint8Array(oKeyPad.length + innerHash.length);
+  outer.set(oKeyPad);
+  outer.set(innerHash, oKeyPad.length);
+  return sha1(outer);
+};
+
+const generateTotp = (secret: string, offset = 0) => {
+  const keyData = decodeBase32(secret);
+  const counter = Math.floor(Date.now() / 1000 / 30) + offset;
+  const buffer = new ArrayBuffer(8);
+  const view = new DataView(buffer);
+  view.setUint32(4, counter);
+  const hmac = hmacSha1(keyData, new Uint8Array(buffer));
+  const offsetBits = hmac[hmac.length - 1] & 0xf;
+  const code =
+    ((hmac[offsetBits] & 0x7f) << 24) |
+    ((hmac[offsetBits + 1] & 0xff) << 16) |
+    ((hmac[offsetBits + 2] & 0xff) << 8) |
+    (hmac[offsetBits + 3] & 0xff);
+  return String(code % 1_000_000).padStart(6, '0');
+};
+
 const AdminPage: React.FC = () => {
   const [museums, setMuseums] = useState<Museum[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -34,8 +165,8 @@ const AdminPage: React.FC = () => {
   const [otpInput, setOtpInput] = useState('');
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpError, setOtpError] = useState('');
-  const [adminCode, setAdminCode] = useState('');
-  const [storedCode, setStoredCode] = useState('');
+  const [otpSecret, setOtpSecret] = useState('');
+  const [otpQr, setOtpQr] = useState('');
   const [search, setSearch] = useState('');
   const [region, setRegion] = useState('Барлығы');
   const [city, setCity] = useState('Барлығы');
@@ -64,12 +195,22 @@ const AdminPage: React.FC = () => {
 
   useEffect(() => {
     const verified = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminVerified') : null;
-    const savedCode = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminCode') : null;
-    if (savedCode) {
-      setStoredCode(savedCode);
+    const storedSecret = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminSecret') : null;
+    const secret =
+      storedSecret ??
+      Array.from({ length: 20 }, () => base32Alphabet[Math.floor(Math.random() * base32Alphabet.length)]).join('');
+    if (!storedSecret && typeof window !== 'undefined') {
+      window.localStorage.setItem('museonetAdminSecret', secret);
     }
+    setOtpSecret(secret);
     setOtpVerified(verified === 'true');
   }, []);
+
+  useEffect(() => {
+    if (!otpSecret) return;
+    const uri = `otpauth://totp/museonet:Admin?secret=${otpSecret}&issuer=museonet&algorithm=SHA1&digits=6&period=30`;
+    setOtpQr(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(uri)}`);
+  }, [otpSecret]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -94,7 +235,10 @@ const AdminPage: React.FC = () => {
       setOtpError('Код қате. Қайта тексеріңіз.');
       return;
     }
-    if (token !== storedCode) {
+    const current = generateTotp(otpSecret, 0);
+    const prev = generateTotp(otpSecret, -1);
+    const next = generateTotp(otpSecret, 1);
+    if (token !== current && token !== prev && token !== next) {
       setOtpError('Код қате. Қайта тексеріңіз.');
       return;
     }
@@ -102,20 +246,6 @@ const AdminPage: React.FC = () => {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('museonetAdminVerified', 'true');
     }
-  };
-
-  const handleAdminCodeSave = () => {
-    const token = adminCode.trim();
-    if (token.length !== 6) {
-      setOtpError('Код қате. Қайта тексеріңіз.');
-      return;
-    }
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('museonetAdminCode', token);
-    }
-    setStoredCode(token);
-    setAdminCode('');
-    setOtpError('');
   };
 
   const handleMuseumChange = (id: number, field: keyof Museum, value: string) => {
@@ -192,40 +322,24 @@ const AdminPage: React.FC = () => {
                 <p>Google Authenticator арқылы бір реттік код енгізіңіз.</p>
               </div>
               <div className="otp-card">
-                {!storedCode && (
-                  <>
-                    <p className="otp-hint">Алғашқы рет 6 таңбалы кодты орнатыңыз.</p>
-                    <div className="otp-inputs">
-                      <input
-                        value={adminCode}
-                        onChange={(event) => setAdminCode(event.target.value)}
-                        placeholder="123456"
-                        inputMode="numeric"
-                        maxLength={6}
-                      />
-                      <button className="button button-primary" type="button" onClick={handleAdminCodeSave}>
-                        Кодты сақтау
-                      </button>
-                    </div>
-                  </>
-                )}
-                {storedCode && (
-                  <>
-                    <p className="otp-hint">Google Authenticator кодыңызды енгізіңіз.</p>
-                    <div className="otp-inputs">
-                      <input
-                        value={otpInput}
-                        onChange={(event) => setOtpInput(event.target.value)}
-                        placeholder="123456"
-                        inputMode="numeric"
-                        maxLength={6}
-                      />
-                      <button className="button button-primary" type="button" onClick={handleOtpVerify}>
-                        Тексеру
-                      </button>
-                    </div>
-                  </>
-                )}
+                {otpQr && <img src={otpQr} alt="Admin QR code" />}
+                <p className="otp-hint">Google Authenticator-ға QR кодты қосып, бір реттік код енгізіңіз.</p>
+                <div className="otp-secret">
+                  <span>Secret:</span>
+                  <strong>{otpSecret}</strong>
+                </div>
+                <div className="otp-inputs">
+                  <input
+                    value={otpInput}
+                    onChange={(event) => setOtpInput(event.target.value)}
+                    placeholder="123456"
+                    inputMode="numeric"
+                    maxLength={6}
+                  />
+                  <button className="button button-primary" type="button" onClick={handleOtpVerify}>
+                    Тексеру
+                  </button>
+                </div>
                 {otpError && <div className="error-banner">{otpError}</div>}
               </div>
             </div>
