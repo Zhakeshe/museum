@@ -54,7 +54,7 @@ const ProfilePage: React.FC = () => {
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem('museonetUserName');
       window.localStorage.removeItem('museonetUserEmail');
-      window.localStorage.removeItem('museonetAdminSecret');
+      window.localStorage.removeItem('museonetAdminCode');
       window.localStorage.removeItem('museonetAdminVerified');
     }
     router.push('/');

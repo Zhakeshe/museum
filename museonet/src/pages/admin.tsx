@@ -25,74 +25,17 @@ type User = {
   lastActive: string;
 };
 
-const base32Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-
-const encodeBase32 = (buffer: Uint8Array) => {
-  let bits = 0;
-  let value = 0;
-  let output = '';
-  for (const byte of buffer) {
-    value = (value << 8) | byte;
-    bits += 8;
-    while (bits >= 5) {
-      output += base32Alphabet[(value >>> (bits - 5)) & 31];
-      bits -= 5;
-    }
-  }
-  if (bits > 0) {
-    output += base32Alphabet[(value << (5 - bits)) & 31];
-  }
-  return output;
-};
-
-const decodeBase32 = (input: string) => {
-  let bits = 0;
-  let value = 0;
-  const output: number[] = [];
-  for (const char of input.toUpperCase().replace(/=+$/, '')) {
-    const index = base32Alphabet.indexOf(char);
-    if (index === -1) continue;
-    value = (value << 5) | index;
-    bits += 5;
-    if (bits >= 8) {
-      output.push((value >>> (bits - 8)) & 255);
-      bits -= 8;
-    }
-  }
-  return new Uint8Array(output);
-};
-
-const generateTotp = async (secret: string, offset = 0) => {
-  const keyData = decodeBase32(secret);
-  const counter = Math.floor(Date.now() / 1000 / 30) + offset;
-  const buffer = new ArrayBuffer(8);
-  const view = new DataView(buffer);
-  view.setUint32(4, counter);
-  const cryptoKey = await window.crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-1' }, false, [
-    'sign',
-  ]);
-  const signature = await window.crypto.subtle.sign('HMAC', cryptoKey, buffer);
-  const hmac = new Uint8Array(signature);
-  const offsetBits = hmac[hmac.length - 1] & 0xf;
-  const code =
-    ((hmac[offsetBits] & 0x7f) << 24) |
-    ((hmac[offsetBits + 1] & 0xff) << 16) |
-    ((hmac[offsetBits + 2] & 0xff) << 8) |
-    (hmac[offsetBits + 3] & 0xff);
-  return String(code % 1_000_000).padStart(6, '0');
-};
-
 const AdminPage: React.FC = () => {
   const [museums, setMuseums] = useState<Museum[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [newUser, setNewUser] = useState({ name: '', email: '' });
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-  const [otpSecret, setOtpSecret] = useState('');
   const [otpInput, setOtpInput] = useState('');
   const [otpVerified, setOtpVerified] = useState(false);
-  const [otpQr, setOtpQr] = useState('');
   const [otpError, setOtpError] = useState('');
+  const [adminCode, setAdminCode] = useState('');
+  const [storedCode, setStoredCode] = useState('');
   const [search, setSearch] = useState('');
   const [region, setRegion] = useState('Барлығы');
   const [city, setCity] = useState('Барлығы');
@@ -120,23 +63,13 @@ const AdminPage: React.FC = () => {
   }, [museums, search, region, city]);
 
   useEffect(() => {
-    const storedSecret = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminSecret') : null;
     const verified = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminVerified') : null;
-    const secret =
-      storedSecret ??
-      encodeBase32(window.crypto.getRandomValues(new Uint8Array(20)));
-    if (!storedSecret && typeof window !== 'undefined') {
-      window.localStorage.setItem('museonetAdminSecret', secret);
+    const savedCode = typeof window !== 'undefined' ? window.localStorage.getItem('museonetAdminCode') : null;
+    if (savedCode) {
+      setStoredCode(savedCode);
     }
-    setOtpSecret(secret);
     setOtpVerified(verified === 'true');
   }, []);
-
-  useEffect(() => {
-    if (!otpSecret) return;
-    const uri = `otpauth://totp/museonet:Admin?secret=${otpSecret}&issuer=museonet&algorithm=SHA1&digits=6&period=30`;
-    setOtpQr(`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(uri)}`);
-  }, [otpSecret]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -154,18 +87,14 @@ const AdminPage: React.FC = () => {
     void loadData();
   }, [otpVerified]);
 
-  const handleOtpVerify = async () => {
+  const handleOtpVerify = () => {
     setOtpError('');
     const token = otpInput.trim();
     if (token.length !== 6) {
       setOtpError('Код қате. Қайта тексеріңіз.');
       return;
     }
-    const current = await generateTotp(otpSecret, 0);
-    const prev = await generateTotp(otpSecret, -1);
-    const next = await generateTotp(otpSecret, 1);
-    const isValid = token === current || token === prev || token === next;
-    if (!isValid) {
+    if (token !== storedCode) {
       setOtpError('Код қате. Қайта тексеріңіз.');
       return;
     }
@@ -173,6 +102,20 @@ const AdminPage: React.FC = () => {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('museonetAdminVerified', 'true');
     }
+  };
+
+  const handleAdminCodeSave = () => {
+    const token = adminCode.trim();
+    if (token.length !== 6) {
+      setOtpError('Код қате. Қайта тексеріңіз.');
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('museonetAdminCode', token);
+    }
+    setStoredCode(token);
+    setAdminCode('');
+    setOtpError('');
   };
 
   const handleMuseumChange = (id: number, field: keyof Museum, value: string) => {
@@ -249,24 +192,40 @@ const AdminPage: React.FC = () => {
                 <p>Google Authenticator арқылы бір реттік код енгізіңіз.</p>
               </div>
               <div className="otp-card">
-                {otpQr && <img src={otpQr} alt="Admin QR code" />}
-                <p className="otp-hint">Алғашқы рет QR кодты Google Authenticator-ға қосыңыз.</p>
-                <div className="otp-secret">
-                  <span>Secret:</span>
-                  <strong>{otpSecret}</strong>
-                </div>
-                <div className="otp-inputs">
-                  <input
-                    value={otpInput}
-                    onChange={(event) => setOtpInput(event.target.value)}
-                    placeholder="123456"
-                    inputMode="numeric"
-                    maxLength={6}
-                  />
-                  <button className="button button-primary" type="button" onClick={handleOtpVerify}>
-                    Тексеру
-                  </button>
-                </div>
+                {!storedCode && (
+                  <>
+                    <p className="otp-hint">Алғашқы рет 6 таңбалы кодты орнатыңыз.</p>
+                    <div className="otp-inputs">
+                      <input
+                        value={adminCode}
+                        onChange={(event) => setAdminCode(event.target.value)}
+                        placeholder="123456"
+                        inputMode="numeric"
+                        maxLength={6}
+                      />
+                      <button className="button button-primary" type="button" onClick={handleAdminCodeSave}>
+                        Кодты сақтау
+                      </button>
+                    </div>
+                  </>
+                )}
+                {storedCode && (
+                  <>
+                    <p className="otp-hint">Google Authenticator кодыңызды енгізіңіз.</p>
+                    <div className="otp-inputs">
+                      <input
+                        value={otpInput}
+                        onChange={(event) => setOtpInput(event.target.value)}
+                        placeholder="123456"
+                        inputMode="numeric"
+                        maxLength={6}
+                      />
+                      <button className="button button-primary" type="button" onClick={handleOtpVerify}>
+                        Тексеру
+                      </button>
+                    </div>
+                  </>
+                )}
                 {otpError && <div className="error-banner">{otpError}</div>}
               </div>
             </div>
