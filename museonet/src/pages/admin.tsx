@@ -403,6 +403,18 @@ const AdminPage: React.FC = () => {
           </div>
             </section>
 
+            <section className="admin-section admin-games-section">
+              <div className="container admin-games-card">
+                <div>
+                  <h2>Game System MVP</h2>
+                  <p>Ойын контенті, scoring және аналитиканы жаңа басқару панелінен реттеңіз.</p>
+                </div>
+                <a className="button button-primary" href="/admin/games">
+                  Game System ашу
+                </a>
+              </div>
+            </section>
+
             <section className="admin-section">
           <div className="container">
             <h2>Музейлерді басқару</h2>
@@ -628,6 +640,19 @@ const AdminPage: React.FC = () => {
 
         .admin-section {
           padding: 48px 0;
+        }
+
+        .admin-games-card {
+          background: rgba(255, 255, 255, 0.85);
+          border-radius: 18px;
+          padding: 24px;
+          border: 1px solid rgba(180, 106, 60, 0.18);
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 16px;
+          align-items: center;
+          box-shadow: 0 12px 24px rgba(64, 42, 18, 0.08);
         }
 
         .otp-card {
