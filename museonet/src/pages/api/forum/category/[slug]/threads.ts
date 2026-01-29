@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fetchForumThreadsByCategory } from '../../../../lib/db';
+import { fetchForumThreadsByCategory } from '@/lib/db';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
