@@ -29,7 +29,6 @@ type UploadedImage = {
   id: string;
   name: string;
   url: string;
-  previewUrl: string;
   uploadedAt: string;
 };
 
@@ -182,8 +181,6 @@ const AdminPage: React.FC = () => {
   const [region, setRegion] = useState('Барлығы');
   const [city, setCity] = useState('Барлығы');
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-  const [uploadMessage, setUploadMessage] = useState('');
 
   const totalMuseums = useMemo(() => 285, []);
   const regionOptions = useMemo(
@@ -215,23 +212,6 @@ const AdminPage: React.FC = () => {
     }
     setOtpSecret(secret);
     setOtpVerified(verified === 'true');
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const storedImages = window.localStorage.getItem('museonetAdminUploads');
-    if (!storedImages) return;
-    try {
-      const parsed = JSON.parse(storedImages) as UploadedImage[];
-      setUploadedImages(
-        parsed.map((image) => ({
-          ...image,
-          previewUrl: image.previewUrl ?? image.url,
-        })),
-      );
-    } catch {
-      setUploadedImages([]);
-    }
   }, []);
 
   useEffect(() => {
@@ -353,46 +333,6 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') return;
-      const id = `${Date.now()}-${file.name.replace(/\s+/g, '-').toLowerCase()}`;
-      const newImage: UploadedImage = {
-        id,
-        name: file.name,
-        url: `https://museonet.world/uploads/${id}`,
-        previewUrl: reader.result,
-        uploadedAt: new Date().toLocaleString(),
-      };
-      const next = [newImage, ...uploadedImages];
-      setUploadedImages(next);
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem('museonetAdminUploads', JSON.stringify(next));
-      }
-      setUploadMessage('Сурет жүктелді. Сілтемені көшіріп, музейге қосыңыз.');
-      setTimeout(() => setUploadMessage(''), 2000);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleCopyLink = async (url: string) => {
-    if (typeof navigator === 'undefined') return;
-    await navigator.clipboard.writeText(url);
-    setUploadMessage('Сілтеме көшірілді.');
-    setTimeout(() => setUploadMessage(''), 1500);
-  };
-
-  const handleRemoveUpload = (id: string) => {
-    const next = uploadedImages.filter((image) => image.id !== id);
-    setUploadedImages(next);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('museonetAdminUploads', JSON.stringify(next));
-    }
-  };
-
   return (
     <div className="page">
       <Head>
@@ -458,47 +398,6 @@ const AdminPage: React.FC = () => {
               <div>
                 <span className="stat-value">20</span>
                 <span className="stat-label">Бастапқы балл</span>
-              </div>
-            </div>
-          </div>
-            </section>
-
-            <section className="admin-section">
-          <div className="container">
-            <div className="upload-panel card">
-              <div className="upload-header">
-                <div>
-                  <h2>Музей суреттерін жүктеу</h2>
-                  <p>Музей фотосын жүктеп, дайын сілтемені көшіріп алыңыз.</p>
-                </div>
-                <label className="upload-button">
-                  Сурет таңдау
-                  <input type="file" accept="image/*" onChange={handleImageUpload} />
-                </label>
-              </div>
-              {uploadMessage && <div className="success-banner">{uploadMessage}</div>}
-              <div className="upload-grid">
-                {uploadedImages.length === 0 ? (
-                  <div className="loading-card">Әзірге сурет жоқ. Жаңа сурет жүктеңіз.</div>
-                ) : (
-                  uploadedImages.map((image) => (
-                    <div className="upload-card" key={image.id}>
-                      <img src={image.previewUrl} alt={image.name} />
-                      <div className="upload-meta">
-                        <strong>{image.name}</strong>
-                        <span>{image.uploadedAt}</span>
-                      </div>
-                      <div className="button-row">
-                        <button className="button button-secondary" type="button" onClick={() => handleCopyLink(image.url)}>
-                          Сілтемені көшіру
-                        </button>
-                        <button className="button button-outline" type="button" onClick={() => handleRemoveUpload(image.id)}>
-                          Жою
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
               </div>
             </div>
           </div>
@@ -729,70 +628,6 @@ const AdminPage: React.FC = () => {
 
         .admin-section {
           padding: 48px 0;
-        }
-
-        .upload-panel {
-          display: grid;
-          gap: 20px;
-        }
-
-        .upload-header {
-          display: flex;
-          justify-content: space-between;
-          gap: 20px;
-          flex-wrap: wrap;
-          align-items: center;
-        }
-
-        .upload-header p {
-          color: rgba(43, 43, 43, 0.7);
-        }
-
-        .upload-button {
-          background: #b46a3c;
-          color: #fff;
-          border-radius: 999px;
-          padding: 10px 18px;
-          cursor: pointer;
-          font-size: 13px;
-          box-shadow: 0 8px 16px rgba(180, 106, 60, 0.25);
-        }
-
-        .upload-button input {
-          display: none;
-        }
-
-        .upload-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
-        }
-
-        .upload-card {
-          background: #fff;
-          border-radius: 18px;
-          padding: 14px;
-          border: 1px solid rgba(180, 106, 60, 0.15);
-          display: grid;
-          gap: 12px;
-        }
-
-        .upload-card img {
-          width: 100%;
-          height: 160px;
-          object-fit: cover;
-          border-radius: 12px;
-          border: 1px solid rgba(180, 106, 60, 0.1);
-        }
-
-        .upload-meta {
-          display: grid;
-          gap: 4px;
-        }
-
-        .upload-meta span {
-          font-size: 12px;
-          color: rgba(43, 43, 43, 0.6);
         }
 
         .otp-card {
