@@ -50,7 +50,7 @@ const ensureSchema = async () => {
     ensureMemoryStore();
     return;
   }
-  let client: Awaited<ReturnType<Pool['connect']>> | null = null;
+  let client: { release?: () => void } | null = null;
   try {
     client = await getPool().connect();
   } catch {
