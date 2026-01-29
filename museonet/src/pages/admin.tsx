@@ -415,6 +415,18 @@ const AdminPage: React.FC = () => {
               </div>
             </section>
 
+            <section className="admin-section admin-games-section">
+              <div className="container admin-games-card">
+                <div>
+                  <h2>Forum moderation</h2>
+                  <p>Категорияларды басқару және есептерді қарау.</p>
+                </div>
+                <a className="button button-primary" href="/admin/forum">
+                  Forum ашу
+                </a>
+              </div>
+            </section>
+
             <section className="admin-section">
           <div className="container">
             <h2>Музейлерді басқару</h2>

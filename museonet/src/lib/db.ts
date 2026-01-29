@@ -10,7 +10,11 @@ import type {
   ScoringRules,
   ThemeSettings,
 } from '../types/gameSystem';
+import type { ProfileAchievement, ProfilePayload } from '../types/profile';
+import type { ForumCategory, ForumPost, ForumReport, ForumThread } from '../types/forum';
 import { defaultGameContent, defaultGameLevels, defaultScoringRules, defaultThemeSettings } from './gameSeeds';
+import { defaultForumCategories } from './forumSeeds';
+import { defaultAchievements } from './profileSeeds';
 import { seedMuseums, type MuseumRecord } from './seedMuseums';
 
 export type UserRecord = {
@@ -35,6 +39,12 @@ let memoryScoringRules: ScoringRules | null = null;
 let memoryThemeSettings: ThemeSettings | null = null;
 let memoryGameLevels: GameLevelConfig[] | null = null;
 let memoryAnalyticsEvents: AnalyticsEvent[] | null = null;
+let memoryProfiles: Record<string, ProfilePayload> | null = null;
+let memoryAchievements: ProfileAchievement[] | null = null;
+let memoryForumCategories: ForumCategory[] | null = null;
+let memoryForumThreads: ForumThread[] | null = null;
+let memoryForumPosts: ForumPost[] | null = null;
+let memoryForumReports: ForumReport[] | null = null;
 
 const ensureMemoryStore = () => {
   if (!memoryMuseums) {
@@ -60,6 +70,24 @@ const ensureMemoryStore = () => {
   }
   if (!memoryAnalyticsEvents) {
     memoryAnalyticsEvents = [];
+  }
+  if (!memoryProfiles) {
+    memoryProfiles = {};
+  }
+  if (!memoryAchievements) {
+    memoryAchievements = defaultAchievements;
+  }
+  if (!memoryForumCategories) {
+    memoryForumCategories = defaultForumCategories;
+  }
+  if (!memoryForumThreads) {
+    memoryForumThreads = [];
+  }
+  if (!memoryForumPosts) {
+    memoryForumPosts = [];
+  }
+  if (!memoryForumReports) {
+    memoryForumReports = [];
   }
 };
 
@@ -184,6 +212,80 @@ const ensureSchema = async () => {
         id SERIAL PRIMARY KEY,
         event_type TEXT NOT NULL,
         payload JSONB NOT NULL,
+        created_at TIMESTAMP NOT NULL
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS achievements (
+        id SERIAL PRIMARY KEY,
+        key TEXT NOT NULL UNIQUE,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        icon TEXT NOT NULL,
+        target INTEGER NOT NULL,
+        created_at TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP NOT NULL
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS user_profiles (
+        user_email TEXT PRIMARY KEY,
+        payload JSONB NOT NULL,
+        updated_at TIMESTAMP NOT NULL
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS forum_categories (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        description TEXT NOT NULL,
+        sort_order INTEGER NOT NULL,
+        created_at TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP NOT NULL
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS forum_threads (
+        id SERIAL PRIMARY KEY,
+        category_id INTEGER NOT NULL REFERENCES forum_categories(id),
+        title TEXT NOT NULL,
+        author_name TEXT NOT NULL,
+        author_email TEXT NOT NULL,
+        pinned BOOLEAN NOT NULL DEFAULT FALSE,
+        locked BOOLEAN NOT NULL DEFAULT FALSE,
+        tags TEXT[] NOT NULL,
+        created_at TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP NOT NULL,
+        last_post_at TIMESTAMP NOT NULL
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS forum_posts (
+        id SERIAL PRIMARY KEY,
+        thread_id INTEGER NOT NULL REFERENCES forum_threads(id),
+        author_name TEXT NOT NULL,
+        author_email TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP NOT NULL,
+        edited_at TIMESTAMP NULL,
+        is_deleted BOOLEAN NOT NULL DEFAULT FALSE
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS forum_reports (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER NOT NULL REFERENCES forum_posts(id),
+        reporter_email TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        status TEXT NOT NULL,
         created_at TIMESTAMP NOT NULL
       );
     `);
@@ -320,6 +422,48 @@ const ensureSchema = async () => {
           VALUES ($1, $2, $3, $4, $5, $6, $7)
           `,
           [item.gameType, item.title, item.status, item.tags, item.data, item.createdAt, item.updatedAt],
+        );
+      }
+    }
+
+    const achievementsCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM achievements');
+    if (Number(achievementsCount.rows[0]?.count ?? 0) === 0) {
+      for (const achievement of defaultAchievements) {
+        await client.query(
+          `
+          INSERT INTO achievements (key, title, description, icon, target, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          `,
+          [
+            achievement.key,
+            achievement.title,
+            achievement.description,
+            achievement.icon,
+            achievement.target,
+            new Date().toISOString(),
+            new Date().toISOString(),
+          ],
+        );
+      }
+    }
+
+    const categoryCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM forum_categories');
+    if (Number(categoryCount.rows[0]?.count ?? 0) === 0) {
+      const categories = defaultForumCategories;
+      for (const category of categories) {
+        await client.query(
+          `
+          INSERT INTO forum_categories (title, slug, description, sort_order, created_at, updated_at)
+          VALUES ($1, $2, $3, $4, $5, $6)
+          `,
+          [
+            category.title,
+            category.slug,
+            category.description,
+            category.order,
+            category.createdAt,
+            category.updatedAt,
+          ],
         );
       }
     }
@@ -1155,4 +1299,477 @@ export const fetchAnalyticsSummary = async (): Promise<AnalyticsSummary> => {
     `,
   );
   return summarizeAnalytics(rows as AnalyticsEvent[]);
+};
+
+export const fetchAchievements = async (): Promise<ProfileAchievement[]> => {
+  await ensureSchema();
+  if (memoryMode) {
+    return memoryAchievements ?? defaultAchievements;
+  }
+  const { rows } = await getPool().query(
+    `
+    SELECT
+      id,
+      key,
+      title,
+      description,
+      icon,
+      target
+    FROM achievements
+    ORDER BY id
+    `,
+  );
+  return rows as ProfileAchievement[];
+};
+
+export const fetchProfile = async (userEmail: string): Promise<ProfilePayload | null> => {
+  await ensureSchema();
+  if (memoryMode) {
+    return memoryProfiles?.[userEmail] ?? null;
+  }
+  const { rows } = await getPool().query(
+    `
+    SELECT payload
+    FROM user_profiles
+    WHERE user_email = $1
+    `,
+    [userEmail],
+  );
+  return (rows[0]?.payload as ProfilePayload) ?? null;
+};
+
+export const upsertProfile = async (userEmail: string, payload: ProfilePayload): Promise<ProfilePayload> => {
+  await ensureSchema();
+  if (memoryMode) {
+    if (!memoryProfiles) memoryProfiles = {};
+    memoryProfiles[userEmail] = payload;
+    return payload;
+  }
+  await getPool().query(
+    `
+    INSERT INTO user_profiles (user_email, payload, updated_at)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (user_email)
+    DO UPDATE SET payload = $2, updated_at = $3
+    `,
+    [userEmail, payload, payload.updatedAt],
+  );
+  return payload;
+};
+
+export const fetchForumCategories = async (): Promise<ForumCategory[]> => {
+  await ensureSchema();
+  if (memoryMode) {
+    return memoryForumCategories ?? defaultForumCategories;
+  }
+  const { rows } = await getPool().query(
+    `
+    SELECT
+      id,
+      title,
+      slug,
+      description,
+      sort_order AS "order",
+      created_at AS "createdAt",
+      updated_at AS "updatedAt"
+    FROM forum_categories
+    ORDER BY sort_order ASC
+    `,
+  );
+  return rows as ForumCategory[];
+};
+
+export const fetchForumCategorySummaries = async (): Promise<
+  (ForumCategory & { threadCount: number; postCount: number })[]
+> => {
+  await ensureSchema();
+  if (memoryMode) {
+    const categories = memoryForumCategories ?? defaultForumCategories;
+    return categories.map((category) => {
+      const threads = (memoryForumThreads ?? []).filter((thread) => thread.categoryId === category.id);
+      const posts = (memoryForumPosts ?? []).filter((post) =>
+        threads.some((thread) => thread.id === post.threadId && !post.isDeleted),
+      );
+      return { ...category, threadCount: threads.length, postCount: posts.length };
+    });
+  }
+  const { rows } = await getPool().query(
+    `
+    SELECT
+      c.id,
+      c.title,
+      c.slug,
+      c.description,
+      c.sort_order AS "order",
+      c.created_at AS "createdAt",
+      c.updated_at AS "updatedAt",
+      COUNT(DISTINCT t.id) AS "threadCount",
+      COUNT(p.id) AS "postCount"
+    FROM forum_categories c
+    LEFT JOIN forum_threads t ON t.category_id = c.id
+    LEFT JOIN forum_posts p ON p.thread_id = t.id AND p.is_deleted = FALSE
+    GROUP BY c.id
+    ORDER BY c.sort_order ASC
+    `,
+  );
+  return rows.map((row) => ({
+    ...row,
+    threadCount: Number(row.threadCount ?? 0),
+    postCount: Number(row.postCount ?? 0),
+  })) as (ForumCategory & { threadCount: number; postCount: number })[];
+};
+
+export const createForumCategory = async (payload: Omit<ForumCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+  await ensureSchema();
+  const createdAt = new Date().toISOString();
+  const updatedAt = createdAt;
+  if (memoryMode) {
+    const nextId = memoryForumCategories?.length
+      ? Math.max(...memoryForumCategories.map((item) => item.id)) + 1
+      : 1;
+    const created = { ...payload, id: nextId, createdAt, updatedAt };
+    memoryForumCategories = [...(memoryForumCategories ?? []), created];
+    return created;
+  }
+  const { rows } = await getPool().query(
+    `
+    INSERT INTO forum_categories (title, slug, description, sort_order, created_at, updated_at)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING
+      id,
+      title,
+      slug,
+      description,
+      sort_order AS "order",
+      created_at AS "createdAt",
+      updated_at AS "updatedAt"
+    `,
+    [payload.title, payload.slug, payload.description, payload.order, createdAt, updatedAt],
+  );
+  return rows[0] as ForumCategory;
+};
+
+export const fetchForumThreadsByCategory = async (slug: string): Promise<ForumThread[]> => {
+  await ensureSchema();
+  if (memoryMode) {
+    const category = (memoryForumCategories ?? []).find((item) => item.slug === slug);
+    if (!category) return [];
+    return (memoryForumThreads ?? []).filter((thread) => thread.categoryId === category.id);
+  }
+  const { rows } = await getPool().query(
+    `
+    SELECT
+      t.id,
+      t.category_id AS "categoryId",
+      t.title,
+      t.author_name AS "authorName",
+      t.author_email AS "authorEmail",
+      t.pinned,
+      t.locked,
+      t.tags,
+      t.created_at AS "createdAt",
+      t.updated_at AS "updatedAt",
+      t.last_post_at AS "lastPostAt",
+      (SELECT COUNT(*)::int FROM forum_posts p WHERE p.thread_id = t.id AND p.is_deleted = FALSE) - 1 AS "repliesCount"
+    FROM forum_threads t
+    JOIN forum_categories c ON c.id = t.category_id
+    WHERE c.slug = $1
+    ORDER BY t.pinned DESC, t.last_post_at DESC
+    `,
+    [slug],
+  );
+  return rows.map((row) => ({
+    ...row,
+    repliesCount: Math.max(0, Number(row.repliesCount ?? 0)),
+  })) as ForumThread[];
+};
+
+export const createForumThread = async (payload: {
+  categoryId: number;
+  title: string;
+  authorName: string;
+  authorEmail: string;
+  content: string;
+  tags: string[];
+}) => {
+  await ensureSchema();
+  const createdAt = new Date().toISOString();
+  const updatedAt = createdAt;
+  if (memoryMode) {
+    const nextId = memoryForumThreads?.length ? Math.max(...memoryForumThreads.map((item) => item.id)) + 1 : 1;
+    const thread: ForumThread = {
+      id: nextId,
+      categoryId: payload.categoryId,
+      title: payload.title,
+      authorName: payload.authorName,
+      authorEmail: payload.authorEmail,
+      pinned: false,
+      locked: false,
+      tags: payload.tags,
+      createdAt,
+      updatedAt,
+      lastPostAt: createdAt,
+      repliesCount: 0,
+    };
+    memoryForumThreads = [...(memoryForumThreads ?? []), thread];
+    const post: ForumPost = {
+      id: (memoryForumPosts?.length ?? 0) + 1,
+      threadId: nextId,
+      authorName: payload.authorName,
+      authorEmail: payload.authorEmail,
+      content: payload.content,
+      createdAt,
+      updatedAt,
+      editedAt: null,
+      isDeleted: false,
+    };
+    memoryForumPosts = [...(memoryForumPosts ?? []), post];
+    return thread;
+  }
+  const { rows } = await getPool().query(
+    `
+    INSERT INTO forum_threads (category_id, title, author_name, author_email, pinned, locked, tags, created_at, updated_at, last_post_at)
+    VALUES ($1, $2, $3, $4, FALSE, FALSE, $5, $6, $7, $8)
+    RETURNING
+      id,
+      category_id AS "categoryId",
+      title,
+      author_name AS "authorName",
+      author_email AS "authorEmail",
+      pinned,
+      locked,
+      tags,
+      created_at AS "createdAt",
+      updated_at AS "updatedAt",
+      last_post_at AS "lastPostAt"
+    `,
+    [payload.categoryId, payload.title, payload.authorName, payload.authorEmail, payload.tags, createdAt, updatedAt, createdAt],
+  );
+  const thread = rows[0] as ForumThread;
+  await getPool().query(
+    `
+    INSERT INTO forum_posts (thread_id, author_name, author_email, content, created_at, updated_at, edited_at, is_deleted)
+    VALUES ($1, $2, $3, $4, $5, $6, NULL, FALSE)
+    `,
+    [thread.id, payload.authorName, payload.authorEmail, payload.content, createdAt, updatedAt],
+  );
+  return { ...thread, repliesCount: 0 };
+};
+
+export const fetchForumThreadById = async (threadId: number) => {
+  await ensureSchema();
+  if (memoryMode) {
+    const thread = (memoryForumThreads ?? []).find((item) => item.id === threadId);
+    if (!thread) return null;
+    const posts = (memoryForumPosts ?? []).filter((post) => post.threadId === threadId);
+    return { thread, posts };
+  }
+  const { rows } = await getPool().query(
+    `
+    SELECT
+      t.id,
+      t.category_id AS "categoryId",
+      t.title,
+      t.author_name AS "authorName",
+      t.author_email AS "authorEmail",
+      t.pinned,
+      t.locked,
+      t.tags,
+      t.created_at AS "createdAt",
+      t.updated_at AS "updatedAt",
+      t.last_post_at AS "lastPostAt"
+    FROM forum_threads t
+    WHERE t.id = $1
+    `,
+    [threadId],
+  );
+  if (!rows[0]) return null;
+  const thread = rows[0] as ForumThread;
+  const { rows: postRows } = await getPool().query(
+    `
+    SELECT
+      id,
+      thread_id AS "threadId",
+      author_name AS "authorName",
+      author_email AS "authorEmail",
+      content,
+      created_at AS "createdAt",
+      updated_at AS "updatedAt",
+      edited_at AS "editedAt",
+      is_deleted AS "isDeleted"
+    FROM forum_posts
+    WHERE thread_id = $1
+    ORDER BY created_at ASC
+    `,
+    [threadId],
+  );
+  return { thread, posts: postRows as ForumPost[] };
+};
+
+export const createForumPost = async (payload: {
+  threadId: number;
+  authorName: string;
+  authorEmail: string;
+  content: string;
+}) => {
+  await ensureSchema();
+  const createdAt = new Date().toISOString();
+  const updatedAt = createdAt;
+  if (memoryMode) {
+    const nextId = (memoryForumPosts?.length ?? 0) + 1;
+    const post: ForumPost = {
+      id: nextId,
+      threadId: payload.threadId,
+      authorName: payload.authorName,
+      authorEmail: payload.authorEmail,
+      content: payload.content,
+      createdAt,
+      updatedAt,
+      editedAt: null,
+      isDeleted: false,
+    };
+    memoryForumPosts = [...(memoryForumPosts ?? []), post];
+    memoryForumThreads = (memoryForumThreads ?? []).map((thread) =>
+      thread.id === payload.threadId ? { ...thread, lastPostAt: createdAt } : thread,
+    );
+    return post;
+  }
+  const { rows } = await getPool().query(
+    `
+    INSERT INTO forum_posts (thread_id, author_name, author_email, content, created_at, updated_at, edited_at, is_deleted)
+    VALUES ($1, $2, $3, $4, $5, $6, NULL, FALSE)
+    RETURNING
+      id,
+      thread_id AS "threadId",
+      author_name AS "authorName",
+      author_email AS "authorEmail",
+      content,
+      created_at AS "createdAt",
+      updated_at AS "updatedAt",
+      edited_at AS "editedAt",
+      is_deleted AS "isDeleted"
+    `,
+    [payload.threadId, payload.authorName, payload.authorEmail, payload.content, createdAt, updatedAt],
+  );
+  await getPool().query('UPDATE forum_threads SET last_post_at = $1 WHERE id = $2', [createdAt, payload.threadId]);
+  return rows[0] as ForumPost;
+};
+
+export const updateForumPost = async (postId: number, content: string) => {
+  await ensureSchema();
+  const updatedAt = new Date().toISOString();
+  if (memoryMode) {
+    if (!memoryForumPosts) return null;
+    const index = memoryForumPosts.findIndex((post) => post.id === postId);
+    if (index === -1) return null;
+    const updated = { ...memoryForumPosts[index], content, editedAt: updatedAt, updatedAt };
+    memoryForumPosts = memoryForumPosts.map((post, idx) => (idx === index ? updated : post));
+    return updated;
+  }
+  const { rows } = await getPool().query(
+    `
+    UPDATE forum_posts
+    SET content = $1, edited_at = $2, updated_at = $2
+    WHERE id = $3
+    RETURNING
+      id,
+      thread_id AS "threadId",
+      author_name AS "authorName",
+      author_email AS "authorEmail",
+      content,
+      created_at AS "createdAt",
+      updated_at AS "updatedAt",
+      edited_at AS "editedAt",
+      is_deleted AS "isDeleted"
+    `,
+    [content, updatedAt, postId],
+  );
+  return rows[0] as ForumPost;
+};
+
+export const reportForumPost = async (payload: { postId: number; reporterEmail: string; reason: string }) => {
+  await ensureSchema();
+  const createdAt = new Date().toISOString();
+  if (memoryMode) {
+    const nextId = (memoryForumReports?.length ?? 0) + 1;
+    const report: ForumReport = {
+      id: nextId,
+      postId: payload.postId,
+      reporterEmail: payload.reporterEmail,
+      reason: payload.reason,
+      status: 'open',
+      createdAt,
+    };
+    memoryForumReports = [...(memoryForumReports ?? []), report];
+    return report;
+  }
+  const { rows } = await getPool().query(
+    `
+    INSERT INTO forum_reports (post_id, reporter_email, reason, status, created_at)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING
+      id,
+      post_id AS "postId",
+      reporter_email AS "reporterEmail",
+      reason,
+      status,
+      created_at AS "createdAt"
+    `,
+    [payload.postId, payload.reporterEmail, payload.reason, 'open', createdAt],
+  );
+  return rows[0] as ForumReport;
+};
+
+export const lockForumThread = async (threadId: number, locked: boolean) => {
+  await ensureSchema();
+  if (memoryMode) {
+    memoryForumThreads = (memoryForumThreads ?? []).map((thread) =>
+      thread.id === threadId ? { ...thread, locked, updatedAt: new Date().toISOString() } : thread,
+    );
+    return;
+  }
+  await getPool().query('UPDATE forum_threads SET locked = $1 WHERE id = $2', [locked, threadId]);
+};
+
+export const pinForumThread = async (threadId: number, pinned: boolean) => {
+  await ensureSchema();
+  if (memoryMode) {
+    memoryForumThreads = (memoryForumThreads ?? []).map((thread) =>
+      thread.id === threadId ? { ...thread, pinned, updatedAt: new Date().toISOString() } : thread,
+    );
+    return;
+  }
+  await getPool().query('UPDATE forum_threads SET pinned = $1 WHERE id = $2', [pinned, threadId]);
+};
+
+export const deleteForumPost = async (postId: number) => {
+  await ensureSchema();
+  if (memoryMode) {
+    memoryForumPosts = (memoryForumPosts ?? []).map((post) =>
+      post.id === postId ? { ...post, isDeleted: true, updatedAt: new Date().toISOString() } : post,
+    );
+    return;
+  }
+  await getPool().query('UPDATE forum_posts SET is_deleted = TRUE WHERE id = $1', [postId]);
+};
+
+export const fetchForumReports = async (): Promise<ForumReport[]> => {
+  await ensureSchema();
+  if (memoryMode) {
+    return memoryForumReports ?? [];
+  }
+  const { rows } = await getPool().query(
+    `
+    SELECT
+      id,
+      post_id AS "postId",
+      reporter_email AS "reporterEmail",
+      reason,
+      status,
+      created_at AS "createdAt"
+    FROM forum_reports
+    ORDER BY created_at DESC
+    `,
+  );
+  return rows as ForumReport[];
 };

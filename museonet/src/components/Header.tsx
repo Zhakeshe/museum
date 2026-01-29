@@ -7,6 +7,7 @@ const navItems = [
   { key: 'home', href: '/' },
   { key: 'about', href: '/about' },
   { key: 'games', href: '/games' },
+  { key: 'forum', href: '/forum' },
   { key: 'museums', href: '/museums' },
 ];
 
@@ -15,12 +16,14 @@ const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { language, setLanguage } = useLanguage();
   const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const labels = useMemo(
     () => ({
       kk: {
         home: 'Басты бет',
         about: 'Біз туралы',
         games: 'Ойындар',
+        forum: 'Форум',
         museums: 'Музейлер',
         login: 'Кіру',
         profile: 'Профиль',
@@ -30,6 +33,7 @@ const Header: React.FC = () => {
         home: 'Главная',
         about: 'О проекте',
         games: 'Игры',
+        forum: 'Форум',
         museums: 'Музеи',
         login: 'Войти',
         profile: 'Профиль',
@@ -39,6 +43,7 @@ const Header: React.FC = () => {
         home: 'Home',
         about: 'About',
         games: 'Games',
+        forum: 'Forum',
         museums: 'Museums',
         login: 'Login',
         profile: 'Profile',
@@ -52,6 +57,7 @@ const Header: React.FC = () => {
     if (typeof window === 'undefined') return;
     const updateUser = () => {
       setUserName(window.localStorage.getItem('museonetUserName') ?? '');
+      setUserEmail(window.localStorage.getItem('museonetUserEmail') ?? '');
     };
     updateUser();
     window.addEventListener('storage', updateUser);
@@ -63,6 +69,17 @@ const Header: React.FC = () => {
     router.events.on('routeChangeComplete', handleRouteChange);
     return () => router.events.off('routeChangeComplete', handleRouteChange);
   }, [router.events]);
+
+  const handleLogout = () => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.removeItem('museonetUserName');
+    window.localStorage.removeItem('museonetUserEmail');
+    window.localStorage.removeItem('museonetAdminSecret');
+    window.localStorage.removeItem('museonetAdminVerified');
+    setUserName('');
+    setUserEmail('');
+    router.push('/');
+  };
 
   return (
     <header className="site-header">
@@ -103,6 +120,13 @@ const Header: React.FC = () => {
                 {userName ? userName : labels[language].login}
               </Link>
             </li>
+            {userEmail && (
+              <li>
+                <button type="button" className="nav-button nav-logout" onClick={handleLogout}>
+                  {language === 'kk' ? 'Шығу' : language === 'ru' ? 'Выйти' : 'Log out'}
+                </button>
+              </li>
+            )}
             <li>
               <div className="lang-switch" role="group" aria-label="Language switch">
                 <button
@@ -196,6 +220,12 @@ const Header: React.FC = () => {
           font-weight: 500;
           color: rgba(43, 43, 43, 0.82);
           transition: color 0.25s ease-out;
+        }
+
+        .nav-logout {
+          background: rgba(138, 106, 69, 0.1);
+          border: 1px solid rgba(138, 106, 69, 0.2);
+          cursor: pointer;
         }
 
         .nav-link::after {
