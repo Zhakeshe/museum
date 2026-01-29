@@ -600,7 +600,7 @@ export const deleteMuseum = async (id: number): Promise<boolean> => {
     return removed;
   }
   const result = await getPool().query('DELETE FROM museums WHERE id = $1', [id]);
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 };
 
 export const fetchUsers = async (): Promise<UserRecord[]> => {
@@ -740,7 +740,7 @@ export const deleteUser = async (id: number): Promise<boolean> => {
     return removed;
   }
   const result = await getPool().query('DELETE FROM users WHERE id = $1', [id]);
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 };
 
 export const findUserByEmail = async (email: string): Promise<UserRecord | null> => {
