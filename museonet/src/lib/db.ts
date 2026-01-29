@@ -1,4 +1,4 @@
-import type { Pool } from 'pg';
+import type { Pool, PoolClient } from 'pg';
 import type {
   AnalyticsEvent,
   AnalyticsSummary,
@@ -86,7 +86,7 @@ const ensureSchema = async () => {
     ensureMemoryStore();
     return;
   }
-  let client: { query: (sql: string, params?: unknown[]) => Promise<unknown>; release?: () => void } | null = null;
+  let client: PoolClient | null = null;
   try {
     client = await getPool().connect();
   } catch {
@@ -188,7 +188,7 @@ const ensureSchema = async () => {
       );
     `);
 
-    const museumsCount = await client.query('SELECT COUNT(*) FROM museums');
+    const museumsCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM museums');
     if (Number(museumsCount.rows[0]?.count ?? 0) === 0) {
       const museums = seedMuseums();
       await client.query('BEGIN');
@@ -240,7 +240,7 @@ const ensureSchema = async () => {
       await client.query('COMMIT');
     }
 
-    const usersCount = await client.query('SELECT COUNT(*) FROM users');
+    const usersCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM users');
     if (Number(usersCount.rows[0]?.count ?? 0) === 0) {
       await client.query(
         `
@@ -276,7 +276,7 @@ const ensureSchema = async () => {
       );
     }
 
-    const scoringCount = await client.query('SELECT COUNT(*) FROM scoring_rules');
+    const scoringCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM scoring_rules');
     if (Number(scoringCount.rows[0]?.count ?? 0) === 0) {
       await client.query(
         `
@@ -287,7 +287,7 @@ const ensureSchema = async () => {
       );
     }
 
-    const themeCount = await client.query('SELECT COUNT(*) FROM theme_settings');
+    const themeCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM theme_settings');
     if (Number(themeCount.rows[0]?.count ?? 0) === 0) {
       await client.query(
         `
@@ -298,7 +298,7 @@ const ensureSchema = async () => {
       );
     }
 
-    const levelCount = await client.query('SELECT COUNT(*) FROM game_level_configs');
+    const levelCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM game_level_configs');
     if (Number(levelCount.rows[0]?.count ?? 0) === 0) {
       for (const level of defaultGameLevels) {
         await client.query(
@@ -311,7 +311,7 @@ const ensureSchema = async () => {
       }
     }
 
-    const contentCount = await client.query('SELECT COUNT(*) FROM game_content');
+    const contentCount = await client.query<{ count: string }>('SELECT COUNT(*) FROM game_content');
     if (Number(contentCount.rows[0]?.count ?? 0) === 0) {
       for (const item of defaultGameContent) {
         await client.query(
