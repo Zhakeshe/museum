@@ -14,10 +14,24 @@ export type UserRecord = {
 
 let pool: Pool | null = null;
 let schemaReady = false;
+let memoryMode = false;
+let memoryMuseums: MuseumRecord[] | null = null;
+let memoryUsers: UserRecord[] | null = null;
+
+const ensureMemoryStore = () => {
+  if (!memoryMuseums) {
+    memoryMuseums = seedMuseums();
+  }
+  if (!memoryUsers) {
+    memoryUsers = [];
+  }
+};
 
 const getPool = () => {
   if (!pool) {
     if (!process.env.DATABASE_URL) {
+      memoryMode = true;
+      ensureMemoryStore();
       throw new Error('DATABASE_URL is not set');
     }
     const { Pool } = (eval('require') as NodeRequire)('pg') as typeof import('pg');
@@ -29,8 +43,21 @@ const getPool = () => {
 };
 
 const ensureSchema = async () => {
+  if (memoryMode) return;
   if (schemaReady) return;
-  const client = await getPool().connect();
+  if (!process.env.DATABASE_URL) {
+    memoryMode = true;
+    ensureMemoryStore();
+    return;
+  }
+  let client: Awaited<ReturnType<Pool['connect']>> | null = null;
+  try {
+    client = await getPool().connect();
+  } catch {
+    memoryMode = true;
+    ensureMemoryStore();
+    return;
+  }
   try {
     await client.query(`
       CREATE TABLE IF NOT EXISTS museums (
@@ -158,7 +185,7 @@ const ensureSchema = async () => {
 
     schemaReady = true;
   } finally {
-    client.release();
+    client?.release();
   }
 };
 
@@ -196,6 +223,9 @@ const mapUserRow = (row: any): UserRecord => ({
 
 export const fetchMuseums = async (): Promise<MuseumRecord[]> => {
   await ensureSchema();
+  if (memoryMode) {
+    return memoryMuseums ? [...memoryMuseums] : [];
+  }
   const { rows } = await getPool().query(
     `
     SELECT
@@ -226,6 +256,9 @@ export const fetchMuseums = async (): Promise<MuseumRecord[]> => {
 
 export const fetchMuseumById = async (id: number): Promise<MuseumRecord | null> => {
   await ensureSchema();
+  if (memoryMode) {
+    return memoryMuseums?.find((museum) => museum.id === id) ?? null;
+  }
   const { rows } = await getPool().query(
     `
     SELECT
@@ -263,6 +296,13 @@ export const createMuseum = async (payload: Partial<MuseumRecord>): Promise<Muse
     ...fallback,
     ...payload,
   } as MuseumRecord;
+
+  if (memoryMode) {
+    const nextId = memoryMuseums?.length ? Math.max(...memoryMuseums.map((item) => item.id)) + 1 : 1;
+    const created = { ...museum, id: nextId };
+    memoryMuseums = [...(memoryMuseums ?? []), created];
+    return created;
+  }
 
   const { rows } = await getPool().query(
     `
@@ -331,6 +371,14 @@ export const createMuseum = async (payload: Partial<MuseumRecord>): Promise<Muse
 
 export const updateMuseum = async (id: number, payload: Partial<MuseumRecord>): Promise<MuseumRecord | null> => {
   await ensureSchema();
+  if (memoryMode) {
+    if (!memoryMuseums) return null;
+    const index = memoryMuseums.findIndex((museum) => museum.id === id);
+    if (index === -1) return null;
+    const updated = { ...memoryMuseums[index], ...payload, id };
+    memoryMuseums = memoryMuseums.map((museum, idx) => (idx === index ? updated : museum));
+    return updated;
+  }
   const existing = await fetchMuseumById(id);
   if (!existing) return null;
   const museum = { ...existing, ...payload, id };
@@ -403,12 +451,22 @@ export const updateMuseum = async (id: number, payload: Partial<MuseumRecord>): 
 
 export const deleteMuseum = async (id: number): Promise<boolean> => {
   await ensureSchema();
+  if (memoryMode) {
+    if (!memoryMuseums) return false;
+    const next = memoryMuseums.filter((museum) => museum.id !== id);
+    const removed = next.length !== memoryMuseums.length;
+    memoryMuseums = next;
+    return removed;
+  }
   const result = await getPool().query('DELETE FROM museums WHERE id = $1', [id]);
   return result.rowCount > 0;
 };
 
 export const fetchUsers = async (): Promise<UserRecord[]> => {
   await ensureSchema();
+  if (memoryMode) {
+    return memoryUsers ? [...memoryUsers] : [];
+  }
   const { rows } = await getPool().query(
     `
     SELECT
@@ -429,6 +487,9 @@ export const fetchUsers = async (): Promise<UserRecord[]> => {
 
 export const fetchUserById = async (id: number): Promise<UserRecord | null> => {
   await ensureSchema();
+  if (memoryMode) {
+    return memoryUsers?.find((user) => user.id === id) ?? null;
+  }
   const { rows } = await getPool().query(
     `
     SELECT
@@ -461,6 +522,13 @@ export const createUser = async (payload: Partial<UserRecord>): Promise<UserReco
     lastActive: payload.lastActive ?? '—',
   } as UserRecord;
 
+  if (memoryMode) {
+    const nextId = memoryUsers?.length ? Math.max(...memoryUsers.map((item) => item.id)) + 1 : 1;
+    const created = { ...user, id: nextId };
+    memoryUsers = [...(memoryUsers ?? []), created];
+    return created;
+  }
+
   const { rows } = await getPool().query(
     `
     INSERT INTO users (name, email, points, role, status, visits, last_active)
@@ -482,6 +550,14 @@ export const createUser = async (payload: Partial<UserRecord>): Promise<UserReco
 
 export const updateUser = async (id: number, payload: Partial<UserRecord>): Promise<UserRecord | null> => {
   await ensureSchema();
+  if (memoryMode) {
+    if (!memoryUsers) return null;
+    const index = memoryUsers.findIndex((user) => user.id === id);
+    if (index === -1) return null;
+    const updated = { ...memoryUsers[index], ...payload, id };
+    memoryUsers = memoryUsers.map((user, idx) => (idx === index ? updated : user));
+    return updated;
+  }
   const existing = await fetchUserById(id);
   if (!existing) return null;
   const user = { ...existing, ...payload, id };
@@ -515,12 +591,22 @@ export const updateUser = async (id: number, payload: Partial<UserRecord>): Prom
 
 export const deleteUser = async (id: number): Promise<boolean> => {
   await ensureSchema();
+  if (memoryMode) {
+    if (!memoryUsers) return false;
+    const next = memoryUsers.filter((user) => user.id !== id);
+    const removed = next.length !== memoryUsers.length;
+    memoryUsers = next;
+    return removed;
+  }
   const result = await getPool().query('DELETE FROM users WHERE id = $1', [id]);
   return result.rowCount > 0;
 };
 
 export const findUserByEmail = async (email: string): Promise<UserRecord | null> => {
   await ensureSchema();
+  if (memoryMode) {
+    return memoryUsers?.find((user) => user.email === email) ?? null;
+  }
   const { rows } = await getPool().query(
     `
     SELECT
