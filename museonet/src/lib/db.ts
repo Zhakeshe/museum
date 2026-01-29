@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import { seedMuseums, type MuseumRecord } from './seedMuseums';
 
 export type UserRecord = {
@@ -20,6 +20,7 @@ const getPool = () => {
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL is not set');
     }
+    const { Pool } = (eval('require') as NodeRequire)('pg') as typeof import('pg');
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
     });
