@@ -35,7 +35,12 @@ const PuzzlePage: React.FC = () => {
     const level = progress.perGame.puzzle.level;
     return (
       levels.find((entry) => entry.level === level) ??
-      ({ config: { gridSize: 3, timerSeconds: 120, previewDurationSeconds: 3 } } as GameLevelConfig)
+      ({
+        gameType: 'puzzle',
+        level,
+        config: { gridSize: 3, timerSeconds: 120, previewDurationSeconds: 3 },
+        updatedAt: new Date().toISOString(),
+      } as GameLevelConfig)
     );
   }, [levels, progress]);
 
