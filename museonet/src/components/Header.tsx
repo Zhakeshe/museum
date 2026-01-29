@@ -1,223 +1,298 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useLanguage } from '../contexts/LanguageContext';
 
-interface MenuItem {
-  label: string;
-  href: string;
-  isAnchor?: boolean;
-}
-
-const menuItems: MenuItem[] = [
-  { label: 'Музеи Казахстана', href: '/museum' },
-  { label: '3D модели', href: '/model-3d' },
-  { label: 'Каталог', href: '/exhibit' },
-  { label: 'Игры', href: '/news-article' },
-  { label: 'Законодательство', href: '/zakonodatelstvo' },
+const navItems = [
+  { key: 'home', href: '/' },
+  { key: 'about', href: '/about' },
+  { key: 'games', href: '/games' },
+  { key: 'museums', href: '/museums' },
 ];
 
 const Header: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const { language, setLanguage } = useLanguage();
+  const [userName, setUserName] = useState('');
+  const labels = useMemo(
+    () => ({
+      kk: {
+        home: 'Басты бет',
+        about: 'Біз туралы',
+        games: 'Ойындар',
+        museums: 'Музейлер',
+        login: 'Кіру',
+        profile: 'Профиль',
+        aria: 'Негізгі навигация',
+      },
+      ru: {
+        home: 'Главная',
+        about: 'О проекте',
+        games: 'Игры',
+        museums: 'Музеи',
+        login: 'Войти',
+        profile: 'Профиль',
+        aria: 'Главная навигация',
+      },
+      en: {
+        home: 'Home',
+        about: 'About',
+        games: 'Games',
+        museums: 'Museums',
+        login: 'Login',
+        profile: 'Profile',
+        aria: 'Main navigation',
+      },
+    }),
+    [],
+  );
 
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
+    if (typeof window === 'undefined') return;
+    const updateUser = () => {
+      setUserName(window.localStorage.getItem('museonetUserName') ?? '');
     };
-  }, [isMenuOpen]);
+    updateUser();
+    window.addEventListener('storage', updateUser);
+    return () => window.removeEventListener('storage', updateUser);
+  }, []);
 
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMenuOpen) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isMenuOpen]);
+    const handleRouteChange = () => setIsOpen(false);
+    router.events.on('routeChangeComplete', handleRouteChange);
+    return () => router.events.off('routeChangeComplete', handleRouteChange);
+  }, [router.events]);
 
   return (
-    <header
-      data-elementor-type="header"
-      data-elementor-id="602"
-      className="elementor elementor-602 elementor-location-header"
-    >
-      <div className="elementor-element elementor-element-c359326 e-grid e-con-full e-con e-parent">
-        {/* Burger Menu */}
+    <header className="site-header">
+      <div className="container header-inner">
+        <Link href="/" className="logo">
+          museonet
+        </Link>
+
         <button
-          className={`kz-burger-menu ${isMenuOpen ? 'active' : ''}`}
-          id="kzBurgerMenu"
-          onClick={toggleMenu}
+          className={`menu-toggle ${isOpen ? 'is-open' : ''}`}
           type="button"
-          aria-expanded={isMenuOpen}
-          aria-controls="kzFullscreenMenu"
-          aria-label={isMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? 'Жабу' : 'Ашу'}
         >
-          <span className="kz-burger-line"></span>
-          <span className="kz-burger-line"></span>
-          <span className="kz-burger-line"></span>
+          <span></span>
+          <span></span>
         </button>
 
-        {/* Fullscreen Menu */}
-        <div
-          className={`kz-fullscreen-menu ${isMenuOpen ? 'active' : ''}`}
-          id="kzFullscreenMenu"
-          aria-hidden={!isMenuOpen}
-        >
-          <div className="kz-menu-left">
-            <button
-              className="kz-menu-close"
-              onClick={toggleMenu}
-              type="button"
-              aria-label="Закрыть меню"
-            >
-              <span></span>
-              <span></span>
-            </button>
-
-            <nav className="kz-menu-nav">
-              {menuItems.map((item, index) => (
-                <Link
-                  key={index}
-                  href={item.href}
-                  className="kz-menu-link"
-                  style={{ ['--i' as any]: index + 1 }}
-                  onClick={toggleMenu}
+        <nav className={`main-nav ${isOpen ? 'is-open' : ''}`} aria-label={labels[language].aria}>
+          <ul>
+            {navItems.map((item) => {
+              const isActive = router.pathname === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`nav-link ${isActive ? 'is-active' : ''}`}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {labels[language][item.key as keyof typeof labels.kk]}
+                  </Link>
+                </li>
+              );
+            })}
+            <li>
+              <Link href={userName ? '/profile' : '/login'} className="nav-button">
+                {userName ? userName : labels[language].login}
+              </Link>
+            </li>
+            <li>
+              <div className="lang-switch" role="group" aria-label="Language switch">
+                <button
+                  type="button"
+                  className={`lang-chip ${language === 'kk' ? 'is-active' : ''}`}
+                  onClick={() => setLanguage('kk')}
                 >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="kz-menu-footer">
-              <div className="kz-menu-social">
-                <a
-                  href="https://www.instagram.com/nationalmuseumkz/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="kz-social-link"
-                  aria-label="Instagram"
+                  Қаз
+                </button>
+                <button
+                  type="button"
+                  className={`lang-chip ${language === 'ru' ? 'is-active' : ''}`}
+                  onClick={() => setLanguage('ru')}
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.facebook.com/www.qrum.kz"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="kz-social-link"
-                  aria-label="Facebook"
+                  Рус
+                </button>
+                <button
+                  type="button"
+                  className={`lang-chip ${language === 'en' ? 'is-active' : ''}`}
+                  onClick={() => setLanguage('en')}
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
-                  </svg>
-                </a>
+                  Eng
+                </button>
               </div>
-              <p className="kz-menu-copyright">© 2026 Музеи Казахстана</p>
-            </div>
-          </div>
-
-          <div
-            className="kz-menu-right"
-            style={{
-              backgroundImage: "url('/wp-content/uploads/sites/11/2025/11/slide.jpg')",
-            }}
-          >
-            <div className="kz-menu-right-overlay"></div>
-            <div className="kz-menu-right-content">
-              <h2>Откройте для себя</h2>
-              <p>богатую историю и культуру Казахстана</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Navigation */}
-        <nav
-          aria-label="Menu"
-          className="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-horizontal"
-        >
-          <ul id="menu-1-3a233a6" className="elementor-nav-menu">
-            {menuItems.map((item, index) => (
-              <li key={index} className="menu-item">
-                <Link href={item.href} className="elementor-item menu-link">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            </li>
           </ul>
         </nav>
-
-        {/* Logo */}
-        <div className="elementor-element elementor-element-eeab1d3">
-          <Link href="/">
-            <div className="logoh" style={{ minWidth: '170px' }}></div>
-          </Link>
-        </div>
-
-        {/* Search */}
-        <div className="elementor-element elementor-element-361c23b">
-          <search className="e-search" role="search">
-            <form className="e-search-form" action="/" method="get">
-              <label className="e-search-label" htmlFor="search-361c23b">
-                <span className="elementor-screen-only">Search</span>
-                <svg
-                  aria-hidden="true"
-                  className="e-font-icon-svg e-fas-search"
-                  viewBox="0 0 512 512"
-                >
-                  <path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path>
-                </svg>
-              </label>
-              <div className="e-search-input-wrapper">
-                <input
-                  id="search-361c23b"
-                  placeholder="Поиск"
-                  className="e-search-input"
-                  type="search"
-                  name="s"
-                  autoComplete="off"
-                />
-              </div>
-            </form>
-          </search>
-        </div>
-
-        {/* Language Switcher */}
-        <div className="elementor-element elementor-element-303a1b8 cpel-switcher--layout-dropdown langh">
-          <nav className="cpel-switcher__nav">
-            <div className="cpel-switcher__toggle cpel-switcher__lang">
-              <a lang="ru-RU" href="/">
-                <span className="cpel-switcher__name">Рус</span>
-                <i className="cpel-switcher__icon fas fa-caret-down" aria-hidden="true"></i>
-              </a>
-            </div>
-            <ul className="cpel-switcher__list">
-              <li className="cpel-switcher__lang">
-                <a lang="kk" href="/kk/main">
-                  <span className="cpel-switcher__name">Қаз</span>
-                </a>
-              </li>
-              <li className="cpel-switcher__lang">
-                <a lang="en-US" href="/en/main">
-                  <span className="cpel-switcher__name">Eng</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        {/* Login Link */}
-        <div className="elementor-element elementor-element-42110f6">
-          <a href="https://crm.e-museum.kz/" target="_blank" rel="noopener noreferrer" className="logh">
-            Войти
-          </a>
-        </div>
       </div>
+      <style jsx>{`
+        .site-header {
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          background: rgba(246, 241, 232, 0.92);
+          border-bottom: 1px solid rgba(181, 139, 100, 0.25);
+          backdrop-filter: blur(12px);
+        }
+
+        .header-inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 18px 0;
+          gap: 24px;
+        }
+
+        .logo {
+          font-size: 20px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+        }
+
+        .main-nav ul {
+          display: flex;
+          list-style: none;
+          gap: 24px;
+          align-items: center;
+        }
+
+        .lang-switch {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 4px 8px;
+          border-radius: 999px;
+          border: 1px solid rgba(181, 139, 100, 0.25);
+          background: rgba(255, 255, 255, 0.65);
+        }
+
+        .lang-chip {
+          border: none;
+          background: transparent;
+          font-size: 12px;
+          font-weight: 600;
+          color: rgba(43, 43, 43, 0.7);
+          padding: 4px 6px;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: background 0.25s ease-out, color 0.25s ease-out;
+        }
+
+        .lang-chip.is-active,
+        .lang-chip:hover {
+          background: rgba(138, 106, 69, 0.15);
+          color: var(--accent);
+        }
+
+        .nav-link {
+          position: relative;
+          font-size: 15px;
+          font-weight: 500;
+          color: rgba(43, 43, 43, 0.82);
+          transition: color 0.25s ease-out;
+        }
+
+        .nav-link::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          bottom: -8px;
+          width: 100%;
+          height: 2px;
+          background: var(--accent);
+          border-radius: 999px;
+          opacity: 0;
+          transform: scaleX(0.6);
+          transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+        }
+
+        .nav-link:hover {
+          color: var(--accent);
+        }
+
+        .nav-link.is-active::after {
+          opacity: 1;
+          transform: scaleX(1);
+        }
+
+        .nav-button {
+          background: rgba(138, 106, 69, 0.12);
+          border: 1px solid rgba(138, 106, 69, 0.35);
+          padding: 8px 18px;
+          border-radius: 999px;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--accent);
+          transition: background 0.25s ease-out, transform 0.25s ease-out;
+        }
+
+        .nav-button:hover {
+          background: rgba(138, 106, 69, 0.2);
+          transform: translateY(-2px);
+        }
+
+        .menu-toggle {
+          display: none;
+          background: transparent;
+          border: none;
+          flex-direction: column;
+          gap: 6px;
+          padding: 6px;
+        }
+
+        .menu-toggle span {
+          width: 24px;
+          height: 2px;
+          background: var(--text);
+          transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+        }
+
+        .menu-toggle.is-open span:first-child {
+          transform: translateY(4px) rotate(45deg);
+        }
+
+        .menu-toggle.is-open span:last-child {
+          transform: translateY(-4px) rotate(-45deg);
+        }
+
+        @media (max-width: 900px) {
+          .menu-toggle {
+            display: flex;
+          }
+
+          .main-nav {
+            position: absolute;
+            top: 64px;
+            left: 0;
+            right: 0;
+            background: var(--background);
+            border-top: 1px solid rgba(181, 139, 100, 0.2);
+            transform: translateY(-12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+          }
+
+          .main-nav ul {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px;
+            gap: 16px;
+          }
+
+          .main-nav.is-open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+          }
+        }
+      `}</style>
     </header>
   );
 };
