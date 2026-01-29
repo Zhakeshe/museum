@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
-import { updateForumPost } from '../../../../lib/db';
-import { sanitizeContent } from '../../../../lib/forumUtils';
+import { updateForumPost } from '@/lib/db';
+import { sanitizeContent } from '@/lib/forumUtils';
 
 const payloadSchema = z.object({
   content: z.string().min(3),
