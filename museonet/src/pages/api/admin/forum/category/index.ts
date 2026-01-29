@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
-import { createForumCategory } from '../../../../lib/db';
-import { requireAdminRole } from '../../../../lib/adminAuth';
+import { createForumCategory } from '../../../../../lib/db';
+import { requireAdminRole } from '../../../../../lib/adminAuth';
 
 const payloadSchema = z.object({
   title: z.string().min(2),
