@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
-import { lockForumThread } from '../../../../../../../lib/db';
-import { requireAdminRole } from '../../../../../../../lib/adminAuth';
+import { lockForumThread } from '@/lib/db';
+import { requireAdminRole } from '@/lib/adminAuth';
 
 const payloadSchema = z.object({
   locked: z.boolean(),
