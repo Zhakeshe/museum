@@ -1,159 +1,198 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { motion } from 'framer-motion';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { useLanguage } from '../contexts/LanguageContext';
+import ProfileHeader from '../components/profile/ProfileHeader';
+import StatsCards from '../components/profile/StatsCards';
+import AchievementsGrid from '../components/profile/AchievementsGrid';
+import RecentSessions from '../components/profile/RecentSessions';
+import WeeklyActivity from '../components/profile/WeeklyActivity';
+import QuickSettings from '../components/profile/QuickSettings';
+import { loadGuestProgress } from '../lib/gameProgress';
+import { createDefaultProfile, defaultAchievements, scoreLevelThresholds } from '../lib/profileSeeds';
+import { loadProfileStorage, mergeProfiles, saveProfileStorage } from '../lib/profileStorage';
+import type { ProfileAchievement, ProfilePayload } from '../types/profile';
+
+const computeLevel = (score: number) => {
+  let level = 1;
+  for (let i = 0; i < scoreLevelThresholds.length; i += 1) {
+    if (score >= scoreLevelThresholds[i]) level = i + 1;
+  }
+  const currentThreshold = scoreLevelThresholds[level - 1] ?? 0;
+  const nextThreshold = scoreLevelThresholds[level] ?? currentThreshold + 400;
+  const progress = Math.min(100, Math.round(((score - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
+  return { level, progress };
+};
 
 const ProfilePage: React.FC = () => {
-  const { language } = useLanguage();
-  const router = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [points, setPoints] = useState(0);
+  const [profile, setProfile] = useState<ProfilePayload>(createDefaultProfile());
+  const [achievements, setAchievements] = useState<ProfileAchievement[]>(defaultAchievements);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const storedName = window.localStorage.getItem('museonetUserName') ?? '';
-    const storedEmail = window.localStorage.getItem('museonetUserEmail') ?? '';
-    const storedPoints = Number(window.localStorage.getItem('museonetUserPoints') ?? 0);
-    setName(storedName);
-    setEmail(storedEmail);
-    setPoints(Number.isNaN(storedPoints) ? 0 : storedPoints);
+    const loadProfile = async () => {
+      const storedProfile = await loadProfileStorage();
+      const gameProgress = await loadGuestProgress();
+      const userEmail = typeof window !== 'undefined' ? window.localStorage.getItem('museonetUserEmail') : '';
+      const userName = typeof window !== 'undefined' ? window.localStorage.getItem('museonetUserName') ?? '' : '';
+      const levelInfo = computeLevel(gameProgress.totalScore);
+      const enriched = {
+        ...storedProfile,
+        name: storedProfile.name || userName,
+        email: storedProfile.email || userEmail,
+        totalScore: gameProgress.totalScore,
+        level: levelInfo.level,
+        levelProgress: levelInfo.progress,
+        perGame: {
+          puzzle: {
+            ...storedProfile.perGame.puzzle,
+            level: gameProgress.perGame.puzzle.level,
+          },
+          quiz: {
+            ...storedProfile.perGame.quiz,
+            level: gameProgress.perGame.quiz.level,
+          },
+          matching: {
+            ...storedProfile.perGame.matching,
+            level: gameProgress.perGame.matching.level,
+          },
+        },
+        lastSavedAt: new Date().toLocaleTimeString(),
+        lastActiveAt: gameProgress.lastActivityAt,
+      };
+      if (!userEmail) {
+        setProfile(enriched);
+        await saveProfileStorage(enriched);
+        return;
+      }
+      const response = await fetch(`/api/profile?userEmail=${encodeURIComponent(userEmail)}&name=${encodeURIComponent(userName)}`);
+      const data = response.ok ? await response.json() : null;
+      const merged = data?.profile ? mergeProfiles(enriched, data.profile) : enriched;
+      setProfile({ ...merged, lastSavedAt: new Date().toLocaleTimeString() });
+      setAchievements(data?.achievements ?? []);
+      await saveProfileStorage(merged);
+      await fetch('/api/profile/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail, profile: merged }),
+      });
+    };
+
+    loadProfile();
   }, []);
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
-    const baseName = name || 'museonet';
-    const isMorning = hour >= 5 && hour < 12;
-    const isAfternoon = hour >= 12 && hour < 18;
-    const isEvening = hour >= 18 || hour < 5;
+    const safeName = profile.name?.trim() ? profile.name : '';
+    const base = safeName ? `Қайырлы ${hour < 12 ? 'таң' : hour < 18 ? 'күн' : 'кеш'}, ${safeName}!` : 'Қайырлы таң!';
+    return base;
+  }, [profile.name]);
 
-    if (language === 'ru') {
-      if (isMorning) return `Доброе утро, ${baseName}!`;
-      if (isAfternoon) return `Добрый день, ${baseName}!`;
-      if (isEvening) return `Добрый вечер, ${baseName}!`;
+  const handleExport = async () => {
+    if (profile.email) {
+      const response = await fetch('/api/profile/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: profile.email }),
+      });
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'museonet-profile.json';
+        link.click();
+        window.URL.revokeObjectURL(url);
+        return;
+      }
     }
+    const link = document.createElement('a');
+    link.href = `data:application/json;charset=utf-8,${encodeURIComponent(JSON.stringify(profile, null, 2))}`;
+    link.download = 'museonet-profile.json';
+    link.click();
+  };
 
-    if (language === 'en') {
-      if (isMorning) return `Good morning, ${baseName}!`;
-      if (isAfternoon) return `Good afternoon, ${baseName}!`;
-      if (isEvening) return `Good evening, ${baseName}!`;
+  const handleSettings = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  const handleSettingsChange = async (updated: ProfilePayload) => {
+    const next = { ...updated, lastSavedAt: new Date().toLocaleTimeString(), updatedAt: new Date().toISOString() };
+    setProfile(next);
+    await saveProfileStorage(next);
+    if (updated.email) {
+      await fetch('/api/profile/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: updated.email, profile: next }),
+      });
     }
-
-    if (isMorning) return `Қайырлы таң, ${baseName}!`;
-    if (isAfternoon) return `Қайырлы күн, ${baseName}!`;
-    return `Қайырлы кеш, ${baseName}!`;
-  }, [language, name]);
-
-  const salutation =
-    language === 'kk'
-      ? 'Сәлеметсіз бе'
-      : language === 'ru'
-        ? 'Здравствуйте'
-        : 'Hello';
-
-  const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.removeItem('museonetUserName');
-      window.localStorage.removeItem('museonetUserEmail');
-      window.localStorage.removeItem('museonetAdminSecret');
-      window.localStorage.removeItem('museonetAdminVerified');
-    }
-    router.push('/');
   };
 
   return (
     <div className="page">
       <Head>
-        <title>{language === 'kk' ? 'Профиль — museonet' : language === 'ru' ? 'Профиль — museonet' : 'Profile — museonet'}</title>
+        <title>Profile — museonet</title>
       </Head>
 
       <Header />
 
       <main>
         <section className="section profile-section">
+          <motion.div
+            className="profile-background"
+            animate={{ opacity: [0.3, 0.5, 0.3], scale: [1, 1.05, 1] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          />
           <div className="container">
-            <div className="profile-card card">
-              <span className="eyebrow">{salutation}</span>
-              <h1>{greeting}</h1>
-              <p className="subtitle">
-                {language === 'kk'
-                  ? 'Профиліңізге қош келдіңіз. Төменде жеке деректеріңіз көрсетілген.'
-                  : language === 'ru'
-                    ? 'Добро пожаловать в профиль. Ниже отображаются ваши данные.'
-                    : 'Welcome to your profile. Your details are shown below.'}
-              </p>
-              <div className="profile-meta">
-                <div>
-                  <span>{language === 'kk' ? 'Аты' : language === 'ru' ? 'Имя' : 'Name'}</span>
-                  <strong>{name || '—'}</strong>
-                </div>
-                <div>
-                  <span>Email</span>
-                  <strong>{email || '—'}</strong>
-                </div>
-                <div>
-                  <span>{language === 'kk' ? 'Жалпы ұпай' : language === 'ru' ? 'Всего очков' : 'Total points'}</span>
-                  <strong>{points}</strong>
-                </div>
+            <ProfileHeader profile={profile} greeting={greeting} onExport={handleExport} onSettings={handleSettings} />
+
+            <div className="profile-grid">
+              <div className="profile-main">
+                <section className="profile-block">
+                  <h2>Game activity (7 күн)</h2>
+                  <WeeklyActivity data={profile.weeklyActivity} />
+                </section>
+
+                <section className="profile-block">
+                  <h2>Recent sessions</h2>
+                  <RecentSessions sessions={profile.sessions.slice(0, 10)} />
+                </section>
+
+                <section className="profile-block">
+                  <h2>Personal records</h2>
+                  <StatsCards profile={profile} />
+                </section>
               </div>
-              <div className="profile-actions">
-                <button type="button" className="button button-outline" onClick={handleLogout}>
-                  {language === 'kk' ? 'Шығу' : language === 'ru' ? 'Выйти' : 'Log out'}
-                </button>
-              </div>
-            </div>
-            <div className="profile-panels">
-              <div className="panel card">
-                <h2>{language === 'kk' ? 'Жетістіктер' : language === 'ru' ? 'Достижения' : 'Achievements'}</h2>
-                <ul>
-                  <li>{language === 'kk' ? 'Археолог (5 миссия)' : language === 'ru' ? 'Археолог (5 миссий)' : 'Archaeologist (5 missions)'}</li>
-                  <li>{language === 'kk' ? 'Пазл шебері' : language === 'ru' ? 'Мастер пазлов' : 'Puzzle master'}</li>
-                  <li>{language === 'kk' ? 'Зертхана аналитигі' : language === 'ru' ? 'Лабораторный аналитик' : 'Lab analyst'}</li>
-                </ul>
-              </div>
-              <div className="panel card">
-                <h2>{language === 'kk' ? 'Ойын белсенділігі' : language === 'ru' ? 'Активность' : 'Activity'}</h2>
-                <div className="activity-list">
-                  <div>
-                    <span>{language === 'kk' ? 'Бүгін' : language === 'ru' ? 'Сегодня' : 'Today'}</span>
-                    <strong>{language === 'kk' ? 'Пазл симуляторы' : language === 'ru' ? 'Пазл симулятор' : 'Puzzle simulator'}</strong>
-                    <em>+20</em>
+
+              <aside className="profile-side">
+                <section className="profile-block">
+                  <h2>Achievements</h2>
+                  <AchievementsGrid achievements={achievements} profile={profile} />
+                </section>
+
+                <section className="profile-block">
+                  <h2>Challenges</h2>
+                  <div className="challenge-list">
+                    {profile.missions.map((mission) => (
+                      <div key={mission.id} className="challenge-card">
+                        <strong>{mission.title}</strong>
+                        <p>{mission.description}</p>
+                        <div className="challenge-bar">
+                          <span style={{ width: `${Math.min(100, (mission.progress / mission.target) * 100)}%` }} />
+                        </div>
+                        <span>
+                          {mission.progress}/{mission.target}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <span>{language === 'kk' ? 'Кеше' : language === 'ru' ? 'Вчера' : 'Yesterday'}</span>
-                    <strong>{language === 'kk' ? 'Қыш сынықтары' : language === 'ru' ? 'Осколки керамики' : 'Ceramic shards'}</strong>
-                    <em>+18</em>
-                  </div>
-                  <div>
-                    <span>{language === 'kk' ? 'Апта' : language === 'ru' ? 'Неделя' : 'Week'}</span>
-                    <strong>{language === 'kk' ? 'Талдау станциясы' : language === 'ru' ? 'Станция анализа' : 'Analysis station'}</strong>
-                    <em>+25</em>
-                  </div>
-                </div>
-              </div>
-              <div className="panel card">
-                <h2>{language === 'kk' ? 'Статистика' : language === 'ru' ? 'Статистика' : 'Stats'}</h2>
-                <div className="stats-grid">
-                  <div>
-                    <span>{language === 'kk' ? 'Сессиялар' : language === 'ru' ? 'Сессии' : 'Sessions'}</span>
-                    <strong>12</strong>
-                  </div>
-                  <div>
-                    <span>{language === 'kk' ? 'Уақыт' : language === 'ru' ? 'Время' : 'Time'}</span>
-                    <strong>4ч 20м</strong>
-                  </div>
-                  <div>
-                    <span>{language === 'kk' ? 'Деңгей' : language === 'ru' ? 'Уровень' : 'Level'}</span>
-                    <strong>5</strong>
-                  </div>
-                  <div>
-                    <span>{language === 'kk' ? 'Рейтинг' : language === 'ru' ? 'Рейтинг' : 'Rank'}</span>
-                    <strong>#28</strong>
-                  </div>
-                </div>
-              </div>
+                </section>
+
+                <section className="profile-block">
+                  <QuickSettings profile={profile} onChange={handleSettingsChange} />
+                </section>
+              </aside>
             </div>
           </div>
         </section>
@@ -163,137 +202,82 @@ const ProfilePage: React.FC = () => {
 
       <style jsx>{`
         .profile-section {
-          padding: 80px 0;
+          position: relative;
+          overflow: hidden;
         }
 
-        .profile-card {
-          max-width: 640px;
-          margin: 0 auto;
+        .profile-background {
+          position: absolute;
+          width: 520px;
+          height: 520px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(138, 106, 69, 0.25), transparent 70%);
+          top: -120px;
+          right: -120px;
+          z-index: 0;
+        }
+
+        .profile-grid {
           display: grid;
-          gap: 18px;
-          text-align: left;
+          grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+          gap: 24px;
+          margin-top: 32px;
+          position: relative;
+          z-index: 1;
         }
 
-        .profile-card h1 {
-          font-size: 36px;
-          margin: 0;
-        }
-
-        .subtitle {
-          color: rgba(43, 43, 43, 0.7);
-        }
-
-        .profile-meta {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 16px;
-        }
-
-        .profile-meta span {
-          display: block;
-          font-size: 12px;
-          color: rgba(43, 43, 43, 0.6);
-          margin-bottom: 6px;
-        }
-
-        .profile-meta strong {
-          font-size: 16px;
-        }
-
-        .profile-actions {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-        }
-
-        .profile-panels {
-          margin-top: 28px;
+        .profile-main,
+        .profile-side {
           display: grid;
           gap: 20px;
         }
 
-        .panel h2 {
-          font-size: 20px;
-          margin-bottom: 12px;
+        .profile-block {
+          padding: 20px;
+          border-radius: 18px;
+          border: var(--border);
+          background: rgba(255, 255, 255, 0.75);
+          box-shadow: var(--shadow-soft);
+          display: grid;
+          gap: 16px;
         }
 
-        .panel ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
+        .challenge-list {
+          display: grid;
+          gap: 12px;
+        }
+
+        .challenge-card {
+          padding: 12px;
+          border-radius: 14px;
+          border: 1px solid rgba(138, 106, 69, 0.18);
+          background: rgba(255, 255, 255, 0.7);
           display: grid;
           gap: 8px;
-          color: rgba(43, 43, 43, 0.75);
         }
 
-        .panel ul li {
-          padding: 10px 14px;
-          border-radius: 12px;
-          background: rgba(180, 106, 60, 0.08);
-        }
-
-        .activity-list {
-          display: grid;
-          gap: 12px;
-        }
-
-        .activity-list div {
-          display: grid;
-          gap: 4px;
-          padding: 12px 14px;
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.7);
-          border: 1px solid rgba(180, 106, 60, 0.12);
-        }
-
-        .activity-list span {
-          font-size: 12px;
+        .challenge-card p {
+          font-size: 13px;
           color: rgba(43, 43, 43, 0.6);
         }
 
-        .activity-list em {
-          font-style: normal;
-          color: #7b4c2a;
-          font-weight: 600;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          gap: 12px;
-        }
-
-        .stats-grid div {
-          padding: 12px 14px;
-          border-radius: 12px;
-          background: rgba(180, 106, 60, 0.08);
-        }
-
-        .stats-grid span {
-          display: block;
-          font-size: 12px;
-          color: rgba(43, 43, 43, 0.6);
-          margin-bottom: 6px;
-        }
-
-        .button {
+        .challenge-bar {
+          height: 6px;
           border-radius: 999px;
-          padding: 10px 20px;
-          font-size: 14px;
-          border: none;
-          cursor: pointer;
+          background: rgba(138, 106, 69, 0.12);
+          overflow: hidden;
         }
 
-        .button-secondary {
-          background: rgba(180, 106, 60, 0.12);
-          color: #7b4c2a;
-          border: 1px solid rgba(180, 106, 60, 0.25);
+        .challenge-bar span {
+          display: block;
+          height: 100%;
+          background: linear-gradient(90deg, #8a6a45, #c2a679);
         }
 
-        .button-outline {
-          background: transparent;
-          border: 1px solid rgba(180, 106, 60, 0.4);
-          color: #7b4c2a;
+        @media (max-width: 900px) {
+          .profile-grid {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
     </div>
