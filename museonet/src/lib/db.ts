@@ -50,7 +50,7 @@ const ensureSchema = async () => {
     ensureMemoryStore();
     return;
   }
-  let client: { release?: () => void } | null = null;
+  let client: { query: (sql: string, params?: unknown[]) => Promise<unknown>; release?: () => void } | null = null;
   try {
     client = await getPool().connect();
   } catch {
