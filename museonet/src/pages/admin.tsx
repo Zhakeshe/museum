@@ -29,6 +29,7 @@ type UploadedImage = {
   id: string;
   name: string;
   url: string;
+  previewUrl: string;
   uploadedAt: string;
 };
 
@@ -222,7 +223,12 @@ const AdminPage: React.FC = () => {
     if (!storedImages) return;
     try {
       const parsed = JSON.parse(storedImages) as UploadedImage[];
-      setUploadedImages(parsed);
+      setUploadedImages(
+        parsed.map((image) => ({
+          ...image,
+          previewUrl: image.previewUrl ?? image.url,
+        })),
+      );
     } catch {
       setUploadedImages([]);
     }
@@ -353,10 +359,12 @@ const AdminPage: React.FC = () => {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result !== 'string') return;
+      const id = `${Date.now()}-${file.name.replace(/\s+/g, '-').toLowerCase()}`;
       const newImage: UploadedImage = {
-        id: `${Date.now()}-${file.name}`,
+        id,
         name: file.name,
-        url: reader.result,
+        url: `https://museonet.world/uploads/${id}`,
+        previewUrl: reader.result,
         uploadedAt: new Date().toLocaleString(),
       };
       const next = [newImage, ...uploadedImages];
@@ -475,7 +483,7 @@ const AdminPage: React.FC = () => {
                 ) : (
                   uploadedImages.map((image) => (
                     <div className="upload-card" key={image.id}>
-                      <img src={image.url} alt={image.name} />
+                      <img src={image.previewUrl} alt={image.name} />
                       <div className="upload-meta">
                         <strong>{image.name}</strong>
                         <span>{image.uploadedAt}</span>
