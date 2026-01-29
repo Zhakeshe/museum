@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fetchForumReports } from '../../../../../../lib/db';
-import { requireAdminRole } from '../../../../../../lib/adminAuth';
+import { fetchForumReports } from '../../../../../lib/db';
+import { requireAdminRole } from '../../../../../lib/adminAuth';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { deleteForumPost } from '../../../../../../lib/db';
-import { requireAdminRole } from '../../../../../../lib/adminAuth';
+import { deleteForumPost } from '../../../../../../../lib/db';
+import { requireAdminRole } from '../../../../../../../lib/adminAuth';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
